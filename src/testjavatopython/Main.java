@@ -5,25 +5,31 @@
  */
 package testjavatopython;
 
-
+/**
+ *
+ */
 public class Main
 {
+    public static void main(String args[])
+    {
 
-    private static void print(EmployeeType employee) {
-        System.out.println("Name: " + employee.getEmployeeFirst() + " "
-                + employee.getEmployeeLast());
-        System.out.println("Id: " + employee.getEmployeeId());
-    }
+//        JythonObjectFactory f1 = new JythonObjectFactory(I_Rig.class, "Rig", "Rig");
+//        I_Rig rig = (I_Rig) f1.createObject();
 
-    public static void main(String[] args) {
-        EmployeeFactory factory = new EmployeeFactory();
-        EmployeeType employee = factory.create("Josh", "Juneau", "1");
+//        JythonObjectFactory f2 = new JythonObjectFactory(I_Radio.class, "Icom", "Icom");
+//        I_Radio radio = (I_Radio) f2.createObject();
+//        
+//        System.out.println(radio.encode_SetFreq(14000000, 0));
         
-        for(int i=0;i<1000; i++)
-        {
-            System.out.println(employee.getEmployeeFirst() + " " +
-            employee.getEmployeeLast()+ " " +
-            employee.getEmployeeId());
-        }
+//        System.out.println(rig.getManufacturer());
+//        System.out.println(rig.getModel());
+//        System.out.println(rig.getSerialPortSettings());
+        
+        
+        JythonObjectFactory f = new JythonObjectFactory(I_AntennaTuner.class, "AntennaTuner", "AntennaTuner");
+        I_AntennaTuner tunner = (I_AntennaTuner) f.createObject();
+        
+        System.out.println(tunner.getManufacturer());
+       
     }
 }
