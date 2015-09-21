@@ -23,10 +23,22 @@
     <fileSets>
         <!--
             Adds startup scripts to the root directory of zip package. The startup
-            scripts are copied from the src/main/scripts directory.
+            scripts are copied from the src/main/bin directory.
+        -->
+         <fileSet>
+            <directory>${project.build.scriptSourceDirectory}</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>startup.*</include>
+            </includes>
+        </fileSet>
+        
+        <!--
+            Adds py to the root directory of zip package. The startup
+            scripts are copied from the src/main/resources/bin directory.
         -->
         <fileSet>
-            <directory>${project.basedir}/src/main/resources/pyrig</directory>
+            <directory>${project.basedir}/src/main/pyrig</directory>
             <outputDirectory>pyrig</outputDirectory>
             <includes>
                 <include>*.*</include>

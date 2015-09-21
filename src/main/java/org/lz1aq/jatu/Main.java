@@ -26,11 +26,11 @@ public class Main
 //        I_Rig rig = (I_Rig) f1.createObject();
 //
       
-        PythonInterpreter interpreter = new PythonInterpreter();
-        interpreter.exec("import sys\n"+"sys.path.append(\"target/classes/pyrig/\")");
+//        PythonInterpreter interpreter = new PythonInterpreter();
+//        interpreter.exec("import sys\n"+"sys.path.append(\"target/classes/pyrig/\")");
         //interpreter.exec("import sys\n"+"sys.path.append(\" pyrig/\")");
         
-        interpreter.exec("print sys.path");
+//        interpreter.exec("print sys.path");
         
         JythonObjectFactory f2 = new JythonObjectFactory(I_Radio.class, "Icom", "Icom");
         I_Radio radio = (I_Radio) f2.createObject();

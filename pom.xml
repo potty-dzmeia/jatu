@@ -18,7 +18,7 @@
     <plugins>
         
         <!-- =====Plugin===== -->
-        <plugin>
+<!--        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.2</version>
@@ -26,8 +26,9 @@
             <source>1.7</source>
             <target>1.7</target>
           </configuration>
-        </plugin>
+        </plugin>-->
         
+       
         <!-- =====Plugin===== -->
         <plugin>
          <artifactId>maven-jar-plugin</artifactId>
@@ -43,12 +44,40 @@
              </manifest>
            </archive>
            <excludes>
+             <!-- Do not include python scripts in the jar file -->
              <exclude>**/pyrig/*</exclude>
            </excludes>
          </configuration>
         </plugin>
         
         <!-- =====Plugin===== -->
+        <!-- Copy pyrig script libraries in /target/pyrig -->
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.7</version>
+          <executions>
+            <execution>
+              <id>copy-resources</id>
+              <!-- here the phase you need -->
+              <phase>compile</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${basedir}/target/pyrig</outputDirectory>
+                <resources>          
+                  <resource>
+                    <directory>src/main/pyrig</directory>
+                    <filtering>true</filtering>
+                  </resource>
+                </resources>              
+              </configuration>            
+            </execution>
+          </executions>
+        </plugin>
+      
+        <!-- =====Plugin===== -->
+        <!-- Creates zip distributable; Uses the assembly.xml file -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
@@ -59,10 +88,21 @@
                   <descriptor>src/main/assembly/assembly.xml</descriptor>
               </descriptors>
           </configuration>
+          <executions>
+            <execution>
+              <id>create-archive</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
       
       
-        <plugin>
+        <!-- =====Plugin===== -->
+        <!-- Generates scripts for starting the application by the user -->
+<!--        <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>appassembler-maven-plugin</artifactId>
           <version>1.10</version>
@@ -82,10 +122,11 @@
               </program>
             </programs>
           </configuration>
-        </plugin>
+        </plugin>-->
+        
+        
         <!-- =====Plugin===== -->
-        <!--
-        <plugin>
+<!--        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
           <version>2.9</version>
@@ -105,29 +146,8 @@
               </configuration>
             </execution>
           </executions>
-        </plugin>
-        -->
+        </plugin>-->
 
-        <!-- =====Plugin===== -->
-        <!--
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <version>1.4.0</version>
-          <executions>
-            <execution>
-              <phase>test</phase> 
-              <goals>
-                <goal>java</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <mainClass>org.lz1aq.jatu.Main</mainClass>
-          </configuration>
-        </plugin>
-        -->
-        
     </plugins>
   </build>
 
