@@ -5,6 +5,7 @@ from org.lz1aq.rig_interfaces import I_Radio
 
 
 class Radio(I_Radio):
+    
         
     @property    
     def encode_SetFreq(self, freq, vfo):
@@ -14,9 +15,7 @@ class Radio(I_Radio):
         :return: String of bytes ready to be send to the Rig
         """
         raise NotImplementedError("encode_SetFreq")
-    
-    
-     
+
     
        
     #Freq - frequency of the target VFO
