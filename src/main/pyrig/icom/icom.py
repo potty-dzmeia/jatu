@@ -9,8 +9,14 @@ class Icom(radio.Radio):
     Configuration script for Icom transcievers
     """
 
+    #-------------------------------------------------------------
+    # Configuration fields below - change if needed
+    #-------------------------------------------------------------
+    # Get default serial port settings
     serial_settings = rig.SerialPortSettings()
-    civ_address = 0x5c  # The address of the Icom transceiver. Value of 0x5c is good for 756Pro
+    # The address of the Icom transceiver. Value of 0x5c is good for 756Pro
+    civ_address = 0x5c
+    #-------------------------------------------------------------
 
 
 
@@ -25,21 +31,24 @@ class Icom(radio.Radio):
 
 
     @classmethod
-    def _transaction(cls, command, data):
+    def __transaction(cls, command, sub_command=None, data=None):
         """
-        Assembles a transaction(command) ready to be send to an Icom transceiver
+        Assembles a transaction ready to be send to an Icom transceiver
 
         Protocol is the following:
-        [preamble, preamble, civ, ctrl_id, command]
+        [preamble(0xFE), preamble(0xFE), ctrl_id(0xE0), civ-address, command, sub_command, data...., 0xFD]
 
-        :param command: The command that we would like to execute
-        :param data: Additional data in case the command supports it
-        :return: The transaction (list of bytes)
+        :param command:     [Integer] Command code. E.g. 0x05 is set frequency)
+        :param sub_command: [Integer] Sub-command code (optional)
+        :param data:        [list of bytes] Additional data (optional)
+        :return:            [list of bytes] The ready transaction
         """
-        transaction= [0xfe,0xfe,cls.civ_address,0xe0,command]
-        if len(data):
+        transaction= [0xFE, 0xFE, 0xE0, cls.civ_address, command]
+        if sub_command is not None:
+            transaction.append(sub_command)
+        if data is not None:
             transaction += data
-        transaction.append(0xfd)
+        transaction.append(0xFD)
         return transaction
 
 
@@ -53,6 +62,37 @@ class Icom(radio.Radio):
         :param vfo: the vfo for which we want to set the frequency
         :return: String of bytes containing the command
         """
-        bytes = cls._transaction(0x05, utils.toBcd(freq,10))
+        bytes = cls.__transaction(0x05, data=utils.toBcd(freq,10))
         return bytearray(bytes).__str__()
+
+
+
+    @classmethod
+    def encodeSetMode(cls, mode, vfo):
+        """
+        Get the command that must be send to the radio in order to set mode (e.g. CW)
+
+        :param mode: (String) specifying the mode - see Radio.modes
+        :param vfo: The vfo which mode must be changed
+        :return: The command (String of bytes)
+        """
+        if not cls.mode_codes.__contains__(mode):
+            raise ValueError("Unsupported mode!")
+
+        bytes = cls.__transaction(0x06, sub_command=cls.mode_codes[mode])
+        return bytearray(bytes).__str__()
+
+
+
+
+    # Icom control codes used for changing the mode
+    mode_codes ={'LSB':     0x00,
+                 'USB':     0x01,
+                 'AM':      0x02,
+                 'CW':      0x03,
+                 'RTTY':    0x04,
+                 'FM':      0x05,
+                 'CWR':     0x07,
+                 'RTTYR':   0x08}
+
 

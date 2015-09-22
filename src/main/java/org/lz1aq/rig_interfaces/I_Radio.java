@@ -6,11 +6,23 @@
 package org.lz1aq.rig_interfaces;
 
 /**
- * By Radio we mean transceiver.
+ * By Radio we mean 
  */
 public interface I_Radio extends I_Rig
 {
-    /** @return command for frequency change
+    /**
+     * 
+     * @param freq
+     * @param vfo
+     * @return 
      */
-    public byte[] encode_SetFreq(long freq, int vfo);
+    public byte[] encodeSetFreq(long freq, int vfo);
+    
+    /**
+     * 
+     * @param mode
+     * @param vfo
+     * @return 
+     */
+    public byte[] encodeSetMode(String mode, int vfo);
 }

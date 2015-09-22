@@ -16,22 +16,21 @@ public class Main
 {
     public static void main(String args[])
     {  
-        JythonObjectFactory f2 = new JythonObjectFactory(I_Radio.class, "Icom", "Icom");
+        JythonObjectFactory f2 = new JythonObjectFactory(I_Radio.class, "icom", "Icom");
         I_Radio radio = (I_Radio) f2.createObject();
         
         byte[] command;
         
+          
+        command = radio.encodeSetFreq(7100000, 1);
         
-        command = radio.encode_SetFreq(7100000, 1);
+        for(int i=0; i<command.length; i++) 
+          System.err.println(String.format("%X", command[i]));
         
-        System.err.println(command);
-//        byte[] array = icom.encode_SetFreq(14000000, 0);
-//        
-//        
-//                
-//                for (byte b : array)
-//      {
-//        System.err.println(String.format("%04x", (int) b));
-//      }
+        
+        command = radio.encodeSetMode(RadioModes.ECSSLSB.toString(), 1);
+        for(int i=0; i<command.length; i++) 
+          System.err.println(String.format("%X", command[i]));
+
     }
 }

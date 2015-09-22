@@ -13,17 +13,33 @@ public class JythonObjectFactory
     private final Class interfaceType;
     private final PyObject klass;
 
-    // Constructor obtains a reference to the importer, module, and the class name
+    // 
+    /**
+     * Constructor obtains a reference to the importer, module, and the class name
+     * 
+     * @param state
+     * @param interfaceType
+     * @param moduleName
+     * @param className 
+     */
     public JythonObjectFactory(PySystemState state, Class interfaceType, String moduleName, String className)
     {
         this.interfaceType = interfaceType;
-        PyObject importer = state.getBuiltins().__getitem__(Py.newString("__import__"));
-        PyObject module = importer.__call__(Py.newString(moduleName));
-        klass = module.__getattr__(className);
+        
+        PyObject fnImporter = state.getBuiltins().__getitem__(Py.newString("__import__"));
+        PyObject module = fnImporter.__call__(Py.newString(moduleName)); // The function imports the module name, 
+        klass = module.__getattr__(className);                           // This method should return the (computed) attribute 
         System.err.println("module=" + module + ",class=" + klass);
     }
 
-    // This constructor passes through to the other constructor
+    // 
+    /**
+     * Constructor obtains a reference to the __importer__, module, and the class name
+     * 
+     * @param interfaceType - Type of classes that will be created
+     * @param moduleName - module name containing the python class
+     * @param className - name of the python class
+     */
     public JythonObjectFactory(Class interfaceType, String moduleName, String className)
     {
         this(new PySystemState(), interfaceType, moduleName, className);

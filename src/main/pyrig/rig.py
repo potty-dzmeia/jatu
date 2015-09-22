@@ -1,6 +1,3 @@
-#! /usr/bin/python
-
-
 from org.lz1aq.rig_interfaces import I_Rig
 import json
 
@@ -82,7 +79,7 @@ class Rig(I_Rig):
 
 
     @property
-    def encode_Init(self):
+    def encodeInit(self):
         """
         If a rig needs some initialization before being able to be used.
         
@@ -92,7 +89,7 @@ class Rig(I_Rig):
 
 
     @property
-    def encode_Cleanup(self):
+    def encodeCleanup(self):
         """
         If a rig needs some cleanup after being used.
         

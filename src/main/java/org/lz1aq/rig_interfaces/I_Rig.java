@@ -34,8 +34,8 @@ public interface I_Rig
     public String decode(byte[] data);
     
     /** @return Initialization command that is to be send to the Rig*/
-    public byte[] encode_Init();
+    public byte[] encodeInit();
     
     /** @return Cleanup command that is to be send to the Rig */
-    public byte[] encode_Cleanup();   
+    public byte[] encodeCleanup();   
 }

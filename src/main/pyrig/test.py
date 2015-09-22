@@ -37,14 +37,25 @@ def toBcd(number, bcd_len):
 
 
 
-def _transaction(command, data):
-        transaction= [0xfe, 0xfe, 0x5c, 0xe0, command]
-        if len(data):
-          transaction += data
-        transaction.append(0xfd)
-        return transaction
+# def _transaction(command, data):
+#         transaction= [0xfe, 0xfe, 0x5c, 0xe0, command]
+#         if len(data):
+#           transaction += data
+#         transaction.append(0xfd)
+#         return transaction
+#
+# trans = _transaction(0, [0, 1, 2])
+# print utils.printListInHex(trans)
+#
+# print bytearray(trans).__str__()
 
-trans = _transaction(0, [0, 1, 2])
-print utils.printListInHex(trans)
+mode_codes ={'LSB', 0x00,
+                 'USB', 0x01,
+                 'AM', 0x02,
+                 'CW', 0x03,
+                 'RTTY', 0x04,
+                 'FM', 0x05,
+                 'CWR', 0x07,
+                 'RTTYR', 0x08}
 
-print bytearray(trans).__str__()
+print mode_codes.__contains__("CW")

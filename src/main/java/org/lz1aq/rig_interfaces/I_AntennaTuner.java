@@ -11,11 +11,11 @@ package org.lz1aq.rig_interfaces;
 */
 public interface I_AntennaTuner extends I_Rig
 {
-    public byte[] encode_SetTuneValues(int c1, int c2, int l);
-    public byte[] encode_SetAntenna(int ant);
-    public byte[] encode_SetThrough(boolean throught);
-    public byte[] encode_TunePa(boolean tunePa);
-    public byte[] encode_GetForwardWave();
-    public byte[] encode_GetReflectedWave();
+    public byte[] encodeSetTuneValues(int c1, int c2, int l);
+    public byte[] encodeSetAntenna(int ant);
+    public byte[] encodeSetThrough(boolean throught);
+    public byte[] encodeTunePa(boolean tunePa);
+    public byte[] encodeGetForwardWave();
+    public byte[] encodeGetReflectedWave();
 
 }
