@@ -19,7 +19,12 @@ public class Main
         JythonObjectFactory f2 = new JythonObjectFactory(I_Radio.class, "Icom", "Icom");
         I_Radio radio = (I_Radio) f2.createObject();
         
-        System.err.println(radio.getSerialPortSettings());
+        byte[] command;
+        
+        
+        command = radio.encode_SetFreq(7100000, 1);
+        
+        System.err.println(command);
 //        byte[] array = icom.encode_SetFreq(14000000, 0);
 //        
 //        

@@ -29,6 +29,8 @@ def toBcd(number, bcd_len):
     return result
 
 
+def printListInHex(list):
+    print ' '.join('0x%02x' % b for b in list)
 
 #----------------------------------------------------------------
 # Unit testing below

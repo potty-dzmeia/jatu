@@ -1,4 +1,4 @@
-
+import utils
 
 def toBcd(number, bcd_len):
         """
@@ -26,19 +26,25 @@ def toBcd(number, bcd_len):
 
         return result
 
-list = toBcd(4123456789, 12)
-
-print ' '.join('0x%02x' % b for b in list)
-
-b = bytearray(list)
-print len(b)
-print b
-print type(b)
-
-# myList = ['0', '1', '2', '3', '4', '5']
+# list = toBcd(4123456789, 12)
 #
-# for i in range(0,len(myList)/2):
-#     myList[i] = myList[i]+myList[i+1]
-#     myList.pop(i+1)
+# print ' '.join('0x%02x' % b for b in list)
 #
-# print myList
+# b = bytearray(list)
+# print len(b)
+# print b
+# print type(b)
+
+
+
+def _transaction(command, data):
+        transaction= [0xfe, 0xfe, 0x5c, 0xe0, command]
+        if len(data):
+          transaction += data
+        transaction.append(0xfd)
+        return transaction
+
+trans = _transaction(0, [0, 1, 2])
+print utils.printListInHex(trans)
+
+print bytearray(trans).__str__()
