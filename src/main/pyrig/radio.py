@@ -8,13 +8,13 @@ class Radio(I_Radio):
     modes ={'NONE':     0,
             'AM':       1,  # AM -- Amplitude Modulation
             'CW':       2,  # CW - CW "normal" sideband
-            'USB':      3,	# USB - Upper Side Band
-            'LSB':      4,	# LSB - Lower Side Band
-            'RTTY':     5,	# RTTY - Radio Teletype
-            'FM':       6, 	# FM - "narrow" band FM
+            'USB':      3,  # USB - Upper Side Band
+            'LSB':      4,  # LSB - Lower Side Band
+            'RTTY':     5,  # RTTY - Radio Teletype
+            'FM':       6,  # FM - "narrow" band FM
             'WFM':      7,  # WFM - broadcast wide FM
             'CWR':      8,  # CWR - CW "reverse" sideband
-            'RTTYR':    9,	# RTTYR - RTTY "reverse" sideband
+            'RTTYR':    9,  # RTTYR - RTTY "reverse" sideband
             'AMS':      10, # AMS - Amplitude Modulation Synchronous
             'PKTLSB':   11, # PKTLSB - Packet/Digital LSB mode (dedicated port)
             'PKTUSB':   12, # PKTUSB - Packet/Digital USB mode (dedicated port)
@@ -34,9 +34,9 @@ class Radio(I_Radio):
         """
         Get the command that must be send to the radio in order to set mode (e.g. CW)
 
-        :param mode: integer specifying the mode (see Radio.modes)
-        :param vfo: The vfo which mode must be changed
-        :return: The command (String of bytes)
+        :param mode:  [string] Specifies the mode (see Radio.modes)
+        :param vfo:   [int] The vfo which mode must be changed
+        :return:      [string] The command (String of bytes)
         """
         raise NotImplementedError("encode_SetFreq")
 
@@ -47,11 +47,13 @@ class Radio(I_Radio):
         """
         Get the command that must be send to the radio in order to set frequency
 
-        :param freq: The frequency to which we want to change
-        :param vfo: The vfo which frequency must be changed
-        :return: The command (String of bytes)
+        :param freq:  [int] The frequency to which we want to change
+        :param vfo:   [int] The vfo which frequency must be changed
+        :return:      [string] The command (String of bytes)
         """
         raise NotImplementedError("encode_SetFreq")
+
+
 
     
        
