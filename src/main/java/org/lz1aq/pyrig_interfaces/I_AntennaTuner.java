@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.lz1aq.rig_interfaces;
+package org.lz1aq.pyrig_interfaces;
 
 /**
  * Automatic Antenna Tuner specific methods

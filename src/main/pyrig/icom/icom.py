@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
 import radio
-import rig
+from serial_settings import SerialPortSettings
 import utils
 
 class Icom(radio.Radio):
@@ -13,7 +13,7 @@ class Icom(radio.Radio):
     # Configuration fields below - change if needed
     #-------------------------------------------------------------
     # Get default serial port settings
-    serial_settings = rig.SerialPortSettings()
+    serial_settings = SerialPortSettings()
     # The address of the Icom transceiver. Value of 0x5c is good for 756Pro
     CIV_ADDRESS = 0x5c
     #-------------------------------------------------------------
@@ -23,10 +23,9 @@ class Icom(radio.Radio):
     @classmethod
     def getSerialPortSettings(cls):
         """
-        Returns a JSON formatted string describing the COM port settings that
-        needs to be used when communicating with this Rig.
+        Object of the type serial_settings.SerialPortSettings
         """
-        return cls.serialSettings.toJson()
+        return cls.serial_settings
 
 
 

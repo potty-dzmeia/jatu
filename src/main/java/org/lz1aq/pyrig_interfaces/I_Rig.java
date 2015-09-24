@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.lz1aq.rig_interfaces;
+package org.lz1aq.pyrig_interfaces;
 
 
 /**
@@ -23,7 +23,7 @@ public interface I_Rig
     
    /** @return JSON formatted string describing the COM port settings that 
     * needs to be used when communicating with this Rig*/
-    public String getSerialPortSettings();
+    public I_SerialSettings getSerialPortSettings();
     
     /**
      * Decodes information coming from the Rig into JSON formatted string
@@ -38,4 +38,32 @@ public interface I_Rig
     
     /** @return Cleanup command that is to be send to the Rig */
     public byte[] encodeCleanup();   
+    
+    
+    /**
+     *  Serial Port settings that must be used when connecting to the rig
+     */
+    public interface I_SerialSettings
+    {
+
+      public int getBauderateMin();
+
+      public int getBauderateMax();
+
+      public int getDataBits();
+
+      public int getStopBits();
+
+      public String getParity();
+
+      public String getHandshake();
+
+      public int getWriteDelay();
+      
+      public int getPostWriteDelay();
+
+      public int getTimeout();
+
+      public int getRetry();
+    }
 }

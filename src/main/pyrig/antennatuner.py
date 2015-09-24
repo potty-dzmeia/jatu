@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
 
-from org.lz1aq.rig_interfaces import I_AntennaTuner
+from org.lz1aq.pyrig_interfaces import I_AntennaTuner
 
 class AntennaTuner(I_AntennaTuner):
 

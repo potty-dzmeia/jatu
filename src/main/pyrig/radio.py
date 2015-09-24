@@ -1,4 +1,4 @@
-from org.lz1aq.rig_interfaces import I_Radio
+from org.lz1aq.pyrig_interfaces import I_Radio
 
 # class Modes
 #     CW = 1
@@ -27,8 +27,8 @@ class Radio(I_Radio):
             'SAH':      19, # SAH - Synchronous AM upper (higher) sideband
             'DSB':      20, # DSB - Double sideband suppressed carrier
     }
-
-
+    
+    
     @property
     def encodeSetMode(self, mode, vfo):
         """
