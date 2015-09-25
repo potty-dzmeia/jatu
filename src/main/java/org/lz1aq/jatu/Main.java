@@ -48,11 +48,7 @@ public class Main
         
         
         
-        
-        Radio radio = new Radio(radioProtocol);
-        Queue myQueue = new LinkedList(); 
-        Byte sdf = new Byte("fafdsf");
-        myQueue.offer(sdf);
+        SerialPort
         
     }
     

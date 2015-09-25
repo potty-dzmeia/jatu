@@ -58,12 +58,50 @@ public interface I_Rig
 
       public String getHandshake();
 
+      /** Delay between each byte sent out, in milliseconds
+       * 
+       * @return 
+       */
       public int getWriteDelay();
       
+      /** Delay between each commands send out, in milliseconds
+       * 
+       * @return 
+       */
       public int getPostWriteDelay();
 
+      /** Timeout, in milliseconds
+       * 
+       * @return 
+       */
       public int getTimeout();
 
+      
+      /** Maximum number of retries if command fails (0 for no retry)
+       *  
+       * @return 
+       */
       public int getRetry();
+    }
+    
+    /**
+     *  Serial transaction contains:
+     *  - the bytes that must be send to the radio
+     *  - additional details concerning the transaction (e.g. if we should w8 for confirmation after sending the transaction)
+     */
+    public interface I_SerialTransaction
+    {
+      /**
+       * Gets the transaction which can be send to the radio
+       * 
+       * @return Transaction in the form of array of bytes  
+       */
+      public byte[] getTransaction();
+      
+      /** Check if there will be a confirmation after this transaction
+       * 
+       * @return TRUE - is the radio will send confirmation after receiving this transaction
+       */
+      public boolean isWaitForConfirmation();
     }
 }

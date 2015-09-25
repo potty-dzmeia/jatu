@@ -2,7 +2,7 @@
 import json
 from org.lz1aq.pyrig_interfaces import I_Rig
 
-class SerialPortSettings(I_Rig.I_SerialSettings):
+class SerialSettings(I_Rig.I_SerialSettings):
 
     def __init__(self):
         self.baudrate_min = 0
