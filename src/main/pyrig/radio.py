@@ -36,7 +36,7 @@ class Radio(I_Radio):
 
         :param mode:  [string] Specifies the mode (see Radio.modes)
         :param vfo:   [int] The vfo which mode must be changed
-        :return:      [string] The command (String of bytes)
+        :return:      [SerialTransaction] Object with the command with some additional settings
         """
         raise NotImplementedError("encode_SetFreq")
 
@@ -49,7 +49,7 @@ class Radio(I_Radio):
 
         :param freq:  [int] The frequency to which we want to change
         :param vfo:   [int] The vfo which frequency must be changed
-        :return:      [string] The command (String of bytes)
+        :return:      [SerialTransaction] Object with the command with some additional settings
         """
         raise NotImplementedError("encode_SetFreq")
 

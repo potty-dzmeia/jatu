@@ -10,8 +10,44 @@ package org.lz1aq.pyrig_interfaces;
  * A rig is an equipment which can be controlled with the help of commands 
  * send from the program to the rig. 
  * 
- * The Rig can also send data backwards.
+ * In the diagram below can be seen how we can communicate with the rig.
+ * Example1: The person has rotated the knob on the radio and changed the frequency
+ *    - The rig sends some data to the program
+ *    - The Java program receives the data
+ *    - The Java program gives the data to icom.py to be decoded 
+ *    - The icom.py returns the parsed data (e.g. Frequency change to 14,000,000)
+ *    - Java program can use this info for example to update the GUI with the new frequency
  * 
+ * Example2: the person using the Java program wants to change the frequency on the radio to 14,200,000 
+ *    - The Java program ask the icom.py to encode the frequency change command
+ *    - Icom.py encodes the command into a transaction that the radio can understand and returns the data to the Java program
+ *    - The Java program sends the transaction to the radio
+ *    - The radio receives the transaction and changes the frequency to the desired value of 14,200,000
+ * 
+ * 
+ *   +-------------+     +----------------+        +----------------+
+ *   |   icom.py   |     | Java program   |        |   Rig(Radio)   |
+ *   +------+------+     +--------+-------+        +--------+-------+
+ *          |                     |                         |        
+ *          |                     |    series of bytes      |        
+ *          |                     <-------------------------+        
+ *          |  array of bytes     |                         |        
+ *          <---------------------+                         |        
+ * decoding |                     |                         |        
+ *          | DecodedTransaction  |                         |        
+ *          +--------------------->                         |        
+ *          |                     |                         |        
+ *  +----------------------------------------------------------------+
+ *          |                     |                         |        
+ *          | encodeChangeFrequency                         |        
+ *          <---------------------+                         |        
+ * encode   |                     |                         |        
+ *          | EncodedTransaction  |                         |        
+ *          +--------------------->                         |        
+ *          |                     |    EncodedTransaction   |        
+ *          |                     +------------------------->        
+ *          |                     |                         |        
+ *          |                     |                         |        
  */
 public interface I_Rig 
 {
@@ -29,9 +65,9 @@ public interface I_Rig
      * Decodes information coming from the Rig into JSON formatted string
      * 
      * @param data The data coming from the Rig
-     * @return JSON formatted string
+     * @return the decoded transaction with some additional control info
      */
-    public String decode(byte[] data);
+    public I_DecodedTransaction decode(byte[] data);
     
     /** @return Initialization command that is to be send to the Rig*/
     public byte[] encodeInit();
@@ -57,51 +93,98 @@ public interface I_Rig
       public String getParity();
 
       public String getHandshake();
-
-      /** Delay between each byte sent out, in milliseconds
-       * 
-       * @return 
-       */
-      public int getWriteDelay();
-      
-      /** Delay between each commands send out, in milliseconds
-       * 
-       * @return 
-       */
-      public int getPostWriteDelay();
-
-      /** Timeout, in milliseconds
-       * 
-       * @return 
-       */
-      public int getTimeout();
-
-      
-      /** Maximum number of retries if command fails (0 for no retry)
-       *  
-       * @return 
-       */
-      public int getRetry();
     }
     
     /**
-     *  Serial transaction contains:
-     *  - the bytes that must be send to the radio
-     *  - additional details concerning the transaction (e.g. if we should w8 for confirmation after sending the transaction)
+     * Container for a "transaction" which is to be sent over the serial port
+     * 
+     * A "transaction" is a packet of bytes being sent to the rig. Usually it
+     * contains some command (e.g. change frequency in case of a radio)
      */
-    public interface I_SerialTransaction
+    public interface I_EncodedTransaction
     {
       /**
-       * Gets the transaction which can be send to the radio
+       * Gets the transaction which can be send to the rig
        * 
        * @return Transaction in the form of array of bytes  
        */
       public byte[] getTransaction();
       
-      /** Check if there will be a confirmation after this transaction
-       * 
-       * @return TRUE - is the radio will send confirmation after receiving this transaction
+      /**
+       * If there should be a delay between each byte of the transaction being sent out
+       *  
+       * @return The amount of delay in milliseconds
        */
-      public boolean isWaitForConfirmation();
+      public int getWriteDelay();
+      
+      /**
+       * If there should be a delay between each transaction send out
+       * 
+       * @return The amount of delay in millisecond
+       */
+      public int getPostWriteDelay();
+      
+      /**
+       *  Timeout after which we should abandon sending the transaction to the rig
+       * 
+       * @return Timeout, in milliseconds
+       */
+      public int getTimeout();
+      
+      /**
+       * Maximum number of retries if command fails (0 for no retry)
+       * 
+       * @return number of retries before abandoning the transaction
+       */
+      public int getRetry();
+      
+      
+      /** If the program should expect confirmation after sending this transaction to the rig
+       * 
+       * @return TRUE - if the rig will send confirmation after receiving this transaction
+       */
+      public boolean isConfirmationExpected();
+    }
+    
+    
+    
+    /**
+     * Contains the decoded transaction together with some control information
+     *
+     */
+    public interface I_DecodedTransaction
+    {
+      /**
+       * Gets the transaction which was received from the rig.
+       * 
+       * @return Transaction in the form of JSON formatted string. 
+       * Might be null in case the supplied buffer did not contain a complete
+       * transaction
+       */
+      public byte[] getTransaction();
+      
+      
+      /**
+       * Returns the amount of bytes that were read from the supplied buffer
+       * in order to decode the transaction.
+       * 
+       * 
+       * Typical usage is:
+       * 1) decodedTransaction1 = I_Rig.decode(receiveBuffer);
+       *    to decode the transaction   
+       * 
+       * 2) receiveBuffer.removeBytes(decodedTransaction.getBytesRea  d());  
+       *    to remove the already decoded bytes from the receive buffer
+       * 
+       * 3) decodedTransaction2 = I_Rig.decode(receiveBuffer);
+       *    to decode next transaction
+       * 
+       * ...and so on...
+       * 
+       * @return The amount of bytes that were read. 0 if no transaction was found.
+       * If this function returns 
+       */
+      public int getBytesRead();
+      
     }
 }

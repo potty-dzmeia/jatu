@@ -1,164 +1,238 @@
 package org.lz1aq.rsi;
 
+import com.sun.corba.se.impl.util.Utility;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Timer;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import org.lz1aq.pyrig_interfaces.I_Radio;
 import java.util.TimerTask;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import jssc.SerialPort;
+import jssc.SerialPortException;
+import org.lz1aq.pyrig_interfaces.I_Rig.I_EncodedTransaction;
 
 /**
  * Class for controlling a radio through the serial interface
+ * 
+ * After creating the star() method must be called!
  * 
  * @author potty
  */
 public class Radio
 {
-  private static final int QUEUE_SIZE = 30; // Max number of commands that queueWithCommands can hold
+  private static final int QUEUE_SIZE = 30;   // Max number of commands that queueWithTransactions can hold
   
-  private I_Radio radioProtocolParser;    // Used for decoding/encoding msg from/to the radio
-  private RadioListener radioListener;    // TODO: make multiple event listeners
-  private Queue<RawCommand>  queueWithCommands; // Commands waiting to be sent to the radio
-  private Timer timer;                    // Used for sending commands (retries, delays etc.)
+  private SerialPort      serialPort;           // Used for writing to serialPort
+  private I_Radio         radioProtocolParser;  // Used for decoding/encoding msg from/to the radio (jython object)
+  private RadioListener   eventListener;        // TODO: make multiple event listeners
+  private BlockingQueue<I_EncodedTransaction>  queueWithTransactions; // Transactions waiting to be sent to the radio
+  private Thread          threadPortWrite;      // Thread that writes transaction to the serial port
+  private Thread          threadPortReader;     // Thread that receives transaction from the serial port
+  private static final Logger logger = Logger.getLogger(Radio.class.getName());
+  private ArrayList<Byte> receiveBuffer;
   
   
-  // This class implements a State Machine for sending commands to the radio.
-  // The variables below control this state machine:
-  // -----------------------------------------------------------------------
-  private CommStates commState =  CommStates.IDLE; // The current state of the communication with the radio
-  private int retryCount = 0; // Number of times we tried to send a given command to the radio
-
-  /**
-   * Used for the state machine of this component
+  /**   
+   * Constructor 
+   * 
+   * @param protocolParser - provides the protocol for communicating with the radio
+   * @param serialPort -  serial port to be used for communication
    */
-  private enum CommStates
+  public Radio(I_Radio protocolParser, SerialPort serialPort)
   {
-   IDLE,        // No command is being send at the moment
-   SENT,        // A command has been sent and we w8 for positive confirmation
-   FAILED,      // A negative confirmation has been received
-   TIMEOUT,     // A timeout has expired while w8ing for positive confirmation
-   CFM,         // Positive confirmation has arrived
-   DELAY,       // We are waiting before sending the next command
+    radioProtocolParser   = protocolParser;           // Store the reference to the jython object
+    this.serialPort       = serialPort;
+    queueWithTransactions = new LinkedBlockingQueue<I_EncodedTransaction>(); 
+    threadPortWrite       = new Thread(new PortWriter(), "threadPortWrite");    
+    receiveBuffer         = new ArrayList<Byte>();
   }
   
-  private enum StateMachineEvents
-  {
-    NEW_COMMAND_INSERTED,
-    TIMER_EXPIRED,
-  }
+    
   
   //----------------------------------------------------------------------
   //                           Public methods
   //----------------------------------------------------------------------
   
   
-  /**  
+
+  /**
+   * Opens the com port (if not already open) and starts threads
+   * The method must be called before the Radio object can be used.
    * 
-   * @param protocolParser - provides the protocol for communicating with the radio
+   * @throws SerialPortException 
    */
-  public Radio(I_Radio protocolParser)
+  public void start() throws Exception
   {
-    radioProtocolParser = protocolParser;
-    queueWithCommands = new LinkedList<RawCommand>(); 
-    timer = new Timer();
-  }
-  
-  
-  public void open()
-  {
+    if(threadPortWrite.getState() != Thread.State.NEW )
+      throw new Exception("Please create a new Radio object");
     
+    if(serialPort.isOpened() == false)
+      serialPort.openPort();
+
+    threadPortWrite.start();              
+  }
+  
+  /**
+   * The user of class "Radio" can choose between closing the ports manually
+   * or calling the stop() method.
+   * 
+   * After an object has been stop it can not be started again by calling the
+   * start() method. For this purpose a new object must be created.
+   * 
+   * @throws jssc.SerialPortException
+   */
+  public void stop() throws SerialPortException
+  {
+    serialPort.closePort();
+    threadPortWrite.interrupt();
   }
   
   
-  public void close()
+  /**
+   * Set the frequency of the radio
+   * 
+   * @param freq - frequency value
+   * @param vfo - VFO which frequency will be changed
+   * @throws Exception 
+   */
+  public void setFrequency(long freq, int vfo) throws Exception
   {
+    this.queueTransaction(radioProtocolParser.encodeSetFreq(freq, vfo));
+  }
+  
+  
+  /**
+   * Set the working mode of the radio (e.g. to CW)
+   * @param mode - mode value (see I_Radio.RadioModes)
+   * @param vfo - VFO which frequency will be changed
+   * @throws Exception 
+   */
+  public void setMode(String mode, int vfo) throws Exception
+  {
+    this.queueTransaction(radioProtocolParser.encodeSetMode(mode, vfo));
+  }
+  
+  
+  public void addEventListener(RadioListener listener) throws Exception
+  {
+    if(threadPortWrite.getState() == Thread.State.NEW )
+      throw new Exception("You need to call the start() method");
     
-  }
-  
-  
-  public void setFrequency(long freq)
-  {
-    RawCommand command = new RawCommand(radioProtocolParser.encodeSetFreq(freq, 1));
-    this.send(command);
-  }
-  
-  
-  public void setMode(String mode)
-  {
-    
-  }
-  
-  
-  public void addEventListener(RadioListener listener)
-  {
-    this.radioListener = listener;
+    this.eventListener = listener;
   }
   
   
   public void removeEventListener(RadioListener listener)
   { 
-    this.radioListener = null;
+    this.eventListener = null;
+  }
+  
+  
+ 
+  //----------------------------------------------------------------------
+  //                           Private methods
+  //----------------------------------------------------------------------
+  
+  private class PortReader implements Runnable
+  {
+    public void run()
+    {
+//      try
+//      {
+//        
+//        byte[] a= {0,1};
+//        a.
+//      }catch(InterruptedException e)
+//      {
+//        System.out.println("PortReader was terminated!");
+//      }
+      
+    }
   }
   
   
   
-  
-  //----------------------------------------------------------------------
-  //                           Private methods
-  //----------------------------------------------------------------------
-
-  private synchronized void send(RawCommand cmd) throws Exception
+  /**
+   * Implements a Thread which is taking care of writing transactions to the
+   * serial port.
+   */
+  private class PortWriter implements Runnable
   {
-    if(queueWithCommands.size() >= QUEUE_SIZE)
+    public void run()
+    {
+      I_EncodedTransaction trans;
+      
+      try
+      {
+        while(true)
+        {
+          // Get the next transaction to be send (w8 if queue is empty)
+          trans = queueWithTransactions.take();
+          
+          // Retry - Try to send it the specified amount of times
+          for(int i = 0; i < trans.getRetry(); i++)
+          {
+            // Write to serial port
+            try
+            {
+              serialPort.writeBytes(trans.getTransaction());
+              serialPort.purgePort(SerialPort.PURGE_RXCLEAR);
+              logger.log(Level.INFO, Utils.toString(trans.getTransaction()));
+            } catch (SerialPortException ex)
+            {
+              logger.log(Level.SEVERE, null, ex);
+            }
+                      
+//            // W8 for confirmation or timeout
+//            if(trans.isConfirmationExpected())
+//            {
+//              wait(trans.getTimeout()); // w8 for notify() which tells us there is a response
+//              confirmation = getConfirmation();
+//            }
+
+            // Delay - logif wanted introduce delay between transactions
+            if(trans.getPostWriteDelay() > 0)
+            {
+              Thread.sleep(trans.getPostWriteDelay());
+            }
+            
+            break;
+            
+//            // Transaction sent successfully 
+//            if(confirmation == positive)
+//            {
+//              break; 
+//            }        
+          }//for   
+          
+        }//while(true)
+      }catch(InterruptedException e)
+      {
+        System.out.println("PortWriter was terminated!");
+      }
+    }// run()
+  }// class
+  
+  /**
+   * 
+   * @param trans
+   * @throws Exception 
+   */
+  private void queueTransaction(I_EncodedTransaction trans) throws Exception
+  {
+    if(threadPortWrite.getState() == Thread.State.NEW )
+      throw new Exception("You need to call the start() method");
+     
+    if(queueWithTransactions.size() >= QUEUE_SIZE)
     {
       throw new Exception("Max queue sized reached");
     }
     
-    queueWithCommands.offer(cmd);     // Queue the command
-    startTimer(radioProtocolParser.getSerialPortSettings().getTimeout());  // Start the timeout timer
-  }
- 
-  
-  private synchronized void timerExpired()
-  {
-    
-  }
-  
-  private synchronized void startTimer(long milliSeconds)
-  {
-    timer.schedule(new TimerTask(){public void run() {timerExpired();}}, // When timer expires timerExpired() is called
-                   milliSeconds);
-  }
-  
-
-  /** Writes the command to the serial comm port
-   * 
-   * @param cmd - bytes to be written
-   */
-  private synchronized boolean writeCommand(byte[] cmd)
-  {
-    
-  }
-  
- 
-  
-  
-  
-  
-  protected class RawCommand
-  {
-    byte[] command;
-
-    public RawCommand(byte[] command)
-    {
-      this.command = command;
-    }
-    
-    public byte[] get()
-    {
-      return command;
-    }
+    queueWithTransactions.offer(trans); // Insert the transaction in the queue
   }
   
 }

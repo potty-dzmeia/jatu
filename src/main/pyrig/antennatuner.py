@@ -19,10 +19,4 @@ class AntennaTuner(I_AntennaTuner):
         """
         return "Automatic Antenna Tuner"
 
-    def getSerialPortSettings(self):
-        """
-        Returns a JSON formatted string describing the COM port settings that
-        needs to be used when communicating with this Rig.
-        """
-        return "afasdfasdf"
         
