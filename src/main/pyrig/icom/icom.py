@@ -1,4 +1,5 @@
 #! /usr/bin/python
+from itertools import combinations
 
 import radio
 from serial_settings import SerialSettings
@@ -53,6 +54,7 @@ class Icom(radio.Radio):
         Returns the serial settings to be used when connecting to this rig
 
         :return: [SerialSettings] object holding the serial port settings
+        :rtype: SerialSettings
         """
         return cls.serial_settings
 
@@ -66,10 +68,14 @@ class Icom(radio.Radio):
         Protocol is the following:
         [preamble(0xFE), preamble(0xFE), ctrl_id(0xE0), civ-address, command, sub_command, data...., 0xFD]
 
-        :param command:     [int] Command code. E.g. 0x05 is set frequency)
-        :param sub_command: [int] Sub-command code (optional)
-        :param data:        [list] Additional data bytes(optional)
-        :return:            [list] The ready transaction bytes
+        :param command: Command code. E.g. 0x05 is set frequency)
+        :type command: list
+        :param sub_command: Sub-command code (optional)
+        :type sub_command: int
+        :param data: Additional data bytes(optional)
+        :type data: list
+        :return: The ready transaction bytes
+        :rtype: list
         """
         transaction= [0xFE, 0xFE, 0xE0, cls.CIV_ADDRESS, command]
         if sub_command is not None:
@@ -86,9 +92,12 @@ class Icom(radio.Radio):
         """
         Gets the command with which we can tell an Icom radio to change frequency
 
-        :param freq:  [int] specifying the frequency. E.g. 7100000 for 7.1MHz
-        :param vfo:   [int] the vfo for which we want to set the frequency
-        :return:      [SerialTransaction] Object with the command with some additional settings
+        :param freq: Specifying the frequency. E.g. 7100000 for 7.1MHz
+        :type freq: int
+        :param vfo: The vfo for which we want to set the frequency
+        :type vfo: int
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
         """
         result = cls.__transaction(0x05, data=utils.toBcd(freq,10))
         return EncodedTransaction(bytearray(result).__str__())
@@ -100,10 +109,14 @@ class Icom(radio.Radio):
         """
         Get the command that must be send to the radio in order to set mode (e.g. CW)
 
-        :param mode:  [String] specifies the mode - see Radio.modes
-        :param vfo:   [int] The vfo which mode must be changed
-        :return:      [String] of bytes containing the command
+        :param mode: Specifies the mode - see Radio.modes
+        :type mode: str
+        :param vfo: The vfo which mode must be changed
+        :type vfo: int
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
         """
+
         if not cls.mode_codes.__contains__(mode):
             raise ValueError("Unsupported mode: "+mode+"!")
 
@@ -112,38 +125,52 @@ class Icom(radio.Radio):
 
 
 
-    TRANS_START = bytearray([0xFE, 0xFE, 0xE0, CIV_ADDRESS]) # Trans\s send by the Icom starts with: 0xFE 0xFE 0xE0 CIV
-    TRANS_END = bytearray([0xFD]) # Transactions send by the Icom ends with: 0xFD
+    TRANS_START = bytearray([0xFE, 0xFE, 0xE0, CIV_ADDRESS])  # Trans\s send by the Icom starts with: 0xFE 0xFE 0xE0 CIV
+    TRANS_END = bytearray([0xFD])  # Transactions send by the Icom ends with: 0xFD
 
     @classmethod
-    def decode(cls, stringOfBytes):
+    def decode(cls, string_of_bytes):
         """
         Decodes information coming from an Icom radio.
         Converts string of bytes coming from the radio into a JSON formatted string with the decoded transaction.
 
-        :param stringOfBytes: [String] Series of bytes from which we must extract the transaction. There is no guarantee
+        :param string_of_bytes: Series of bytes from which we must extract the transaction. There is no guarantee
         that the first byte is the beginning of the transaction (i.e. there might be some trash in the beginning).
-        :return: [DecodedTransaction] object containing the transaction and some additional control information
+        :type string_of_bytes: str
+        :return: Object containing the transaction and some additional control information
+        :rtype: DecodedTransaction
         """
-        trans = bytearray(stringOfBytes)
+        trans = bytearray(string_of_bytes)
 
-        trans_start_index = trans.find(cls.TRANS_START)   # get the beginning of the transaction
-        trans_end_index = trans.find(cls.TRANS_END)       # get the end of the transaction
-
-        # No complete transaction was found
-        # ---------------------------------
-        if trans_start_index == -1 or trans_end_index == -1:
+        # Find the beginning of the transaction
+        trans_start_index = trans.find(cls.TRANS_START)
+        if trans_start_index == -1:
             return DecodedTransaction(None, 0)
-        
 
-        raise NotImplementedError("Functionality missing")
+        # Find the end of the transaction (must be after trans_start_index)
+        trans_end_index = trans.find(cls.TRANS_END, trans_start_index)
+        if trans_end_index == -1:
+            return DecodedTransaction(None, 0)
+
+        cmd_idx = trans_start_index + 4  # get the index of the command
+
+        if trans[cmd_idx] == cls.SEND_FREQ:    # ---------------------------------
+            # result = __decodeFrequency(,)
+        elif trans[cmd_idx] == cls.SEND_MODE:  # ---------------------------------
+            result = __decodeMode(trans[cmd_idx+1])
+        else:                                  # ---------------------------------
+            result = DecodedTransaction.createNotSupported()
 
 
+        return DecodedTransaction(result, trans_end_index+1)
 
+    @classmethod
+    def __decodeMode(cls, mode):
+        for
 
-
-
-
+    # Some icom commands
+    SEND_FREQ = 0x00  # send by the Icom
+    SEND_MODE = 0x01  # send by the Icom
 
     # Icom control codes used for changing the mode
     mode_codes ={'LSB':     0x00,

@@ -13,9 +13,8 @@ class Rig(I_Rig):
     @property
     def getManufacturer(self):
         """
-        Returns the manufacturer of the rig - E.g. "Kenwood"
-
-        :return: [String]
+        :return: The manufacturer of the rig - E.g. "Kenwood"
+        :rtype: str
         """
         raise NotImplementedError("getManufacturer")
 
@@ -23,9 +22,8 @@ class Rig(I_Rig):
     @property
     def getModel(self):
         """
-        Returns the model of the Rig - E.g. "IC-756PRO"
-
-        :return: [String]
+        :return: The model of the Rig - E.g. "IC-756PRO"
+        :rtype: str
         """
         raise NotImplementedError("getModel")
 
@@ -33,22 +31,23 @@ class Rig(I_Rig):
     @property
     def getSerialPortSettings(self):
         """
-        Returns the COM port settings that needs to be used when communicating with this Rig.
-
-        :return: [SerialSettings] object
+        :return: The COM port settings that needs to be used when communicating with this Rig.
+        :rtype: SerialSettings
         """
         raise NotImplementedError("getSerialPortSettings")
 
 
     @property
-    def decode(self, stringOfBytes):
+    def decode(self, string_of_bytes):
         """
         Decodes information coming from the Rig.
         Converts string of bytes coming from the rig into a JSON formatted command.
 
-        :param stringOfBytes: [string] Series of bytes from which we must extract the transaction. There is no guarantee
+        :param string_of_bytes: Series of bytes from which we must extract the transaction. There is no guarantee
         that the first byte is the beginning of the transaction (i.e. there might be some trash in the beginning).
-        :return: [DecodedTransaction] object containing the transaction and some additional control information
+        :type string_of_bytes: str
+        :return: Object containing the transaction and some additional control information
+        :rtype: DecodedTransaction
         """
         raise NotImplementedError("decode")
 
@@ -58,7 +57,8 @@ class Rig(I_Rig):
         """
         If a rig needs some initialization before being able to be used.
         
-        :return: [SerialTransaction] Initialization command that is to be send to the Rig
+        :return: Initialization command that is to be send to the Rig
+        :rtype: EncodedTransaction
         """
         raise NotImplementedError("encode_Init")
 
@@ -68,7 +68,8 @@ class Rig(I_Rig):
         """
         If a rig needs some cleanup after being used.
         
-        :return: [SerialTransaction] Cleanup command that is to be send to the Rig
+        :return: Cleanup command that is to be send to the Rig
+        :rtype: EncodedTransaction
         """
         raise NotImplementedError("encode_Cleanup")
     

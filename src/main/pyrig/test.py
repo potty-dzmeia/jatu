@@ -24,27 +24,45 @@ import re
 #
 # print bytearray(trans).__str__()
 
-
+mylist = [0xFE, 0xFE, 0xE0, 0x5C, 0, 0, 0xFD, 0xFE, 0xFE, 0xE0, 0x5C, 0, 0, 1, 0xFD]
 transaction = bytearray([0xFE, 0xFE, 0xE0, 0x5C, 0, 0, 0xFD, 0xFE, 0xFE, 0xE0, 0x5C, 0, 0, 1, 0xFD])
 TRANS_START = bytearray([0xFE, 0xFE, 0xE0, 0x5C]) # Transactions send by the Icom starts with: 0xFE 0xFE 0xE0 CIV-Adress
 TRANS_END = bytearray([0xFD]) # Transactions send by the Icom ends with: 0xFD
 invalid = bytearray([0xFC])
 
 
-not_found = """{
-"command": "not_found",
-}"""
+# print("".join([chr(i) for i in mylist]))
+#
+# print transaction.__str__()
 
 
+mode_codes ={'LSB':     0x00,
+                 'USB':     0x01,
+                 'AM':      0x02,
+                 'CW':      0x03,
+                 'RTTY':    0x04,
+                 'FM':      0x05,
+                 'CWR':     0x07,
+                 'RTTYR':   0x08}
 
-trans_start_index = transaction.find(TRANS_START)
-trans_end_index = transaction.find(TRANS_END)
+ print mode_codes.
 
-print 'start: '+int(trans_start_index).__str__()
-print 'start: '+int(trans_end_index).__str__()
+# not_found = """{
+# "command": "not_found",
+# }"""
+#
+#
+#
+# trans_start_index = transaction.find(TRANS_START)
+# trans_end_index = transaction.find(TRANS_END)
+#
+# print 'start: '+int(trans_start_index).__str__()
+# print 'start: '+int(trans_end_index).__str__()
+#
+#
+# print bytearray(transaction.__str__()).__str__()
 
 
-print bytearray(transaction.__str__()).__str__()
 
 
 

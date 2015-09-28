@@ -28,35 +28,39 @@ class Radio(I_Radio):
             'DSB':      20, # DSB - Double sideband suppressed carrier
     }
     
-    
+
+    @property
+    def encodeSetFreq(self, freq, vfo):
+        """
+        Gets the command with which we can tell an Icom radio to change frequency
+
+        :param freq: Specifying the frequency. E.g. 7100000 for 7.1MHz
+        :type freq: int
+        :param vfo: The vfo for which we want to set the frequency
+        :type vfo: int
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
+        """
+        raise NotImplementedError("encode_SetFreq")
+
+
     @property
     def encodeSetMode(self, mode, vfo):
         """
         Get the command that must be send to the radio in order to set mode (e.g. CW)
 
-        :param mode:  [string] Specifies the mode (see Radio.modes)
-        :param vfo:   [int] The vfo which mode must be changed
-        :return:      [SerialTransaction] Object with the command with some additional settings
+        :param mode: Specifies the mode - see Radio.modes
+        :type mode: str
+        :param vfo: The vfo which mode must be changed
+        :type vfo: int
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
         """
         raise NotImplementedError("encode_SetFreq")
 
 
 
-    @property    
-    def encodeSetFreq(self, freq, vfo):
-        """
-        Get the command that must be send to the radio in order to set frequency
 
-        :param freq:  [int] The frequency to which we want to change
-        :param vfo:   [int] The vfo which frequency must be changed
-        :return:      [SerialTransaction] Object with the command with some additional settings
-        """
-        raise NotImplementedError("encode_SetFreq")
-
-
-
-    
-       
     #Freq - frequency of the target VFO
     #rig_set_mode(RIG *rig, vfo_t vfo, rmode_t mode, pbwidth_t width)
     #rig_set_vfo(RIG *rig, vfo_t vfo) - set the current VFO

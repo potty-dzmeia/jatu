@@ -13,7 +13,8 @@ class EncodedTransaction(I_Rig.I_EncodedTransaction):
         When the object is created the control variables are given default values. When needed the
         user has to change them manually.
 
-        :param transaction: [string] The encoded transaction ready to be send to the rig
+        :param transaction: String of bytes with the encoded transaction ready to be send to the rig
+        :type transaction: str
         """
         # underscores are added because of a jython issue
         self.transaction_          = transaction;  # The data (i.e. the transaction itself)
@@ -27,43 +28,49 @@ class EncodedTransaction(I_Rig.I_EncodedTransaction):
 
     def getTransaction(self):
         """
-        :return: [string] The encoded transaction ready to be send to the rig
+        :return: The encoded transaction ready to be send to the rig
+        :rtype: str
         """
         return self.transaction_
 
 
     def getWriteDelay(self):
         """
-        :return: [int] Delay between each byte of the transaction being sent out (in milliseconds)
+        :return: Delay between each byte of the transaction being sent out (in milliseconds)
+        :rtype: int
         """
         return self.writeDelay_
 
 
     def getPostWriteDelay(self):
         """
-        :return: [int] Delay between each transaction send out (in milliseconds)
+        :return: Delay between each transaction send out (in milliseconds)
+        :rtype: int
         """
         return self.postWriteDelay_
 
 
     def getTimeout(self):
         """
-        :return: [int] Timeout after which we should not wait for confirmation from the rig (in milliseconds)
+        :return: Timeout after which we should not wait for confirmation from the rig (in milliseconds)
+        :rtype: int
         """
         return self.timeout_
 
 
     def getRetry(self):
         """
-        :return: [int] Maximum number of retries if sending the transaction fails (e.g. timeout or negative response).
+        :return: Maximum number of retries if sending the transaction fails (e.g. timeout or negative response).
         Set to 0 for no retry.
+        :rtype: int
         """
         return self.retry_
 
 
     def isConfirmationExpected(self):
         """
-        :return: [int] True - if we should wait for confirmation from the rig that the transaction was received
+        :return: True - if we should wait for confirmation from the rig that the transaction was received
+        :rtype: int
         """
         return self.confirmationExpected_
 
