@@ -1,4 +1,6 @@
 from org.lz1aq.pyrig_interfaces import I_Rig
+from radio import Radio
+import json
 
 class DecodedTransaction(I_Rig.I_DecodedTransaction):
     """
@@ -59,31 +61,62 @@ class DecodedTransaction(I_Rig.I_DecodedTransaction):
         if command not in cls.supported_commands:
             raise ValueError("Unknown command")
 
-
         jsonBlock = dict()
-        jsonBlock["command"] =  command
+        jsonBlock["command"] = command
         if data is not None:
             jsonBlock["data"] = data
-        return jsonBlock.dumps(jsonBlock, indent=4)
+        return json.dumps(jsonBlock, indent=4)
 
 
     @classmethod
     def createNotSupported(cls):
-        return cls.create("not-supported")
+        """
+        Creates a JSON formatted transaction indicating that the decoded command is not supported
+        :return: The following string {"command": "not-supported"}
+        :rtype: str
+        """
+        return cls.__create("not-supported")
+
 
     @classmethod
     def createPositiveCfm(cls):
-        return cls.create("positive_cfm")
+        """
+        Creates a JSON formatted transaction indicating that the decoded command is not supported
+        :return: The following string {"command": "positive_cfm"}
+        :rtype: str
+        """
+        return cls.__create("confirmation", 1)
+
 
     @classmethod
     def createNegativeCfm(cls):
-        return cls.create("negative_cfm")
+        """
+        Creates a JSON formatted transaction indicating that the decoded command is not supported
+        :return: The following string  {"command": "negative_cfm"}
+        :rtype: str
+        """
+        return cls.__create("confirmation", 0)
+
 
     @classmethod
     def createFreq(cls, freq):
-        return cls.create("frequency", freq)
+        """
+        Creates a JSON formatted transaction indicating that the decoded command is not supported
+        :return: String of the type {"command": "frequency", "data": "14000100"}
+        :rtype: str
+        """
+        return cls.__create("frequency", freq)
+
 
     @classmethod
-    def createFreq(cls, mode):
-        return cls.create("mode", mode)
+    def createMode(cls, mode):
+        """
+        Creates a JSON formatted transaction indicating that the decoded command is not supported
+        :return: String of the type {"command": "mode", "data": "cw"}
+        :rtype: str
+        """
+        if mode not in Radio.modes:
+            raise ValueError("Unknown command")
+
+        return cls.__create("mode", mode)
 

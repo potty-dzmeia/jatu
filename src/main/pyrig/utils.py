@@ -1,15 +1,40 @@
 __author__ = 'chavdar'
 
 
+def fromBcd(byte_array):
+    """
+    Converts a number in little endian 4bits per digit bcd format to binary
+
+    Example:
+    [0x31, 0x02, 0x10, 0x14, 0x0] converts to 14100231
+
+    :param byteArray: digits in 4bit bcd format (little endian)
+    :type byteArray: bytearray
+    :return: number
+    :rtype: int
+    """
+    result = 0;
+    mult = 1;
+    for b in byte_array:
+        result += (b & 0x0F) * mult
+        mult *= 10
+        result += ((b>>4) & 0x0F) * mult
+        mult *= 10
+
+    return result
+
 
 def toBcd(number, bcd_len):
     """
     Converts number to 4bit BCD values (little endian).
-    Example: toBcd(1234,10)--> [0x34, 0x12, 0x00, 0x00, 0x00]
+    Example: toBcd(1234, 10) --> [0x34, 0x12, 0x00, 0x00, 0x00]
 
     :param number: number to be converted to BCD format
+    :type number: int
     :param bcd_len: how many BCD character should the output contain (must be an even value)
+    :type bcd_len: int
     :return: list of integers containing the BCD values
+    :rtype: list
     """
 
     if bcd_len % 2 != 0:

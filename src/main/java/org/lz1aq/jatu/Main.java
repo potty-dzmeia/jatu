@@ -68,12 +68,25 @@ public class Main
 //        {
 //          Logger.getLogger(Main.class.getName()).log(Level.SEVERE, ex.toString(), ex);
 //        }
-        byte[] trans = {1,2,3,4,5,6};
+       
         
-        I_Rig.I_DecodedTransaction decoded = radioProtocol.decode(trans);
+        I_Rig.I_DecodedTransaction decoded = radioProtocol.decode(transFreq);
         
-        System.err.println(decoded.getBytesRead());
-        System.out.println(decoded.getTransaction());
+        System.err.println("bytes read: "+decoded.getBytesRead());
+        System.out.println("jason: "+decoded.getTransaction());
+        
+        decoded = radioProtocol.decode(transMode);
+        System.err.println("bytes read: "+decoded.getBytesRead());
+        System.out.println("jason: "+decoded.getTransaction());
+        
+        decoded = radioProtocol.decode(transNegative);
+        System.err.println("bytes read: "+decoded.getBytesRead());
+        System.out.println("jason: "+decoded.getTransaction());
+        
+        decoded = radioProtocol.decode(transPositive);
+        System.err.println("bytes read: "+decoded.getBytesRead());
+        System.out.println("jason: "+decoded.getTransaction());
+        
      
   }
     
@@ -85,5 +98,44 @@ public class Main
 //    }SerialPort
 //  }
   private I_Radio radioProtocol;
+  
+   static byte[] transFreq = {(byte)0xFE, 
+                            (byte)0xFE, 
+                            (byte)0xE0, 
+                            (byte)0x5C, 
+                            (byte)0x00, 
+                            (byte)0x31, 
+                            (byte)0x02, 
+                            (byte)0x10, 
+                            (byte)0x14, 
+                            (byte)0x00, 
+                            (byte)0xFD};
+         
+  static byte[] transPositive = {(byte)0xFE, 
+                                (byte)0xFE, 
+                                (byte)0xE0, 
+                                (byte)0x5C, 
+                                (byte)0xFB, 
+                                (byte)0xFD};
+   
+  static byte[] transNegative = {(byte)0xFE, 
+                                (byte)0xFE, 
+                                (byte)0xE0, 
+                                (byte)0x5C, 
+                                (byte)0xFA, 
+                                (byte)0xFD};
+   
+  static byte[] transMode = {   (byte)0xFe, 
+                                (byte)0xFE, 
+                                (byte)0xe0, 
+                                (byte)0x5C, 
+                                (byte)0xFD,
+                                (byte)0xFE, 
+                                (byte)0xFE, 
+                                (byte)0xE0, 
+                                (byte)0x5C, 
+                                (byte)0x01,
+                                (byte)0x08,
+                                (byte)0xFD};
 
 }

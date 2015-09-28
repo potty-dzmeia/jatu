@@ -161,7 +161,7 @@ public interface I_Rig
        * Might be null in case the supplied buffer did not contain a complete
        * transaction
        */
-      public byte[] getTransaction();
+      public String getTransaction();
       
       
       /**

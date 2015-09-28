@@ -12,6 +12,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jssc.SerialPort;
+import jssc.SerialPortEvent;
+import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import org.lz1aq.pyrig_interfaces.I_Rig.I_EncodedTransaction;
 
@@ -73,7 +75,11 @@ public class Radio
     if(serialPort.isOpened() == false)
       serialPort.openPort();
 
-    threadPortWrite.start();              
+    threadPortWrite.start();
+    
+    // Register the serial port reader
+    serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
+    serialPort.addEventListener(new SerialPortReader());
   }
   
   /**
@@ -89,6 +95,8 @@ public class Radio
   {
     serialPort.closePort();
     threadPortWrite.interrupt();
+    
+    serialPort.removeEventListener();
   }
   
   
@@ -134,23 +142,21 @@ public class Radio
   
  
   //----------------------------------------------------------------------
-  //                           Private methods
+  //                           Private stuff
   //----------------------------------------------------------------------
   
-  private class PortReader implements Runnable
+  private class SerialPortReader implements SerialPortEventListener
   {
-    public void run()
+
+    public void serialEvent(SerialPortEvent event)
     {
-//      try
-//      {
-//        
-//        byte[] a= {0,1};
-//        a.
-//      }catch(InterruptedException e)
-//      {
-//        System.out.println("PortReader was terminated!");
-//      }
-      
+      try
+      {
+        byte buffer[] = serialPort.readBytes(10);
+      } catch (SerialPortException ex)
+      {
+        System.out.println(ex);
+      }
     }
   }
   
@@ -187,14 +193,14 @@ public class Radio
               logger.log(Level.SEVERE, null, ex);
             }
                       
-//            // W8 for confirmation or timeout
 //            if(trans.isConfirmationExpected())
 //            {
-//              wait(trans.getTimeout()); // w8 for notify() which tells us there is a response
+                // w8 for notify() which tells us there is a response or for the timeout
+//              wait(trans.getTimeout()); 
 //              confirmation = getConfirmation();
 //            }
 
-            // Delay - logif wanted introduce delay between transactions
+            // Delay - if wanted introduce delay between transactions
             if(trans.getPostWriteDelay() > 0)
             {
               Thread.sleep(trans.getPostWriteDelay());

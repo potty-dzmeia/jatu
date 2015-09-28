@@ -125,9 +125,6 @@ class Icom(radio.Radio):
 
 
 
-    TRANS_START = bytearray([0xFE, 0xFE, 0xE0, CIV_ADDRESS])  # Trans\s send by the Icom starts with: 0xFE 0xFE 0xE0 CIV
-    TRANS_END = bytearray([0xFD])  # Transactions send by the Icom ends with: 0xFD
-
     @classmethod
     def decode(cls, string_of_bytes):
         """
@@ -154,32 +151,83 @@ class Icom(radio.Radio):
 
         cmd_idx = trans_start_index + 4  # get the index of the command
 
-        if trans[cmd_idx] == cls.SEND_FREQ:    # ---------------------------------
-            # result = __decodeFrequency(,)
-        elif trans[cmd_idx] == cls.SEND_MODE:  # ---------------------------------
-            result = __decodeMode(trans[cmd_idx+1])
-        else:                                  # ---------------------------------
+        if trans[cmd_idx] == cls.CFM_POSITIVE:      # <------------------------- positive confirm
+            result = DecodedTransaction.createPositiveCfm()
+
+        elif trans[cmd_idx] == cls.CFM_NEGATIVE:    # <------------------------- negative confirm
+            result = DecodedTransaction.createNegativeCfm()
+
+        elif trans[cmd_idx] == cls.SEND_FREQ:       # <------------------------- frequency
+            freq = cls.__decodeFrequency(trans[(cmd_idx + 1):trans_end_index])
+            result = DecodedTransaction.createFreq(freq)
+
+        elif trans[cmd_idx] == cls.SEND_MODE:       # <------------------------- mode
+            mode = cls.__decodeMode(trans[cmd_idx+1])
+            result = DecodedTransaction.createMode(mode)
+
+        else:                                       # <------------------------- not-supported
             result = DecodedTransaction.createNotSupported()
 
-
+        # return the object with the decoded transaction and the amount of bytes that we have read from the supplied buffer(string)
         return DecodedTransaction(result, trans_end_index+1)
+
+
 
     @classmethod
     def __decodeMode(cls, mode):
-        for
+        """
+        Returns a string describing the current working mode
+        :param mode: Byte describing the mode see cls.mode_codes
+        :type mode: int
+        :return: String describing the working mode (e.g. "CW"). "none" if we couldn't recognize the mode.
+        :rtype: str
+        """
 
-    # Some icom commands
-    SEND_FREQ = 0x00  # send by the Icom
-    SEND_MODE = 0x01  # send by the Icom
+        # Convert the "mode" to valid string
+        for key, value in cls.mode_codes.items():
+            if mode == value:
+                return key
 
-    # Icom control codes used for changing the mode
-    mode_codes ={'LSB':     0x00,
-                 'USB':     0x01,
-                 'AM':      0x02,
-                 'CW':      0x03,
-                 'RTTY':    0x04,
-                 'FM':      0x05,
-                 'CWR':     0x07,
-                 'RTTYR':   0x08}
+        # In case of unknown mode integer
+        return "none"
+
+
+
+    @classmethod
+    def __decodeFrequency(cls, frequency):
+        """
+        Converts the bytearray with the frequency to a string representation
+        Example: 0x00, 0x02, 0x10, 0x14, 0x00 is converted to "14,100,200"
+        :param frequency: Bytearray containing the frequency in a little endian format bcd format
+        :type frequency: bytearray
+        :return: Frequency in string format
+        :rtype: str
+        """
+        return utils.fromBcd(frequency).__str__()
+
+
+
+    #+--------------------------------------------------------------------------+
+    #|   Icom command codes
+    #+--------------------------------------------------------------------------+
+
+    TRANS_START = bytearray([0xFE, 0xFE, 0xE0, CIV_ADDRESS])  # Trans\s send by the Icom starts with: 0xFE 0xFE 0xE0 CIV
+    TRANS_END = bytearray([0xFD])  # Transactions send by the Icom ends with: 0xFD
+
+    SEND_FREQ = 0x00        # send by the Icom when frequency has changed
+    SEND_MODE = 0x01        # send by the Icom whe mode has changed
+    CFM_POSITIVE = 0xFB     # Positive confirmation send by the Icom radio
+    CFM_NEGATIVE = 0xFA     # Negative confirmation send by the Icom radio
+
+
+    # Codes used for changing the mode
+    mode_codes ={'lsb':     0x00,
+                 'usb':     0x01,
+                 'am':      0x02,
+                 'cw':      0x03,
+                 'rtty':    0x04,
+                 'fm':      0x05,
+                 'cwr':     0x07,
+                 'rttyr':   0x08}
 
 
