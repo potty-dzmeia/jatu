@@ -6,6 +6,8 @@
 package org.lz1aq.utils;
 
 import java.io.ByteArrayOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -13,7 +15,9 @@ import java.io.ByteArrayOutputStream;
  */
 public class DynamicByteArray extends ByteArrayOutputStream 
 {
-
+  private static final Logger logger = Logger.getLogger(DynamicByteArray.class.getName());
+  
+  
   public DynamicByteArray()
   {
     super();
@@ -33,6 +37,7 @@ public class DynamicByteArray extends ByteArrayOutputStream
    */
   public void remove(int removedBytes)
   {
+    
     if(removedBytes==0)
       return;
     
@@ -44,6 +49,7 @@ public class DynamicByteArray extends ByteArrayOutputStream
     
     this.count -=removedBytes;
     
+    logger.log(Level.INFO, "Removed: "+removedBytes+"; Remaining: "+this.count+";  Buffer size "+this.buf.length);
     
   }
   

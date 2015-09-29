@@ -48,7 +48,7 @@ public class Radio
   {
     radioProtocolParser   = protocolParser;           // Store the reference to the jython object
     this.serialPort       = serialPort;
-    queueWithTransactions = new LinkedBlockingQueue<I_EncodedTransaction>(); 
+    queueWithTransactions = new LinkedBlockingQueue<>(); 
     threadPortWriter      = new Thread(new PortWriter(), "threadPortWrite");    
     receiveBuffer         = new DynamicByteArray(200);  // Set the initial size to some reasonable value
   }
@@ -154,6 +154,7 @@ public class Radio
      * 
      * @param event 
      */
+    @Override
     public void serialEvent(SerialPortEvent event)
     {
       try
@@ -162,7 +163,7 @@ public class Radio
         receiveBuffer.write(serialPort.readBytes());
       } catch (Exception ex)
       {
-        Logger.getLogger(Radio.class.getName()).log(Level.SEVERE, null, ex);
+        logger.log(Level.SEVERE, null, ex);
       }
       
       // Pass the received data to the protocol parser for decoding
@@ -279,7 +280,7 @@ public class Radio
     // Get the command and the data that the radio has sent us
     JSONObject jso = new JSONObject(jsonEvent);
     String command = jso.getString("command");
-    String data = jso.getString("data");
+    String data = jso.optString("data");
     
     
     switch (command)
@@ -304,7 +305,7 @@ public class Radio
       // -----------------------------
       case RadioEvents.FREQUENCY:
       // -----------------------------
-        eventListener.frequency(new RadioListener.FrequencyEvent(Integer.getInteger(data)));
+        eventListener.frequency(new RadioListener.FrequencyEvent(data));
         break;
         
       // -----------------------------

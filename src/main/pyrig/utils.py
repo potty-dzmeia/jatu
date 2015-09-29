@@ -14,12 +14,12 @@ def fromBcd(byte_array):
     :rtype: int
     """
     result = 0;
-    mult = 1;
+    multi = 1;
     for b in byte_array:
-        result += (b & 0x0F) * mult
-        mult *= 10
-        result += ((b>>4) & 0x0F) * mult
-        mult *= 10
+        result += (b & 0x0F) * multi
+        multi *= 10
+        result += ((b>>4) & 0x0F) * multi
+        multi *= 10
 
     return result
 

@@ -58,8 +58,9 @@ class DecodedTransaction(I_Rig.I_DecodedTransaction):
         :return: JSON formatted string holding the command and the data
         :rtype: str
         """
-        if type(data) is not str:
-            raise ValueError("Parameter 'data' should be a string")
+        if data is not None:
+            if type(data) is not str:
+                raise ValueError("Parameter 'data' should be a string")
         if command not in cls.supported_commands:
             raise ValueError("Unknown command")
 

@@ -29,17 +29,17 @@ public interface RadioListener extends EventListener
   public void mode(ModeEvent e);
 
   
- 
+  
   
   public static class FrequencyEvent
   {
-    private final long frequency;
-    public FrequencyEvent(long freq)
+    private final String frequency;
+    public FrequencyEvent(java.lang.String freq)
     {
       frequency = freq;
     }
     
-    public long getFrequency()
+    public String getFrequency()
     {
       return frequency;
     }
