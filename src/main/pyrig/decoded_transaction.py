@@ -8,8 +8,8 @@ class DecodedTransaction(I_Rig.I_DecodedTransaction):
     with some additional control information
     """
 
-    # Commands coming from the radio
-    supported_commands = ["not-supported",  # When the transaction contained unknown data
+    # Supported commands coming from the radio
+    supported_commands = ["not_supported",  # When the transaction contained unknown data
                           "confirmation",   # Radio has sent positive for negative confirmation
                           "frequency",      # Radio has sent new frequency
                           "mode"]           # Radio has sent new mode
@@ -58,6 +58,8 @@ class DecodedTransaction(I_Rig.I_DecodedTransaction):
         :return: JSON formatted string holding the command and the data
         :rtype: str
         """
+        if type(data) is not str:
+            raise ValueError("Parameter 'data' should be a string")
         if command not in cls.supported_commands:
             raise ValueError("Unknown command")
 
@@ -75,7 +77,7 @@ class DecodedTransaction(I_Rig.I_DecodedTransaction):
         :return: The following string {"command": "not-supported"}
         :rtype: str
         """
-        return cls.__create("not-supported")
+        return cls.__create("not_supported")
 
 
     @classmethod
@@ -85,7 +87,7 @@ class DecodedTransaction(I_Rig.I_DecodedTransaction):
         :return: The following string {"command": "positive_cfm"}
         :rtype: str
         """
-        return cls.__create("confirmation", 1)
+        return cls.__create("confirmation", str(1))
 
 
     @classmethod
@@ -95,13 +97,15 @@ class DecodedTransaction(I_Rig.I_DecodedTransaction):
         :return: The following string  {"command": "negative_cfm"}
         :rtype: str
         """
-        return cls.__create("confirmation", 0)
+        return cls.__create("confirmation", str(0))
 
 
     @classmethod
     def createFreq(cls, freq):
         """
-        Creates a JSON formatted transaction indicating that the decoded command is not supported
+        Creates a JSON formatted transaction holding  frequency
+        :param freq: frequncy
+        :type freq: str
         :return: String of the type {"command": "frequency", "data": "14000100"}
         :rtype: str
         """
@@ -111,7 +115,9 @@ class DecodedTransaction(I_Rig.I_DecodedTransaction):
     @classmethod
     def createMode(cls, mode):
         """
-        Creates a JSON formatted transaction indicating that the decoded command is not supported
+        Creates a JSON formatted transaction holding  mode
+        :param mode: A string describing the working mode of the radio
+        :type mode: str
         :return: String of the type {"command": "mode", "data": "cw"}
         :rtype: str
         """

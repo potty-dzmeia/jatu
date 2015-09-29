@@ -5,21 +5,8 @@
  */
 package org.lz1aq.jatu;
 
-
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import jssc.SerialPort;
-import jssc.SerialPortEvent;
-import jssc.SerialPortEventListener;
-import jssc.SerialPortException;
-import jssc.SerialPortList;
 import org.lz1aq.pyrig_interfaces.I_Radio;
 import org.lz1aq.pyrig_interfaces.I_Rig;
-import org.lz1aq.rsi.DynamicByteArray;
-import org.lz1aq.rsi.Radio;
 
 
 /**
@@ -51,12 +38,8 @@ public class Main
         decoded = radioProtocol.decode(transPositive);
         System.err.println("bytes read: "+decoded.getBytesRead());
         System.out.println("jason: "+decoded.getTransaction());
-        
-
-        
- 
   }
-    
+      
     
 //    String[] portNames = SerialPortList.getPortNames();
 //    for (int i = 0; i < portNames.length; i++)
@@ -98,12 +81,14 @@ public class Main
                                 (byte)0xe0, 
                                 (byte)0x5C, 
                                 (byte)0xFD,
-                                (byte)0xFE, 
+                                (byte)0xFE,     
                                 (byte)0xFE, 
                                 (byte)0xE0, 
                                 (byte)0x5C, 
                                 (byte)0x01,
                                 (byte)0x08,
                                 (byte)0xFD};
+  
+  
 
 }

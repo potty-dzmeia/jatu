@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.lz1aq.rsi;
+package org.lz1aq.utils;
 
 import java.io.ByteArrayOutputStream;
 

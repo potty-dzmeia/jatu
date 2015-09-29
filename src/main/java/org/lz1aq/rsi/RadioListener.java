@@ -29,7 +29,7 @@ public interface RadioListener extends EventListener
   public void mode(ModeEvent e);
 
   
-  
+ 
   
   public static class FrequencyEvent
   {

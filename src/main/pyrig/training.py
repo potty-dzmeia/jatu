@@ -1,66 +1,62 @@
+import threading
+from time import sleep
 
 
-class Board(object):
 
-    def __init__(self):
-        self._rows = list()
 
-        for x in range(0,8):
-            self._rows.append([None, None, None, None, None, None, None, None])
+class Game:
 
-    def reset(self):
-        for x in range(0,8,2):
-            (self._rows[0])[x] = Piece.createBlackMan()
-        for x in range(1,9,2):
-            (self._rows[1])[x] = Piece.createBlackMan()
+    _lock = threading._RLock()
+    mark = 5
+    start = 0
 
-    def setPiece(self, piece, x, y):
-        if (self._rows[x])[y] != None:
-            raise Exception("Square is not free")
+    @classmethod
+    def plus(self):
+        while(1):
 
-        self._rows[x][y] = piece
+            with Game._lock:
+                if self.start == 0:
+                    pass
+                if self.mark==9 or self.mark==1:
+                    break
+                self.mark +=1
+                self.prints(self.mark)
+                sleep(0.5)
 
-    def __repr__(self):
+    @classmethod
+    def minus(self):
+         while(1):
+
+            with Game._lock:
+                if self.start == 0:
+                    pass
+                if self.mark==9 or self.mark==1:
+                    break
+                self.mark -=1
+                self.prints(self.mark)
+                sleep(0.5)
+
+    @staticmethod
+    def prints(position):
         msg = ""
-        for i in self._rows:
-            msg += i.__str__() + "\n"
-            # msg += str(r) + " " + str(value) + "\n"
-
-        return msg
-
-class Piece(object):
-
-    def __init__(self, color="white", type="man"):
-        self._color = color
-        self._type = type
-
-    def __repr__(self):
-        if self._color == "white":
-            if self._type == "man":
-                return "w".ljust(4)
+        msg += "|"
+        for i in range(1,10):
+            if(i==position):
+                msg += "* "
             else:
-                return "W".ljust(4)
-        else:
-            if self._type == "man":
-                return "b".ljust(4)
-            else:
-                return "B".ljust(4)
+                msg += "_ "
 
-    @classmethod
-    def createWhiteMan(cls):
-        return Piece("white", "man")
+        msg += "|"
+        print msg
 
-    @classmethod
-    def createWhiteKing(cls):
-        return Piece("white", "king")
 
-    @classmethod
-    def createBlackMan(cls):
-        return Piece("black", "man")
+if __name__ == "__main__":
 
-    @classmethod
-    def createBlackKing(cls):
-        return Piece("black", "king")
+    thread1 = threading.Thread(target = Game.plus )
+    thread2 = threading.Thread(target = Game.minus)
 
-b = Board()
-print b
+    thread1.start()
+    thread2.start()
+
+    Game.start = 1
+    print "thread finished...exiting"

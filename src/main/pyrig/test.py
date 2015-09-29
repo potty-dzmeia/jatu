@@ -34,7 +34,7 @@ import re
 #
 #
 #
-TRANS_START = bytearray([0x01, 0x60, 0xFE, 0xFE, 0xE0, 0x66, 0x61])
+
 #
 # print TRANS_START.__str__()
 # print TRANS_START[0:7]
