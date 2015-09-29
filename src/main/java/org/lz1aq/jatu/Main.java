@@ -18,6 +18,7 @@ import jssc.SerialPortException;
 import jssc.SerialPortList;
 import org.lz1aq.pyrig_interfaces.I_Radio;
 import org.lz1aq.pyrig_interfaces.I_Rig;
+import org.lz1aq.rsi.DynamicByteArray;
 import org.lz1aq.rsi.Radio;
 
 
@@ -33,43 +34,7 @@ public class Main
         JythonObjectFactory f2 = new JythonObjectFactory(I_Radio.class, "icom", "Icom");
         I_Radio radioProtocol = (I_Radio) f2.createObject();
         
-//        byte[] command;
-//        
-//          
-//        command = radioProtocol.encodeSetFreq(7100000, 1);
-//        
-//        for(int i=0; i<command.length; i++) 
-//          System.out.println(String.format("%X", command[i]));
-//        
-//        
-//        command = radioProtocol.encodeSetMode(RadioModes.CW.toString(), 1);
-//        for(int i=0; i<command.length; i++) 
-//          System.out.println(String.format("%X", command[i]));
-//        
-//        I_Radio.I_SerialSettings serialSettings = radioProtocol.getSerialPortSettings();
-//        System.out.println(serialSettings.getParity());
 
-        
-        
-//        String[] serialPorts= SerialPortList.getPortNames();
-//        SerialPort port = new SerialPort(serialPorts[0]);
-//        Radio rad = new Radio(radioProtocol, port);
-//        rad.start();
-//        
-//        try
-//        {
-//          for(int i=0; i<1000000; i++)
-//          {
-//            rad.setFrequency(14000300, 1);
-//            Thread.sleep(10);
-//          }
-//          
-//        } catch (Exception ex)
-//        {
-//          Logger.getLogger(Main.class.getName()).log(Level.SEVERE, ex.toString(), ex);
-//        }
-       
-        
         I_Rig.I_DecodedTransaction decoded = radioProtocol.decode(transFreq);
         
         System.err.println("bytes read: "+decoded.getBytesRead());
@@ -87,7 +52,9 @@ public class Main
         System.err.println("bytes read: "+decoded.getBytesRead());
         System.out.println("jason: "+decoded.getTransaction());
         
-     
+
+        
+ 
   }
     
     
@@ -96,7 +63,8 @@ public class Main
 //    {
 //      System.out.println(portNames[i]);
 //    }SerialPort
-//  }
+//  }  private I_Radio radioProtocol;
+
   private I_Radio radioProtocol;
   
    static byte[] transFreq = {(byte)0xFE, 

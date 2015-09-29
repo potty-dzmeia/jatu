@@ -45,7 +45,7 @@ class DecodedTransaction(I_Rig.I_DecodedTransaction):
 
 
     #+--------------------------------------------------------------------------+
-    #|   Class methods                                                          |
+    #|   Helper Class methods for creating the JSON string                      |
     #+--------------------------------------------------------------------------+
     @classmethod
     def __create(cls, command, data=None):

@@ -1,6 +1,7 @@
 package org.lz1aq.rsi;
 
 import com.sun.corba.se.impl.util.Utility;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -15,6 +16,7 @@ import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
+import org.lz1aq.pyrig_interfaces.I_Rig.I_DecodedTransaction;
 import org.lz1aq.pyrig_interfaces.I_Rig.I_EncodedTransaction;
 
 /**
@@ -33,9 +35,8 @@ public class Radio
   private RadioListener   eventListener;        // TODO: make multiple event listeners
   private BlockingQueue<I_EncodedTransaction>  queueWithTransactions; // Transactions waiting to be sent to the radio
   private Thread          threadPortWrite;      // Thread that writes transaction to the serial port
-  private Thread          threadPortReader;     // Thread that receives transaction from the serial port
   private static final Logger logger = Logger.getLogger(Radio.class.getName());
-  private ArrayList<Byte> receiveBuffer;
+  DynamicByteArray        receiveBuffer;        // Where bytes received through the serial port will be put
   
   
   /**   
@@ -50,7 +51,7 @@ public class Radio
     this.serialPort       = serialPort;
     queueWithTransactions = new LinkedBlockingQueue<I_EncodedTransaction>(); 
     threadPortWrite       = new Thread(new PortWriter(), "threadPortWrite");    
-    receiveBuffer         = new ArrayList<Byte>();
+    receiveBuffer         = new DynamicByteArray(200);  // Set the initial size to some reasonable value
   }
   
     
@@ -147,16 +148,35 @@ public class Radio
   
   private class SerialPortReader implements SerialPortEventListener
   {
-
+    /**
+     * Reads bytes from the serial port and tries to decode them. If decoding
+     * is successful the decoded transaction is send to a dispatcher who is
+     * responsible of notifying the interested parties.
+     * \
+     * @param event 
+     */
     public void serialEvent(SerialPortEvent event)
     {
       try
+      {  
+        // Read all there is and add it to our receive buffer
+        receiveBuffer.write(serialPort.readBytes());
+      } catch (Exception ex)
       {
-        byte buffer[] = serialPort.readBytes(10);
-      } catch (SerialPortException ex)
-      {
-        System.out.println(ex);
+        Logger.getLogger(Radio.class.getName()).log(Level.SEVERE, null, ex);
       }
+      
+      // Pass the received data to the protocol parser for decoding
+      I_DecodedTransaction trans = radioProtocolParser.decode(receiveBuffer.toByteArray());
+      
+      if(trans.getBytesRead() > 0)
+      { 
+        // Let the dispatcher notify the interested parties
+//        transactionDispatcher(trans.getTransaction());
+        // Remove the processed bytes from the received buffer
+        receiveBuffer.remove(trans.getBytesRead());
+      }
+      
     }
   }
   
