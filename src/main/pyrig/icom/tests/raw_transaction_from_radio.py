@@ -56,6 +56,8 @@ while 1:
     for key, value in raw_transactions.items():
         ser.write(value)
         ser.write("fsgsdsafsfasfadsfasfadsfdfadsfasgafsagfdghdhjhgjgjfgjfjgfjfjfjgjgf ")
+        ser.write("fsgsdsafsfasfadsfasfadsfdfadsfasgafsagfdghdhjhgjgjfgjfjgfjfjfjgjgf ")
+        ser.write("fsgsdsafsfasfadsfasfadsfdfadsfasgafsagfdghdhjhgjgjfgjfjgfjfjfjgjgf ")
         print value
         time.sleep(0.1)
 

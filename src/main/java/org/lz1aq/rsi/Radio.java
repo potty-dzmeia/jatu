@@ -197,7 +197,7 @@ public class Radio
       {
         while(true)
         {
-          // Get the next transaction to be send (w8 if queue is empty)
+          // Get the next transaction to be send (waits if the queue is empty)
           trans = queueWithTransactions.take();
           
           // Retry - Try to send it the specified amount of times
@@ -207,27 +207,17 @@ public class Radio
             try
             {
               serialPort.writeBytes(trans.getTransaction());
-              serialPort.purgePort(SerialPort.PURGE_RXCLEAR);
+              serialPort.purgePort(SerialPort.PURGE_TXCLEAR);
               logger.log(Level.INFO, Misc.toString(trans.getTransaction()));
             } catch (SerialPortException ex)
             {
               logger.log(Level.SEVERE, null, ex);
             }
-             
-            
+                        
             // Wait for confirmation from the radio (optional)
             if(trans.isConfirmationExpected())
             {
-              synchronized(this)
-              {
-                if(confirmation == CfmType.EMPTY)
-                  wait(trans.getTimeout());
-                else
-                  logger.log(Level.WARNING, "\"confirmation\" arrived super fast!");
-                cfm = confirmation;           // read the confirmation
-                confirmation = CfmType.EMPTY; // reset to empty for the next operation
-              }
-              
+              waitForConfirmation(trans);
             }
 
             // Delay between transactions (optional)
@@ -249,6 +239,26 @@ public class Radio
         System.out.println("PortWriter was terminated!");
       }
     }// run()
+
+    /**
+     * Blocks the thread until the confirmation flag is updated or until the
+     * timeout specified in trans expires.
+     * 
+     * @param trans - holds the timeout value for the confirmation
+     * @throws InterruptedException 
+     */
+    private void waitForConfirmation(I_EncodedTransaction trans) throws InterruptedException
+    {
+      synchronized(this)
+      {
+        if(confirmation == CfmType.EMPTY)
+          wait(trans.getTimeout());
+        else
+          logger.log(Level.WARNING, "\"confirmation\" arrived super fast!");
+        cfm = confirmation;           // read the confirmation
+        confirmation = CfmType.EMPTY; // reset to empty for the next operation
+      }
+    }
   }// class
   
   
@@ -287,19 +297,7 @@ public class Radio
     {
       // -----------------------------
       case RadioEvents.CONFIRMATION:
-      // -----------------------------
-        // Inform portWriter that we have received confirmation for last command we have sent
-        synchronized(threadPortWriter)
-        { 
-          if(confirmation != CfmType.EMPTY)
-            logger.log(Level.WARNING, "Upon receiving of confirmation from the radio the \"confirmation\" var is not empty!");
-          if(data.equals("1"))
-            confirmation = CfmType.POSITIVE;
-          else
-            confirmation = CfmType.NEGATIVE;
-          
-          threadPortWriter.notify();
-        }
+        updateConfirmation(data);
         break;
        
       // -----------------------------
@@ -313,6 +311,29 @@ public class Radio
       // -----------------------------
         eventListener.mode(new RadioListener.ModeEvent(data));
         break;  
+    }
+  }
+
+  
+  /**
+   *  Stores the confirmation received from the radio and notifies the threadPortWriter
+   * 
+   * @param cfm - Confirmation type (i.e. positive or negative)
+   */
+  private void updateConfirmation(String cfm)
+  {
+    // -----------------------------
+    // Inform portWriter that we have received confirmation for last command we have sent
+    synchronized(threadPortWriter)
+    {
+      if(confirmation != CfmType.EMPTY)
+        logger.log(Level.WARNING, "Upon receiving of confirmation from the radio the \"confirmation\" var is not empty!");
+      if(cfm.equals("1"))
+        confirmation = CfmType.POSITIVE;
+      else
+        confirmation = CfmType.NEGATIVE;
+      
+      threadPortWriter.notify();
     }
   }
   
