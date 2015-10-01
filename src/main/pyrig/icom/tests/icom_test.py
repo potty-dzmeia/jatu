@@ -1,3 +1,9 @@
+import sys
+
+sys.path.append("/home/potty/development/projects/jatu/target/classes/")
+import unittest
+from icom import Icom
+
 
 civ_address = 0x5C
 
@@ -37,29 +43,45 @@ raw_transactions = {
 'freq_4bytes_0'         :   bytearray([0xFE, 0xFE, 0xE0, civ_address, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFD]),
 }
 
-import time
-import serial
+# import time
+# import serial
+#
+# # configure the serial connections (the parameters differs on the device you are connecting to)
+# ser = serial.Serial(
+#      port='/dev/ttyUSB0',
+#     baudrate=9600,
+#     parity=serial.PARITY_NONE,
+#     stopbits=serial.STOPBITS_ONE,
+#     bytesize=serial.EIGHTBITS
+# )
+#
+# print ser.isOpen()
+#
+#
+# while 1:
+#     for key, value in raw_transactions.items():
+#         ser.write(value)
+#         ser.write("fsgsdsafsfasfadsfasfadsfdfadsfasgafsagfdghdhjhgjgjfgjfjgfjfjfjgjgf ")
+#         ser.write("fsgsdsafsfasfadsfasfadsfdfadsfasgafsagfdghdhjhgjgjfgjfjgfjfjfjgjgf ")
+#         ser.write("fsgsdsafsfasfadsfasfadsfdfadsfasgafsagfdghdhjhgjgjfgjfjgfjfjfjgjgf ")
+#         print value
+#         time.sleep(0.1)
+#
+#
+# print ser.close()
 
-# configure the serial connections (the parameters differs on the device you are connecting to)
-ser = serial.Serial(
-     port='/dev/ttyUSB0',
-    baudrate=9600,
-    parity=serial.PARITY_NONE,
-    stopbits=serial.STOPBITS_ONE,
-    bytesize=serial.EIGHTBITS
-)
-
-print ser.isOpen()
 
 
-while 1:
-    for key, value in raw_transactions.items():
-        ser.write(value)
-        ser.write("fsgsdsafsfasfadsfasfadsfdfadsfasgafsagfdghdhjhgjgjfgjfjgfjfjfjgjgf ")
-        ser.write("fsgsdsafsfasfadsfasfadsfdfadsfasgafsagfdghdhjhgjgjfgjfjgfjfjfjgjgf ")
-        ser.write("fsgsdsafsfasfadsfasfadsfdfadsfasgafsagfdghdhjhgjgjfgjfjgfjfjfjgjgf ")
-        print value
-        time.sleep(0.1)
+class IcomTest(unittest.TestCase):
 
+    def setUp(self):
+        self.icom = Icom()
 
-print ser.close()
+    def test_mytest(self):
+        trans =  self.icom.decode(raw_transactions["mode_usb"]).getTransaction()
+        print trans
+        self.assertEqual('string', 'string')
+
+if __name__ == '__main__':
+
+    unittest.main()

@@ -21,10 +21,10 @@ class Icom(radio.Radio):
     # If different value than the default one is need - uncomment and set to desired value
     # serial_settings.baudrate_min_ = 2400
     # serial_settings.baudrate_max_ = 19200
-    # serial_settings.data_bits_ = 8
-    # serial_settings.stop_bits_ = 1
-    # serial_settings.handshake_ = "None"       # possible values 'None', 'XON_XOFF' and 'CTS_RTS'
-    # serial_settings.parity_ = "None"          # possible values 'None', 'Even', 'Odd', 'Mark', 'Space'
+    # serial_settings.data_bits_ = SerialSettings.DATABITS_EIGTH
+    # serial_settings.stop_bits_ = SerialSettings.STOPBITS_ONE
+    # serial_settings.handshake_ = SerialSettings.HANDSHAKE_NONE
+    # serial_settings.parity_ = SerialSettings.PARITY_NONE
 
     # The address of the Icom transceiver. Value of 0x5c is good for 756Pro
     CIV_ADDRESS = 0x5c
