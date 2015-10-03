@@ -50,7 +50,7 @@ package org.lz1aq.pyrig_interfaces;
  *          |                     |                         |        
  */
 public interface I_Rig 
-{
+{   
     /** @return string specifying the manufacturer of the rig - E.g. "Kenwood"*/
     public String getManufacturer();
     
@@ -60,6 +60,7 @@ public interface I_Rig
    /** @return JSON formatted string describing the COM port settings that 
     * needs to be used when communicating with this Rig*/
     public I_SerialSettings getSerialPortSettings();
+ 
     
     /**
      * Decodes information coming from the Rig into JSON formatted string
@@ -89,7 +90,11 @@ public interface I_Rig
       public int getDataBits();
 
       public int getStopBits();
-
+      
+      /**
+       *  Returns parity parameter
+       * @return Possible values are: 'None', 'Even', 'Odd', 'Mark', 'Space'
+       */
       public String getParity();
 
       public String getHandshake();
@@ -145,7 +150,6 @@ public interface I_Rig
        */
       public boolean isConfirmationExpected();
     }
-    
     
     
     /**

@@ -9,18 +9,25 @@ class Rig(I_Rig):
     """
 
     
-    
-    @property
-    def getManufacturer(self):
+    @classmethod
+    def getFilename(cls):
+        """
+        Returns the file name in which this class is defined
+        :return: module name
+        :rtype: str
+        """
+        return __name__
+        
+    @classmethod
+    def getManufacturer(cls):
         """
         :return: The manufacturer of the rig - E.g. "Kenwood"
         :rtype: str
         """
         raise NotImplementedError("getManufacturer")
 
-
-    @property
-    def getModel(self):
+    @classmethod
+    def getModel(cls):
         """
         :return: The model of the Rig - E.g. "IC-756PRO"
         :rtype: str
@@ -28,8 +35,8 @@ class Rig(I_Rig):
         raise NotImplementedError("getModel")
 
 
-    @property
-    def getSerialPortSettings(self):
+    @classmethod
+    def getSerialPortSettings(cls):
         """
         :return: The COM port settings that needs to be used when communicating with this Rig.
         :rtype: SerialSettings
@@ -37,8 +44,8 @@ class Rig(I_Rig):
         raise NotImplementedError("getSerialPortSettings")
 
 
-    @property
-    def decode(self, string_of_bytes):
+    @classmethod
+    def decode(cls, string_of_bytes):
         """
         Decodes information coming from the Rig.
         Converts string of bytes coming from the rig into a JSON formatted command.
@@ -52,8 +59,8 @@ class Rig(I_Rig):
         raise NotImplementedError("decode")
 
 
-    @property
-    def encodeInit(self):
+    @classmethod
+    def encodeInit(cls):
         """
         If a rig needs some initialization before being able to be used.
         
@@ -63,8 +70,8 @@ class Rig(I_Rig):
         raise NotImplementedError("encode_Init")
 
 
-    @property
-    def encodeCleanup(self):
+    @classmethod
+    def encodeCleanup(cls):
         """
         If a rig needs some cleanup after being used.
         

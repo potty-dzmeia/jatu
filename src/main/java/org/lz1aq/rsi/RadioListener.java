@@ -39,7 +39,8 @@ public interface RadioListener extends EventListener
       frequency = freq;
     }
     
-    public String getFrequency()
+    @Override
+    public String toString()
     {
       return frequency;
     }
@@ -53,7 +54,8 @@ public interface RadioListener extends EventListener
       mode = md;
     }
     
-    public String getMode()
+    @Override
+    public String toString()
     {
       return mode;
     }

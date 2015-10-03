@@ -16,8 +16,8 @@ import org.lz1aq.pyrig_interfaces.I_Rig.I_EncodedTransaction;
 import org.json.*;
 /**
  * Class for controlling a radio through the serial interface
- * 
- * After creating the star() method must be called!
+ 
+ After creating the radio object the connect() method must be called!
  * 
  * @author potty
  */
@@ -25,18 +25,20 @@ public class Radio
 {
   private static final int QUEUE_SIZE = 30;   // Max number of commands that queueWithTransactions can hold
   
+  private boolean                 isConnected = false;  // If there is a com port open
   private RadioListener           eventListener;        // TODO: make multiple event listeners
-  private final SerialPort        serialPort;           // Used for writing to serialPort
+  private final String            serialPortName;       // 
+  private       SerialPort        serialPort;           // Used for writing to serialPort
   private final I_Radio           radioProtocolParser;  // Used for decoding/encoding msg from/to the radio (jython object)
   private final Thread            threadPortWriter;     // Thread that writes transaction to the serial port
   private final DynamicByteArray  receiveBuffer;        // Where bytes received through the serial port will be put
    
   private final BlockingQueue<I_EncodedTransaction>  queueWithTransactions; // Transactions waiting to be sent to the radio
   
-  private static final Logger logger = Logger.getLogger(Radio.class.getName());
+  private static final Logger     logger = Logger.getLogger(Radio.class.getName());
  
   private enum CfmType{EMPTY, POSITIVE, NEGATIVE}
-  private CfmType           confirmation = CfmType.EMPTY; // Variable holding the last positive or negative confirmation from the rig
+  private CfmType                 confirmation = CfmType.EMPTY; // Variable holding the last positive or negative confirmation from the rig
   
   /**   
    * Constructor 
@@ -44,10 +46,10 @@ public class Radio
    * @param protocolParser - provides the protocol for communicating with the radio
    * @param serialPort -  serial port to be used for communication
    */
-  public Radio(I_Radio protocolParser, SerialPort serialPort)
+  public Radio(I_Radio protocolParser, String portName)
   {
     radioProtocolParser   = protocolParser;           // Store the reference to the jython object
-    this.serialPort       = serialPort;
+    this.serialPortName   = portName;
     queueWithTransactions = new LinkedBlockingQueue<>(); 
     threadPortWriter      = new Thread(new PortWriter(), "threadPortWrite");    
     receiveBuffer         = new DynamicByteArray(200);  // Set the initial size to some reasonable value
@@ -67,37 +69,42 @@ public class Radio
    * 
    * @throws SerialPortException 
    */
-  public void start() throws Exception
+  public void connect() throws Exception
   {
     if(threadPortWriter.getState() != Thread.State.NEW )
       throw new Exception("Please create a new Radio object");
     
-    if(serialPort.isOpened() == false)
-      serialPort.openPort();
-
+   
+    serialPort = new SerialPort(serialPortName);
+    serialPort.openPort();
+    setComPortParams(serialPort, radioProtocolParser.getSerialPortSettings());
+    
     threadPortWriter.start();
     
     // Register the serial port reader
     serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
     serialPort.addEventListener(new PortReader());
+    
+    isConnected = true;
   }
   
   
   /**
-   * The user of class "Radio" can choose between closing the ports manually
-   * or calling the stop() method.
+   * The user of class "Radio" can choose between closing the ports manually 
+   * or calling the disconnects() method.
    * 
-   * After an object has been stop it can not be started again by calling the
-   * start() method. For this purpose a new object must be created.
+   * After an object has been disconnects it can not be started again by calling 
+   * the connect() method. For this purpose a new object must be created.
    * 
    * @throws jssc.SerialPortException
    */
-  public void stop() throws SerialPortException
+  public void disconnects() throws SerialPortException
   {
-    serialPort.closePort();
     threadPortWriter.interrupt();
-    
     serialPort.removeEventListener();
+    serialPort.closePort();
+    
+    isConnected = false;
   }
   
   
@@ -110,7 +117,27 @@ public class Radio
    */
   public void setFrequency(long freq, int vfo) throws Exception
   {
+    if(isConnected==false) 
+      throw new Exception("Not connected to radio!");
+    
     this.queueTransaction(radioProtocolParser.encodeSetFreq(freq, vfo));
+  }
+  
+  /**
+   * Asks the radio to send us the current frequency.
+   * 
+   * If we would like to get the frequency event when it comes we have to
+   * register an EventListener
+   * 
+   * @param vfo - for which vfo we would like to get the frequency
+   * @throws Exception 
+   */
+  public void getFrequency(int vfo) throws Exception
+  {
+    if(isConnected==false) 
+      throw new Exception("Not connected to radio!");
+    
+    //this.queueTransaction(radioProtocolParser.);
   }
   
   
@@ -122,6 +149,9 @@ public class Radio
    */
   public void setMode(String mode, int vfo) throws Exception
   {
+   if(isConnected==false) 
+      throw new Exception("Not connected to radio!");
+    
     this.queueTransaction(radioProtocolParser.encodeSetMode(mode, vfo));
   }
   
@@ -337,6 +367,43 @@ public class Radio
     }
   }
   
+   /**
+   * Sets Com port parameters
+   * 
+   * @param port The serial port which params will be adjusted
+   * @param settings Source from which the values will be taken
+   */
+  private void setComPortParams(SerialPort port, I_Radio.I_SerialSettings settings) throws SerialPortException
+  {
+    int parity = SerialPort.PARITY_NONE;;
+    switch(settings.getParity())
+    {
+      case "None":
+        parity = SerialPort.PARITY_NONE;
+        break;
+
+      case "Odd":
+        parity = SerialPort.PARITY_ODD;
+        break;
+
+      case "Even":
+        parity = SerialPort.PARITY_EVEN;
+        break;
+
+      case "Mark":
+        parity = SerialPort.PARITY_MARK;
+        break;
+
+      case "Space":
+        parity = SerialPort.PARITY_SPACE;
+        break;
+    }
+    
+    port.setParams(settings.getBauderateMax(),
+                   settings.getDataBits(),
+                   settings.getStopBits(),
+                   parity);
+  }
   
   /**
    *  Currently we support the following events coming from the radio

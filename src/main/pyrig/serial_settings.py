@@ -32,7 +32,21 @@ class SerialSettings(I_Rig.I_SerialSettings):
         return json.dumps(jsonBlock, indent=4)
 
 
-    def getBauderate_Min(self):
+    def toString(self):
+        """Packs the class variables into a JSON formatted string
+        :rtype : str
+        """
+        jsonBlock = dict()
+        jsonBlock["baudrate_min"] = self.baudrate_min_
+        jsonBlock["baudrate_max"] = self.baudrate_max_
+        jsonBlock["data_bits"] = self.baudrate_min_
+        jsonBlock["data_bits"] = self.data_bits_
+        jsonBlock["stop_bits"] = self.stop_bits_
+        jsonBlock["parity"] = self.parity
+        jsonBlock["handshake"] = self.handshake
+        return json.dumps(jsonBlock, indent=4)
+
+    def getBauderateMin(self):
         """
         :rtype: int
         """

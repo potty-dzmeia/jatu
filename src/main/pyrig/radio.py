@@ -6,31 +6,41 @@ from org.lz1aq.pyrig_interfaces import I_Radio
 class Radio(I_Radio):
 
 
-    modes =['none'  ,
-            'am'    ,  # AM -- Amplitude Modulation
-            'cw'    ,  # CW - CW "normal" sideband
-            'usb'   ,  # USB - Upper Side Band
-            'lsb'   ,  # LSB - Lower Side Band
-            'rtty'  ,  # RTTY - Radio Teletype
-            'fm'    ,  # FM - "narrow" band FM
-            'wfm'   ,  # WFM - broadcast wide FM
-            'cwr'   ,  # CWR - CW "reverse" sideband
-            'rttyr' ,  # RTTYR - RTTY "reverse" sideband
-            'ams'   , # AMS - Amplitude Modulation Synchronous
-            'pktlsb', # PKTLSB - Packet/Digital LSB mode (dedicated port)
-            'pktusb', # PKTUSB - Packet/Digital USB mode (dedicated port)
-            'pktfm' , # PKTFM - Packet/Digital FM mode (dedicated port)
-            'ecssusb', # ECSSUSB - Exalted Carrier Single Sideb and USB
-            'ecsslsb', # ECSSLSB - Exalted Carrier Single Sideband LSB
-            'fax'   , # FAX - Facsimile Mode
-            'sam'   , # SAM - Synchronous AM double sideband
-            'sal'   , # SAL - Synchronous AM lower sideband
-            'sah'   , # SAH - Synchronous AM upper (higher) sideband
-            'dsb'   , # DSB - Double sideband suppressed carrier
-    ]
+    # modes =['none'  ,
+    #         'am'    ,  # AM -- Amplitude Modulation
+    #         'cw'    ,  # CW - CW "normal" sideband
+    #         'usb'   ,  # USB - Upper Side Band
+    #         'lsb'   ,  # LSB - Lower Side Band
+    #         'rtty'  ,  # RTTY - Radio Teletype
+    #         'fm'    ,  # FM - "narrow" band FM
+    #         'wfm'   ,  # WFM - broadcast wide FM
+    #         'cwr'   ,  # CWR - CW "reverse" sideband
+    #         'rttyr' ,  # RTTYR - RTTY "reverse" sideband
+    #         'ams'   , # AMS - Amplitude Modulation Synchronous
+    #         'pktlsb', # PKTLSB - Packet/Digital LSB mode (dedicated port)
+    #         'pktusb', # PKTUSB - Packet/Digital USB mode (dedicated port)
+    #         'pktfm' , # PKTFM - Packet/Digital FM mode (dedicated port)
+    #         'ecssusb', # ECSSUSB - Exalted Carrier Single Sideb and USB
+    #         'ecsslsb', # ECSSLSB - Exalted Carrier Single Sideband LSB
+    #         'fax'   , # FAX - Facsimile Mode
+    #         'sam'   , # SAM - Synchronous AM double sideband
+    #         'sal'   , # SAL - Synchronous AM lower sideband
+    #         'sah'   , # SAH - Synchronous AM upper (higher) sideband
+    #         'dsb'   , # DSB - Double sideband suppressed carrier
+    # ]
 
-    @property
-    def encodeSetFreq(self, freq, vfo):
+    @classmethod
+    def getManufacturer(cls):
+        raise NotImplementedError("getManufacturer")
+
+
+    @classmethod
+    def getModel(cls):
+        raise NotImplementedError("getModel")
+
+
+    @classmethod
+    def encodeSetFreq(cls, freq, vfo):
         """
         Gets the command with which we can tell an Icom radio to change frequency
 
@@ -44,8 +54,8 @@ class Radio(I_Radio):
         raise NotImplementedError("encode_SetFreq")
 
 
-    @property
-    def encodeSetMode(self, mode, vfo):
+    @classmethod
+    def encodeSetMode(cls, mode, vfo):
         """
         Get the command that must be send to the radio in order to set mode (e.g. CW)
 
@@ -58,6 +68,29 @@ class Radio(I_Radio):
         """
         raise NotImplementedError("encode_SetFreq")
 
+
+    @classmethod
+    def getModes(cls):
+        """
+        The function returns a string with all the modes that it supports.
+        Example: "cw ssb lsb"
+
+        :return: A string with the supported modes. Each mode is separated from the next with space.
+        :rtype: str
+        """
+        raise NotImplementedError("getModes")
+
+
+    @classmethod
+    def getBands(cls):
+        """
+        The function returns a string with all the bands that it supports.
+        Example: "3.5 7 14"
+
+        :return: A string with the supported bands. Each band is separated from the next with space.
+        :rtype: str
+        """
+        raise NotImplementedError("getBands")
 
 
 

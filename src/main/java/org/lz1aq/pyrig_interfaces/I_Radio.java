@@ -32,31 +32,49 @@ public interface I_Radio extends I_Rig
   public I_EncodedTransaction encodeSetMode(String mode, int vfo);
 
   
+  /**
+   * The function returns a string with all the modes that it supports.
+   * Example: "cw ssb lsb"
+   * 
+   * @return A string with the supported modes. Each mode is separated from 
+   * the next with space.
+   */
+  public String getModes();
   
   
-  public enum RadioModes
-  {
-    NONE,
-    AM, // AM -- Amplitude Modulation 
-    CW, // CW - CW "normal" sideband
-    USB, // USB - Upper Side Band
-    LSB, // LSB - Lower Side Band 
-    RTTY, // RTTY - Radio Teletype 
-    FM, // FM - "narrow" band FM 
-    WFM, // WFM - broadcast wide FM 
-    CWR, // CWR - CW "reverse" sideband
-    RTTYR, // RTTYR - RTTY "reverse" sideband
-    AMS, // AMS - Amplitude Modulation Synchronous 
-    PKTLSB, // PKTLSB - Packet/Digital LSB mode (dedicated port) 
-    PKTUSB, // PKTUSB - Packet/Digital USB mode (dedicated port) 
-    PKTFM, // PKTFM - Packet/Digital FM mode (dedicated port) 
-    ECSSUSB, // ECSSUSB - Exalted Carrier Single Sideband USB 
-    ECSSLSB, // ECSSLSB - Exalted Carrier Single Sideband LSB 
-    FAX, // FAX - Facsimile Mode
-    SAM, // SAM - Synchronous AM double sideband
-    SAL, // SAL - Synchronous AM lower sideband
-    SAH, // SAH - Synchronous AM upper (higher) sideband
-    DSB         // DSB - Double sideband suppressed carrier
-  }
+  /**
+   * The function returns a string with all the bands that it supports.
+   * Example: "3.5 7 14"
+   * 
+   * @return A string with the supported bands. Each band is separated from the
+   *  next with space.
+   */
+  public String getBands();
+  
+  
+//  public enum RadioModes
+//  {
+//    NONE,
+//    AM, // AM -- Amplitude Modulation 
+//    CW, // CW - CW "normal" sideband
+//    USB, // USB - Upper Side Band
+//    LSB, // LSB - Lower Side Band 
+//    RTTY, // RTTY - Radio Teletype 
+//    FM, // FM - "narrow" band FM 
+//    WFM, // WFM - broadcast wide FM 
+//    CWR, // CWR - CW "reverse" sideband
+//    RTTYR, // RTTYR - RTTY "reverse" sideband
+//    AMS, // AMS - Amplitude Modulation Synchronous 
+//    PKTLSB, // PKTLSB - Packet/Digital LSB mode (dedicated port) 
+//    PKTUSB, // PKTUSB - Packet/Digital USB mode (dedicated port) 
+//    PKTFM, // PKTFM - Packet/Digital FM mode (dedicated port) 
+//    ECSSUSB, // ECSSUSB - Exalted Carrier Single Sideband USB 
+//    ECSSLSB, // ECSSLSB - Exalted Carrier Single Sideband LSB 
+//    FAX, // FAX - Facsimile Mode
+//    SAM, // SAM - Synchronous AM double sideband
+//    SAL, // SAL - Synchronous AM lower sideband
+//    SAH, // SAH - Synchronous AM upper (higher) sideband
+//    DSB         // DSB - Double sideband suppressed carrier
+//  }
 
 }

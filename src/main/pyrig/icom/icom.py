@@ -13,7 +13,7 @@ class Icom(radio.Radio):
     """
 
     #+--------------------------------------------------------------------------+
-    #|  User configuration fields - change if needed                           |
+    #|  User configuration fields - change if needed                               |
     #+--------------------------------------------------------------------------+
 
     # Get default serial port settings
@@ -47,6 +47,23 @@ class Icom(radio.Radio):
     #|   End of user configuration fields
     #+--------------------------------------------------------------------------+
 
+
+    @classmethod
+    def getManufacturer(cls):
+        """
+        :return: The manufacturer of the rig - E.g. "Kenwood"
+        :rtype: str
+        """
+        return cls.MANUFACTURER
+
+
+    @classmethod
+    def getModel(cls):
+        """
+        :return: The model of the Rig - E.g. "IC-756PRO"
+        :rtype: str
+        """
+        return cls.ICOM_MODEL_NAME
 
     @classmethod
     def getSerialPortSettings(cls):
@@ -205,7 +222,33 @@ class Icom(radio.Radio):
         """
         return utils.fromBcd(frequency).__str__()
 
+    @classmethod
+    def getModes(cls):
+        """
+        The function returns a string with all the modes that the radio supports.
+        Example: "cw ssb lsb"
 
+        :return: A string with the supported modes. Each mode is separated from the next with space.
+        :rtype: str
+        """
+        return " ".join("%s" % key for key in cls.mode_codes)
+
+
+    # @classmethod
+    # def getBands(cls):
+    #     """
+    #     The function returns a string with all the bands that it supports.
+    #     Example: "3.5 7 14"
+    #
+    #     :return: A string with the supported bands. Each band is separated from the next with space.
+    #     :rtype: str
+    #     """
+    #     return " ".join("%s" % key for key in cls.mode_codes)
+
+
+
+    MANUFACTURER = "Icom"
+    ICOM_MODEL_NAME = "None"
 
     #+--------------------------------------------------------------------------+
     #|   Icom command codes

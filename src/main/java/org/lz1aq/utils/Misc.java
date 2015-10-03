@@ -5,6 +5,8 @@
  */
 package org.lz1aq.utils;
 
+
+
 /**
  *
  * @author potty
@@ -29,5 +31,31 @@ public class Misc
     }
     
     return resultString;
+  }
+  
+  /**
+   * Inserts "," between the thousands 
+   * 
+   * @param freq - the frequency that we would like to format
+   * @return - new frequency with the "," between the thousands
+   */
+  public static String formatFrequency(String freq)
+  {
+    StringBuilder buf = new StringBuilder();
+    int counter = 0;
+    
+    for(int i=freq.length()-1; i>=0 ; i--)
+    {
+      counter++;
+      buf.append(freq.charAt(i));
+      if(counter==3 && i!=0)
+      {
+        buf.append(",");
+        counter=0;
+      }
+    }
+    buf.reverse();
+
+    return buf.toString();
   }
 }

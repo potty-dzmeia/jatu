@@ -7,6 +7,7 @@ package org.lz1aq.jatu;
 
 import org.lz1aq.pyrig_interfaces.I_Radio;
 import org.lz1aq.pyrig_interfaces.I_Rig;
+import org.lz1aq.utils.Misc;
 
 
 /**
@@ -18,34 +19,34 @@ public class Main
   
     public static void main(String args[]) throws Exception
     {  
-        JythonObjectFactory f2 = new JythonObjectFactory(I_Radio.class, "icom", "Icom");
-        I_Radio radioProtocol = (I_Radio) f2.createObject();
-        
-
-        I_Rig.I_DecodedTransaction decoded = radioProtocol.decode(transFreq);
-        
-        System.err.println("bytes read: "+decoded.getBytesRead());
-        System.out.println("jason: "+decoded.getTransaction());
-        
-        decoded = radioProtocol.decode(transMode);
-        System.err.println("bytes read: "+decoded.getBytesRead());
-        System.out.println("jason: "+decoded.getTransaction());
-        
-        decoded = radioProtocol.decode(transNegative);
-        System.err.println("bytes read: "+decoded.getBytesRead());
-        System.out.println("jason: "+decoded.getTransaction());
-        
-        decoded = radioProtocol.decode(transPositive);
-        System.err.println("bytes read: "+decoded.getBytesRead());
-        System.out.println("jason: "+decoded.getTransaction());
+//        JythonObjectFactory f2 = new JythonObjectFactory(I_Radio.class, "icom", "Icom");
+//        I_Radio radioProtocol = (I_Radio) f2.createObject();
+//        
+//
+//        I_Rig.I_DecodedTransaction decoded = radioProtocol.decode(transFreq);
+//        
+//        System.err.println("bytes read: "+decoded.getBytesRead());
+//        System.out.println("jason: "+decoded.getTransaction());
+//        
+//        decoded = radioProtocol.decode(transMode);
+//        System.err.println("bytes read: "+decoded.getBytesRead());
+//        System.out.println("jason: "+decoded.getTransaction());
+//        
+//        decoded = radioProtocol.decode(transNegative);
+//        System.err.println("bytes read: "+decoded.getBytesRead());
+//        System.out.println("jason: "+decoded.getTransaction());
+//        
+//        decoded = radioProtocol.decode(transPositive);
+//        System.err.println("bytes read: "+decoded.getBytesRead());
+//        System.out.println("jason: "+decoded.getTransaction());
+      
+      String freq = "14.100.sadf200";
+      System.out.println(freq.replaceAll("[^0-9]+", ""));
+    
   }
       
     
-//    String[] portNames = SerialPortList.getPortNames();
-//    for (int i = 0; i < portNames.length; i++)
-//    {
-//      System.out.println(portNames[i]);
-//    }SerialPort
+//   
 //  }  private I_Radio radioProtocol;
 
   private I_Radio radioProtocol;
