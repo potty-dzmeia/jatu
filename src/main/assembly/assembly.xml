@@ -40,9 +40,9 @@
         <fileSet>
             <directory>${project.basedir}/src/main/pyrig</directory>
             <outputDirectory>pyrig</outputDirectory>
-            <includes>
+<!--            <includes>
                 <include>*.*</include>
-            </includes>
+            </includes>-->
         </fileSet>
       
         <!--

@@ -39,7 +39,7 @@
                <addClasspath>true</addClasspath>
                 <!--Specifies that all dependencies of our application are found from the lib directory.-->
                <classpathPrefix>lib/</classpathPrefix>
-               <mainClass>org.lz1aq.jatu.Main</mainClass>
+               <mainClass>org.lz1aq.jatu.SimpleRadioPanel</mainClass>
              </manifest>
            </archive>
            <excludes>

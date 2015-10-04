@@ -42,7 +42,7 @@ class Radio(I_Radio):
     @classmethod
     def encodeSetFreq(cls, freq, vfo):
         """
-        Gets the command with which we can tell an Icom radio to change frequency
+        Gets the command with which we can tell the radio to change frequency
 
         :param freq: Specifying the frequency. E.g. 7100000 for 7.1MHz
         :type freq: int
@@ -55,6 +55,20 @@ class Radio(I_Radio):
 
 
     @classmethod
+    def encodeGetFreq(cls, freq, vfo):
+        """
+        Gets the command with which we can tell the radio send us the current frequency
+
+        :param vfo: For which VFO we want the mode
+        :type vfo: int
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
+        """
+        raise NotImplementedError("encode_SetFreq")
+
+
+
+    @classmethod
     def encodeSetMode(cls, mode, vfo):
         """
         Get the command that must be send to the radio in order to set mode (e.g. CW)
@@ -62,6 +76,18 @@ class Radio(I_Radio):
         :param mode: Specifies the mode - see Radio.modes
         :type mode: str
         :param vfo: The vfo which mode must be changed
+        :type vfo: int
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
+        """
+        raise NotImplementedError("encode_SetFreq")
+
+    @classmethod
+    def encodeGetMode(cls, mode, vfo):
+        """
+        Gets the command with which we can tell the radio to send us the current mode
+
+        :param vfo: The VFO for which we want the current mode
         :type vfo: int
         :return: Object containing transaction with some additional control settings
         :rtype: EncodedTransaction

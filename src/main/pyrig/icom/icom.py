@@ -18,13 +18,15 @@ class Icom(radio.Radio):
 
     # Get default serial port settings
     serial_settings = SerialSettings()
-    # If different value than the default one is need - uncomment and set to desired value
+    # If different values than the default ones are need - uncomment and set to desired value
     # serial_settings.baudrate_min_ = 2400
-    # serial_settings.baudrate_max_ = 19200
+    serial_settings.baudrate_max_ = 9600
     # serial_settings.data_bits_ = SerialSettings.DATABITS_EIGTH
     # serial_settings.stop_bits_ = SerialSettings.STOPBITS_ONE
-    # serial_settings.handshake_ = SerialSettings.HANDSHAKE_NONE
+    # serial_settings.handshake_ = SerialSettings.HANDSHAKE_CTSRTS
     # serial_settings.parity_ = SerialSettings.PARITY_NONE
+    serial_settings.rts_ = SerialSettings.RTS_STATE_ON
+    #serial_settings.dtr_ = SerialSettings.DTR_STATE_NONE
 
     # The address of the Icom transceiver. Value of 0x5c is good for 756Pro
     CIV_ADDRESS = 0x5c
@@ -120,6 +122,20 @@ class Icom(radio.Radio):
         return EncodedTransaction(bytearray(result).__str__())
 
 
+    @classmethod
+    def encodeGetFreq(cls, vfo):
+        """
+        Gets the command with which we can tell the radio send us the current frequency
+
+        :param vfo: For which VFO we want the mode
+        :type vfo: int
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
+        """
+        result = cls.__transaction(0x03)
+        return EncodedTransaction(bytearray(result).__str__(), confirmation_expected=0)
+
+
 
     @classmethod
     def encodeSetMode(cls, mode, vfo):
@@ -133,13 +149,26 @@ class Icom(radio.Radio):
         :return: Object containing transaction with some additional control settings
         :rtype: EncodedTransaction
         """
-
-        if not cls.mode_codes.__contains__(mode):
+        new_mode = mode.lower()
+        if not cls.mode_codes.__contains__(new_mode):
             raise ValueError("Unsupported mode: "+mode+"!")
 
-        result = cls.__transaction(0x06, sub_command=cls.mode_codes[mode])
+        result = cls.__transaction(0x06, sub_command=cls.mode_codes[new_mode])
         return EncodedTransaction(bytearray(result).__str__())
 
+
+    @classmethod
+    def encodeGetMode(cls, vfo):
+        """
+        Gets the command with which we can tell the radio to send us the current mode
+
+        :param vfo: The VFO for which we want the current mode
+        :type vfo: int
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
+        """
+        result = cls.__transaction(0x04)
+        return EncodedTransaction(bytearray(result).__str__(), confirmation_expected=0)
 
 
     @classmethod

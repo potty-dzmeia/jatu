@@ -7,6 +7,8 @@ class SerialSettings(I_Rig.I_SerialSettings):
     STOPBITS_ONE, STOPBITS_ONE_POINT_FIVE, STOPBITS_TWO = (1, 1.5, 2)
     DATABITS_FIVE, DATABITS_SIX, DATABITS_SEVEN, DATABITS_EIGTH = (5, 6, 7, 8)
     HANDSHAKE_NONE, HANDSHAKE_XONXOFF, HANDSHAKE_CTSRTS = 'None', 'XonXoff', 'CtsRts'
+    RTS_STATE_NONE, RTS_STATE_ON, RTS_STATE_OFF = 'None', 'On', 'Off'
+    DTR_STATE_NONE, DTR_STATE_ON, DTR_STATE_OFF = 'None', 'On', 'Off'
 
     def __init__(self):
         # underscore added because of a jython issue
@@ -16,6 +18,8 @@ class SerialSettings(I_Rig.I_SerialSettings):
         self.stop_bits_ = self.STOPBITS_ONE
         self.parity_ = self.PARITY_NONE
         self.handshake_ = self.HANDSHAKE_NONE
+        self.rts_ = self.RTS_STATE_NONE
+        self.dtr_ = self.DTR_STATE_NONE
 
     def __str__(self):
         """Packs the class variables into a JSON formatted string
@@ -27,8 +31,10 @@ class SerialSettings(I_Rig.I_SerialSettings):
         jsonBlock["data_bits"] = self.baudrate_min_
         jsonBlock["data_bits"] = self.data_bits_
         jsonBlock["stop_bits"] = self.stop_bits_
-        jsonBlock["parity"] = self.parity
-        jsonBlock["handshake"] = self.handshake
+        jsonBlock["parity"] = self.parity_
+        jsonBlock["handshake"] = self.handshake_
+        jsonBlock["rts"] = self.rts_
+        jsonBlock["dtr"] = self.dtr_
         return json.dumps(jsonBlock, indent=4)
 
 
@@ -44,6 +50,8 @@ class SerialSettings(I_Rig.I_SerialSettings):
         jsonBlock["stop_bits"] = self.stop_bits_
         jsonBlock["parity"] = self.parity
         jsonBlock["handshake"] = self.handshake
+        jsonBlock["rts"] = self.rts_
+        jsonBlock["dtr"] = self.dtr_
         return json.dumps(jsonBlock, indent=4)
 
     def getBauderateMin(self):
@@ -75,6 +83,7 @@ class SerialSettings(I_Rig.I_SerialSettings):
 
     def getParity(self):
         """
+        :return: Possible values are PARITY_NONE, PARITY_EVEN, PARITY_ODD, PARITY_MARK, PARITY_SPACE
         :rtype: str
         """
         return self.parity_
@@ -82,6 +91,23 @@ class SerialSettings(I_Rig.I_SerialSettings):
 
     def getHandshake(self):
         """
+        :return: Possible values are HANDSHAKE_NONE, HANDSHAKE_XONXOFF, HANDSHAKE_CTSRTS
         :rtype: str
         """
         return self.handshake_
+
+
+    def getRts(self):
+        """
+        :return: Possible values are RTS_STATE_NONE, RTS_STATE_ON, RTS_STATE_OFF
+        :rtype: str
+        """
+        return self.rts_
+
+
+    def getDtr(self):
+        """
+        :return: Possible values are DTR_STATE_NONE, DTR_STATE_ON, DTR_STATE_OFF
+        :rtype: str
+        """
+        return self.dtr_

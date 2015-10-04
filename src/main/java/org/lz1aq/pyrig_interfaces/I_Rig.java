@@ -97,7 +97,25 @@ public interface I_Rig
        */
       public String getParity();
 
-      public String getHandshake();
+      /**
+       * Returns handshake parameter
+       * @return Possible values are 'None', 'XonXoff', 'CtsRts'
+       */
+      public String getHandshake(); 
+      
+      /**
+       * If the RTS line state should be changed.
+       * 
+       * @return Possible values are "None", "On", "Off"
+       */
+      public String getRts();
+      
+       /**
+       * If the DTR line state should be changed.
+       * 
+       * @return Possible values are "None", "On", "Off"
+       */
+      public String getDtr();
     }
     
     /**

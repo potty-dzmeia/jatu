@@ -342,6 +342,13 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     controlPanel.add(bandsCombobox, gridBagConstraints);
 
     modesCombobox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+    modesCombobox.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        modesComboboxActionPerformed(evt);
+      }
+    });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
@@ -459,8 +466,9 @@ public class SimpleRadioPanel extends javax.swing.JFrame
         }
         // Create the radio object usong the selected Com port
         radio = new Radio(radioParser, String.valueOf(comportCombobox.getSelectedItem()));
+        radio.addEventListener(new LocalRadioListener());
         radio.connect(); // Let's not forget to call connect(). Calling disconnects() later will close the Com Port
-
+        
         // Now add listeners for the events comming from the radio (e.g. frequency change, mode change, etc...)
         //radio.addEventListener(new TestJFrame.LocalRadioListener());
       } 
@@ -486,18 +494,73 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     if(radio!=null)
     {
       String freq = bandsCombobox.getSelectedItem().toString();
-      freq = freq.replaceAll("[^0-9]+", "");    // remove all non-digits
+      
       try
       {
-        radio.setFrequency(Long.parseLong(freq), 0);
-        // TODO: ask for frequency
+        switch(freq)
+        {
+          case "1.8":
+            radio.setFrequency(1810000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            break;
+          case "3.5":
+            radio.setFrequency(350000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            break;
+          case "7":
+            radio.setFrequency(7000000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            break;
+          case "10":
+            radio.setFrequency(10000000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            break;
+          case "14":
+            radio.setFrequency(14000000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            break;
+          case "18":
+            radio.setFrequency(18000000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            break;
+          case "21":
+            radio.setFrequency(21000000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            break;
+          case "24":
+            radio.setFrequency(24000000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            break;
+          case "28":
+            radio.setFrequency(28000000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            break;
+
+        }
+      }catch(Exception exc)
+      {
+        logger.log(Level.SEVERE, null, exc);
+      }
+      //freq = freq.replaceAll("[^0-9]+", "");    // remove all non-digits
+    }
+     
+  }//GEN-LAST:event_bandsComboboxActionPerformed
+
+  private void modesComboboxActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_modesComboboxActionPerformed
+  {//GEN-HEADEREND:event_modesComboboxActionPerformed
+    if(radio!=null)
+    {
+      String mode = modesCombobox.getSelectedItem().toString();
+      try
+      {
+        radio.setMode(mode, 0);
+        radio.getMode(0); // after setting the frequency let's ask which will update our display
       } catch (Exception ex)
       {
         logger.log(Level.SEVERE, null, ex);
       }
     }
-     
-  }//GEN-LAST:event_bandsComboboxActionPerformed
+  }//GEN-LAST:event_modesComboboxActionPerformed
 
 
  

@@ -20,6 +20,16 @@ public interface I_Radio extends I_Rig
    * @return Packet of bytes containing the command
    */
   public I_EncodedTransaction encodeSetFreq(long freq, int vfo);
+  
+  
+  /**
+   * Gets the command with which we can tell the radio to send us the frequency
+   *
+   * @param vfo - for which VFO we want the frequency
+   * @return Packet of bytes containing the command
+   */
+  public I_EncodedTransaction encodeGetFreq(int vfo);
+  
 
   /**
    * Gets the command that must be send to the radio in order to set mode (e.g.
@@ -30,6 +40,15 @@ public interface I_Radio extends I_Rig
    * @return Packet of bytes containing the command
    */
   public I_EncodedTransaction encodeSetMode(String mode, int vfo);
+  
+  /**
+   * Gets the command with which we can tell the radio to send us the current
+   * mode
+   *
+   * @param vfo - for which VFO we want the mode  
+   * @return Packet of bytes containing the command
+   */
+  public I_EncodedTransaction encodeGetMode(int vfo);
 
   
   /**

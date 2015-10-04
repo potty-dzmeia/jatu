@@ -129,7 +129,7 @@ public class Radio
    * If we would like to get the frequency event when it comes we have to
    * register an EventListener
    * 
-   * @param vfo - for which vfo we would like to get the frequency
+   * @param vfo - for which VFO we would like to get the frequency
    * @throws Exception 
    */
   public void getFrequency(int vfo) throws Exception
@@ -137,7 +137,7 @@ public class Radio
     if(isConnected==false) 
       throw new Exception("Not connected to radio!");
     
-    //this.queueTransaction(radioProtocolParser.);
+    this.queueTransaction(radioProtocolParser.encodeGetFreq(vfo));
   }
   
   
@@ -155,12 +155,25 @@ public class Radio
     this.queueTransaction(radioProtocolParser.encodeSetMode(mode, vfo));
   }
   
+  /**
+   * Get the working mode of the radio
+   * If we would like to get the mode event when it comes from the radio we 
+   * have to register an EventListener
+   * 
+   * @param vfo - VFO which frequency will be changed
+   * @throws Exception 
+   */
+  public void getMode(int vfo) throws Exception
+  {
+   if(isConnected==false) 
+      throw new Exception("Not connected to radio!");
+    
+    this.queueTransaction(radioProtocolParser.encodeGetMode(vfo));
+  }
+  
   
   public void addEventListener(RadioListener listener) throws Exception
   {
-    if(threadPortWriter.getState() == Thread.State.NEW )
-      throw new Exception("You need to call the start() method");
-    
     this.eventListener = listener;
   }
   
@@ -193,7 +206,7 @@ public class Radio
         receiveBuffer.write(serialPort.readBytes());
       } catch (Exception ex)
       {
-        logger.log(Level.SEVERE, null, ex);
+        logger.log(Level.SEVERE, ex.toString(), ex);
       }
       
       // Pass the received data to the protocol parser for decoding
@@ -317,6 +330,10 @@ public class Radio
    */
   private void dispatchEvent(String jsonEvent)
   {
+    if(eventListener==null)
+    {
+      return;
+    }
     // Get the command and the data that the radio has sent us
     JSONObject jso = new JSONObject(jsonEvent);
     String command = jso.getString("command");
@@ -375,26 +392,27 @@ public class Radio
    */
   private void setComPortParams(SerialPort port, I_Radio.I_SerialSettings settings) throws SerialPortException
   {
-    int parity = SerialPort.PARITY_NONE;;
-    switch(settings.getParity())
+    int parity = SerialPort.PARITY_NONE;
+    
+    switch(settings.getParity().toLowerCase())
     {
-      case "None":
+      case "none":
         parity = SerialPort.PARITY_NONE;
         break;
 
-      case "Odd":
+      case "odd":
         parity = SerialPort.PARITY_ODD;
         break;
 
-      case "Even":
+      case "even":
         parity = SerialPort.PARITY_EVEN;
         break;
 
-      case "Mark":
+      case "mark":
         parity = SerialPort.PARITY_MARK;
         break;
 
-      case "Space":
+      case "space":
         parity = SerialPort.PARITY_SPACE;
         break;
     }
@@ -403,6 +421,30 @@ public class Radio
                    settings.getDataBits(),
                    settings.getStopBits(),
                    parity);
+    
+    switch (settings.getDtr().toLowerCase())
+    {
+      case "none":
+        break;
+      case "on":
+        port.setDTR(true);
+        break;
+      case "off":
+        port.setDTR(false);
+        break;
+    }
+
+    switch (settings.getRts().toLowerCase())
+    {
+      case "none":
+        break;
+      case "on":
+        port.setRTS(true);
+        break;
+      case "off":
+        port.setRTS(false);
+        break;
+    }
   }
   
   /**

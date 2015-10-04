@@ -122,8 +122,5 @@ class DecodedTransaction(I_Rig.I_DecodedTransaction):
         :return: String of the type {"command": "mode", "data": "cw"}
         :rtype: str
         """
-        if mode not in Radio.modes:
-            raise ValueError("Unknown command")
-
         return cls.__create("mode", mode)
 
