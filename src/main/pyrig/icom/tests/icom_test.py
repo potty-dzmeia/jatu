@@ -9,6 +9,7 @@ civ_address = 0x5C
 
 raw_transactions = {
 'empty_transaction':        bytearray([0xFE, 0xFE, 0xE0, civ_address, 0xFD]),
+'not_supported':        bytearray([0xFE, 0xFE, 0xE0, civ_address, 0x99, 0xFD]),
 'positive_cfm':             bytearray([0xFE, 0xFE, 0xE0, civ_address, 0xFB, 0xFD]),
 'negative_cfm':             bytearray([0xFE, 0xFE, 0xE0, civ_address, 0xFA, 0xFD]),
 'mode_lsb':                 bytearray([0xFE, 0xFE, 0xE0, civ_address, 0x01, 0x00, 0xFD]),
@@ -64,8 +65,8 @@ while 1:
         # ser.write("fsgsdsafsfasfadsfasfadsfdfadsfasgafsagfdghdhjhgjgjfgjfjgfjfjfjgjgf ")
         # ser.write("fsgsdsafsfasfadsfasfadsfdfadsfasgafsagfdghdhjhgjgjfgjfjgfjfjfjgjgf ")
         # ser.write("fsgsdsafsfasfadsfasfadsfdfadsfasgafsagfdghdhjhgjgjfgjfjgfjfjfjgjgf ")
-        print value
-        time.sleep(0.1)
+        print key + " -- " + value
+        time.sleep(0.5)
 
 
 print ser.close()

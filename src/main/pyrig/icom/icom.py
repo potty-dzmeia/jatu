@@ -25,7 +25,7 @@ class Icom(radio.Radio):
     # serial_settings.stop_bits_ = SerialSettings.STOPBITS_ONE
     # serial_settings.handshake_ = SerialSettings.HANDSHAKE_CTSRTS
     # serial_settings.parity_ = SerialSettings.PARITY_NONE
-    serial_settings.rts_ = SerialSettings.RTS_STATE_ON
+    serial_settings.rts_ = SerialSettings.RTS_STATE_ON      # This is used to power the electronics
     #serial_settings.dtr_ = SerialSettings.DTR_STATE_NONE
 
     # The address of the Icom transceiver. Value of 0x5c is good for 756Pro
@@ -107,7 +107,7 @@ class Icom(radio.Radio):
 
 
     @classmethod
-    def encodeSetFreq(cls, freq, vfo):
+    def encodeSetVfoFreq(cls, freq, vfo):
         """
         Gets the command with which we can tell an Icom radio to change frequency
 
@@ -123,7 +123,7 @@ class Icom(radio.Radio):
 
 
     @classmethod
-    def encodeGetFreq(cls, vfo):
+    def encodeGetVfoFreq(cls, vfo):
         """
         Gets the command with which we can tell the radio send us the current frequency
 
@@ -138,7 +138,7 @@ class Icom(radio.Radio):
 
 
     @classmethod
-    def encodeSetMode(cls, mode, vfo):
+    def encodeSetVfoMode(cls, mode, vfo):
         """
         Get the command that must be send to the radio in order to set mode (e.g. CW)
 
@@ -158,7 +158,7 @@ class Icom(radio.Radio):
 
 
     @classmethod
-    def encodeGetMode(cls, vfo):
+    def encodeGetVfoMode(cls, vfo):
         """
         Gets the command with which we can tell the radio to send us the current mode
 
@@ -212,7 +212,7 @@ class Icom(radio.Radio):
             result = DecodedTransaction.createMode(mode)
 
         else:                                       # <------------------------- not-supported
-            result = DecodedTransaction.createNotSupported()
+            result = DecodedTransaction.createNotSupported(utils.getListInHex(trans[trans_start_index:trans_end_index+1]))
 
         # return the object with the decoded transaction and the amount of bytes that we have read from the supplied buffer(string)
         return DecodedTransaction(result, trans_end_index+1)

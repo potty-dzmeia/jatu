@@ -53,74 +53,95 @@ class DecodedTransaction(I_Rig.I_DecodedTransaction):
         Creates a JSON formatted string holding the decoded data coming from the radio
         :param command: The command that was send by the radio (e.g. "frequency")
         :type command: str
-        :param data: Additional data that the radio has send (e.g. "14,000,000")
-        :type data: str
+        :param data: JSON object holding additional data that the radio has send (e.g. "14,000,000")
+        :type data: dict
         :return: JSON formatted string holding the command and the data
         :rtype: str
         """
         if data is not None:
-            if type(data) is not str:
-                raise ValueError("Parameter 'data' should be a string")
+            if type(data) is not dict:
+                raise ValueError("Parameter 'data' should be dictionary")
         if command not in cls.supported_commands:
             raise ValueError("Unknown command")
 
         jsonBlock = dict()
-        jsonBlock["command"] = command
-        if data is not None:
-            jsonBlock["data"] = data
+        jsonBlock[command] = data
         return json.dumps(jsonBlock, indent=4)
 
 
     @classmethod
-    def createNotSupported(cls):
+    def createNotSupported(cls, data=None):
         """
         Creates a JSON formatted transaction indicating that the decoded command is not supported
+        :param data: The transaction that couldn't be decoded in hex format
+        :type data: str
         :return: The following string {"command": "not-supported"}
         :rtype: str
         """
-        return cls.__create("not_supported")
+        if data is not None:
+            json_command_content = dict()
+            json_command_content["not_supported"] = data;
+        return cls.__create("not_supported", json_command_content)
 
 
     @classmethod
     def createPositiveCfm(cls):
         """
         Creates a JSON formatted transaction indicating that the decoded command is not supported
-        :return: The following string {"command": "positive_cfm"}
+        :return: The following string {"confirmation": {"confirmation": "1"}}
         :rtype: str
         """
-        return cls.__create("confirmation", str(1))
+        json_command_content = dict()
+        json_command_content["confirmation"] = "1";
+        return cls.__create("confirmation", json_command_content)
 
 
     @classmethod
     def createNegativeCfm(cls):
         """
         Creates a JSON formatted transaction indicating that the decoded command is not supported
-        :return: The following string  {"command": "negative_cfm"}
+        :return: The following string  {"confirmation": {"confirmation": "0"}}
         :rtype: str
         """
-        return cls.__create("confirmation", str(0))
+        json_command_content = dict()
+        json_command_content["confirmation"] = "0";
+        return cls.__create("confirmation", json_command_content)
 
 
     @classmethod
-    def createFreq(cls, freq):
+    def createFreq(cls, freq, vfo=None):
         """
         Creates a JSON formatted transaction holding  frequency
-        :param freq: frequncy
+        :param freq: frequency
         :type freq: str
-        :return: String of the type {"command": "frequency", "data": "14000100"}
+        :param vfo: VFO that changed frequency (optional). Possible values are "0", "1" and so on...
+        :type vfo: int
+        :return: String of the type {"frequency": {"frequency": "14195000", "vfo": "0"}}
         :rtype: str
         """
-        return cls.__create("frequency", freq)
+        json_command_content = dict()
+        json_command_content["frequency"] = freq;
+        if vfo is not None:
+            json_command_content = dict()
+            json_command_content["vfo"] = str(vfo)
+        return cls.__create("frequency", json_command_content)
 
 
     @classmethod
-    def createMode(cls, mode):
+    def createMode(cls, mode, vfo=None):
         """
         Creates a JSON formatted transaction holding  mode
         :param mode: A string describing the working mode of the radio
         :type mode: str
-        :return: String of the type {"command": "mode", "data": "cw"}
+        :param vfo: VFO that changed mode (optional). Possible values are "0", "1" and so on...
+        :type vfo: int
+        :return: String of the type {"mode": {"mode": "cw", "vfo": "0"}}
         :rtype: str
         """
-        return cls.__create("mode", mode)
+        json_command_content = dict()
+        json_command_content["mode"] = mode;
+        if vfo is not None:
+            json_command_content = dict()
+            json_command_content["vfo"] = str(vfo);
+        return cls.__create("mode", json_command_content)
 

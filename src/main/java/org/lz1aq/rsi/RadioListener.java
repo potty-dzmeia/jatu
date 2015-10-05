@@ -1,13 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.lz1aq.rsi;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+
 import java.util.EventListener;
+import org.lz1aq.utils.RadioModes;
+import org.lz1aq.utils.RadioVfos;
 
 /**
  *
@@ -33,31 +29,45 @@ public interface RadioListener extends EventListener
   
   public static class FrequencyEvent
   {
-    private final String frequency;
-    public FrequencyEvent(java.lang.String freq)
+    private final String    freq; // The new frequency
+    private final RadioVfos vfo;  // Which VFO changed its frequency
+    
+    public FrequencyEvent(String freq, RadioVfos vfo)
     {
-      frequency = freq;
+      this.freq = freq;
+      this.vfo = vfo;
     }
     
-    @Override
-    public String toString()
+    public String getFrequency()
     {
-      return frequency;
+      return this.freq;
+    }
+    
+    public RadioVfos getVfo()
+    {
+      return this.vfo;
     }
   }
 
   public static class ModeEvent
   {
-    private final String mode;
-    public ModeEvent(String md)
+    private final RadioModes  mode; // The new mode
+    private final RadioVfos   vfo;  // Which VFO changed its frequency
+    
+    public ModeEvent(RadioModes mode, RadioVfos vfo)
     {
-      mode = md;
+      this.mode = mode;
+      this.vfo = vfo;
     }
     
-    @Override
-    public String toString()
+    public RadioModes getMode()
     {
       return mode;
+    }
+    
+    public RadioVfos getVfo()
+    {
+      return this.vfo;
     }
   }
 

@@ -1,5 +1,6 @@
 package org.lz1aq.rsi;
 
+import java.util.Iterator;
 import org.lz1aq.utils.Misc;
 import org.lz1aq.utils.DynamicByteArray;
 import org.lz1aq.pyrig_interfaces.I_Radio;
@@ -44,7 +45,7 @@ public class Radio
    * Constructor 
    * 
    * @param protocolParser - provides the protocol for communicating with the radio
-   * @param serialPort -  serial port to be used for communication
+   * @param portName -  name of the serial port that will be used for communicating with the radio
    */
   public Radio(I_Radio protocolParser, String portName)
   {
@@ -112,15 +113,29 @@ public class Radio
    * Set the frequency of the radio
    * 
    * @param freq - frequency value
-   * @param vfo - VFO which frequency will be changed
    * @throws Exception 
    */
-  public void setFrequency(long freq, int vfo) throws Exception
+  public void setFrequency(long freq) throws Exception
   {
     if(isConnected==false) 
       throw new Exception("Not connected to radio!");
     
-    this.queueTransaction(radioProtocolParser.encodeSetFreq(freq, vfo));
+    this.queueTransaction(radioProtocolParser.encodeSetFreq(freq));
+  }
+  
+  /**
+   * Set the VFO frequency of the radio
+   * 
+   * @param freq - frequency value
+   * @param vfo - VFO which frequency will be changed
+   * @throws Exception 
+   */
+  public void setVfoFrequency(long freq, int vfo) throws Exception
+  {
+    if(isConnected==false) 
+      throw new Exception("Not connected to radio!");
+    
+    this.queueTransaction(radioProtocolParser.encodeSetVfoFreq(freq, vfo));
   }
   
   /**
@@ -129,46 +144,92 @@ public class Radio
    * If we would like to get the frequency event when it comes we have to
    * register an EventListener
    * 
-   * @param vfo - for which VFO we would like to get the frequency
    * @throws Exception 
    */
-  public void getFrequency(int vfo) throws Exception
+  public void getFrequency() throws Exception
   {
     if(isConnected==false) 
       throw new Exception("Not connected to radio!");
     
-    this.queueTransaction(radioProtocolParser.encodeGetFreq(vfo));
+    this.queueTransaction(radioProtocolParser.encodeGetFreq());
+  }
+  
+  /**
+   * Asks the radio to send us the current VFO frequency.
+   * 
+   * If we would like to get the frequency event when it comes we have to
+   * register an EventListener
+   * 
+   * @param vfo - for which VFO we would like to get the frequency
+   * @throws Exception 
+   */
+  public void getVfoFrequency(int vfo) throws Exception
+  {
+    if(isConnected==false) 
+      throw new Exception("Not connected to radio!");
+    
+    this.queueTransaction(radioProtocolParser.encodeGetVfoFreq(vfo));
   }
   
   
   /**
    * Set the working mode of the radio (e.g. to CW)
+   * 
    * @param mode - mode value (see I_Radio.RadioModes)
-   * @param vfo - VFO which frequency will be changed
    * @throws Exception 
    */
-  public void setMode(String mode, int vfo) throws Exception
+  public void setMode(String mode) throws Exception
   {
    if(isConnected==false) 
       throw new Exception("Not connected to radio!");
     
-    this.queueTransaction(radioProtocolParser.encodeSetMode(mode, vfo));
+    this.queueTransaction(radioProtocolParser.encodeSetMode(mode));
   }
   
   /**
+   * Set the working mode of the radio (e.g. to CW)
+   * @param mode - mode value (see I_Radio.RadioModes)
+   * @param vfo - VFO which mode will be changed
+   * @throws Exception 
+   */
+  public void setVfoMode(String mode, int vfo) throws Exception
+  {
+   if(isConnected==false) 
+      throw new Exception("Not connected to radio!");
+    
+    this.queueTransaction(radioProtocolParser.encodeSetVfoMode(mode, vfo));
+  }
+  
+  
+   /**
    * Get the working mode of the radio
    * If we would like to get the mode event when it comes from the radio we 
    * have to register an EventListener
    * 
-   * @param vfo - VFO which frequency will be changed
    * @throws Exception 
    */
-  public void getMode(int vfo) throws Exception
+  public void getMode() throws Exception
   {
    if(isConnected==false) 
       throw new Exception("Not connected to radio!");
     
-    this.queueTransaction(radioProtocolParser.encodeGetMode(vfo));
+    this.queueTransaction(radioProtocolParser.encodeGetMode());
+  }
+  
+  /**
+   * Get the VFO mode of the radio
+   * If we would like to get the mode event when it comes from the radio we 
+   * have to register an EventListener
+   * 
+   * @param vfo - VFO of which we want to read the mode
+   * @throws Exception 
+   */
+  public void getVfoMode(int vfo) throws Exception
+  {
+   if(isConnected==false) 
+      throw new Exception("Not connected to radio!");
+    
+    this.queueTransaction(radioProtocolParser.encodeGetVfoMode(vfo));
   }
   
   
@@ -232,6 +293,7 @@ public class Radio
   {
     CfmType cfm;
     
+    @Override
     public void run()
     {
       I_EncodedTransaction trans;
@@ -286,7 +348,7 @@ public class Radio
     /**
      * Blocks the thread until the confirmation flag is updated or until the
      * timeout specified in trans expires.
-     * 
+     * getTransaction
      * @param trans - holds the timeout value for the confirmation
      * @throws InterruptedException 
      */
@@ -325,39 +387,62 @@ public class Radio
   
   
   /**
+   * Parses the JSON event and notifies the interested listeners
    * 
-   * @param jsonEvent 
+   * @param jsonEvent JSON formatted string. Example:
+   *                  {
+   *                    "command_name_here": {
+   *                      ......data.....
+   *                    }
+   *                  }
+   * @see For more info on the format of the JSON transactions see at the end of "I_Radio.java"
    */
   private void dispatchEvent(String jsonEvent)
   {
     if(eventListener==null)
     {
+      logger.log(Level.WARNING, "dispatchEvent(): There is no registered RadioListener!");
       return;
     }
-    // Get the command and the data that the radio has sent us
-    JSONObject jso = new JSONObject(jsonEvent);
-    String command = jso.getString("command");
-    String data = jso.optString("data");
     
+    // Get the command (i.e. the name of the object) that the radio has sent us
+    JSONObject jso = new JSONObject(jsonEvent);
+    Iterator<?> keys = jso.keys();
+    
+    if(keys.hasNext()==false)
+    {
+      logger.log(Level.SEVERE, "dispatchEvent(): We received an empty decoded transaction");
+      return;
+    }
+    
+    String command = (String)keys.next();
     
     switch (command)
     {
       // -----------------------------
-      case RadioEvents.CONFIRMATION:
-        updateConfirmation(data);
+      case JsonCommandParser.CONFIRMATION:
+        
+        updateConfirmation(JsonCommandParser.parseConfirmation(jso.getJSONObject(command)));
         break;
        
       // -----------------------------
-      case RadioEvents.FREQUENCY:
+      case JsonCommandParser.FREQUENCY:
       // -----------------------------
-        eventListener.frequency(new RadioListener.FrequencyEvent(data));
+        eventListener.frequency(JsonCommandParser.parseFrequency(jso.getJSONObject(command)));
         break;
         
       // -----------------------------
-      case RadioEvents.MODE:
+      case JsonCommandParser.MODE:
       // -----------------------------
-        eventListener.mode(new RadioListener.ModeEvent(data));
+        eventListener.mode(JsonCommandParser.parseMode(jso.getJSONObject(command)));
         break;  
+        
+      // -----------------------------
+      case JsonCommandParser.NOT_SUPPORTED:
+      // -----------------------------
+        logger.log(Level.WARNING, "Received not supported transaction: " + JsonCommandParser.parseNotSupported(jso.getJSONObject(command)));
+        break;  
+        
     }
   }
 
@@ -367,7 +452,7 @@ public class Radio
    * 
    * @param cfm - Confirmation type (i.e. positive or negative)
    */
-  private void updateConfirmation(String cfm)
+  private void updateConfirmation(boolean cfm)
   {
     // -----------------------------
     // Inform portWriter that we have received confirmation for last command we have sent
@@ -375,7 +460,7 @@ public class Radio
     {
       if(confirmation != CfmType.EMPTY)
         logger.log(Level.WARNING, "Upon receiving of confirmation from the radio the \"confirmation\" var is not empty!");
-      if(cfm.equals("1"))
+      if(cfm)
         confirmation = CfmType.POSITIVE;
       else
         confirmation = CfmType.NEGATIVE;
@@ -447,14 +532,4 @@ public class Radio
     }
   }
   
-  /**
-   *  Currently we support the following events coming from the radio
-   */
-  class RadioEvents
-  {
-    public static final String NOT_SUPPORTED  = "not_supported";
-    public static final String CONFIRMATION   = "confirmation";
-    public static final String FREQUENCY      = "frequency";
-    public static final String MODE           = "mode";
-  }
 }

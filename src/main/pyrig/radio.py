@@ -39,8 +39,31 @@ class Radio(I_Radio):
         raise NotImplementedError("getModel")
 
 
+
     @classmethod
-    def encodeSetFreq(cls, freq, vfo):
+    def encodeSetFreq(cls, freq):
+        """
+        Gets the command with which we can tell the radio to change current frequency
+        :param freq: Specifying the frequency. E.g. 7100000 for 7.1MHz
+        :type freq: int
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
+        """
+        raise NotImplementedError("encode_SetFreq")
+
+
+    @classmethod
+    def encodeGetFreq(cls):
+        """
+        Gets the command with which we can tell the radio send us the current frequency
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
+        """
+        raise NotImplementedError("encode_SetFreq")
+
+
+    @classmethod
+    def encodeSetVfoFreq(cls, freq, vfo):
         """
         Gets the command with which we can tell the radio to change frequency
 
@@ -55,7 +78,7 @@ class Radio(I_Radio):
 
 
     @classmethod
-    def encodeGetFreq(cls, freq, vfo):
+    def encodeGetVfoFreq(cls, vfo):
         """
         Gets the command with which we can tell the radio send us the current frequency
 
@@ -67,9 +90,32 @@ class Radio(I_Radio):
         raise NotImplementedError("encode_SetFreq")
 
 
+    @classmethod
+    def encodeSetMode(cls, mode):
+        """
+        Get the command that must be send to the radio in order to set mode (e.g. CW)
+
+        :param mode: Specifies the mode - see Radio.modes
+        :type mode: str
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
+        """
+        raise NotImplementedError("encode_SetFreq")
+
 
     @classmethod
-    def encodeSetMode(cls, mode, vfo):
+    def encodeGetMode(cls):
+        """
+        Gets the command with which we can tell the radio to send us the current mode
+
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
+        """
+        raise NotImplementedError("encode_SetFreq")
+
+
+    @classmethod
+    def encodeSetVfoMode(cls, mode, vfo):
         """
         Get the command that must be send to the radio in order to set mode (e.g. CW)
 
@@ -82,8 +128,9 @@ class Radio(I_Radio):
         """
         raise NotImplementedError("encode_SetFreq")
 
+
     @classmethod
-    def encodeGetMode(cls, mode, vfo):
+    def encodeGetVfoMode(cls, vfo):
         """
         Gets the command with which we can tell the radio to send us the current mode
 
