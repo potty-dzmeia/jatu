@@ -11,8 +11,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import jssc.SerialPortList;
 import org.lz1aq.pyrig_interfaces.I_Radio;
 import org.lz1aq.rsi.Radio;
-import org.lz1aq.rsi.RadioListener;
+import org.lz1aq.rsi.event.RadioListener;
 import org.apache.commons.lang3.StringUtils;
+import org.lz1aq.rsi.event.ConfirmationEvent;
+import org.lz1aq.rsi.event.FrequencyEvent;
+import org.lz1aq.rsi.event.ModeEvent;
+import org.lz1aq.rsi.event.NotsupportedEvent;
 import org.lz1aq.utils.Misc;
 
 
@@ -100,11 +104,16 @@ public class SimpleRadioPanel extends javax.swing.JFrame
   /**
    * Handlers for events coming from the radio
    */
-  class LocalRadioListener implements RadioListener
+  private class LocalRadioListener implements RadioListener
   {
+    @Override
+    public void notsupportedEvent(NotsupportedEvent e){} // not interested
 
     @Override
-    public void frequency(final RadioListener.FrequencyEvent e)
+    public void confirmationEvent(ConfirmationEvent e){} // not interested
+
+    @Override
+    public void frequencyEvent(final FrequencyEvent e)
     {
       /* Create and display the form */
       java.awt.EventQueue.invokeLater(new Runnable()
@@ -115,13 +124,12 @@ public class SimpleRadioPanel extends javax.swing.JFrame
           frequencyTextfield.setText(Misc.formatFrequency(e.getFrequency()));
         }
       });
-      
     }
 
     @Override
-    public void mode(final RadioListener.ModeEvent e)
+    public void modeEvent(final ModeEvent e)
     {
-      /* Create and display the form */
+       /* Create and display the form */
       java.awt.EventQueue.invokeLater(new Runnable()
       {
         @Override
@@ -130,7 +138,6 @@ public class SimpleRadioPanel extends javax.swing.JFrame
           modeTextfield.setText(e.getMode().toString());
         }
       });
-      
     }
 
   }
@@ -500,40 +507,40 @@ public class SimpleRadioPanel extends javax.swing.JFrame
         switch(freq)
         {
           case "1.8":
-            radio.setVfoFrequency(1810000, 0);
-            radio.getVfoFrequency(0); // after setting the frequency let's ask which will update our display
+            radio.setFrequency(1810000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "3.5":
-            radio.setVfoFrequency(350000, 0);
-            radio.getVfoFrequency(0); // after setting the frequency let's ask which will update our display
+            radio.setFrequency(350000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "7":
-            radio.setVfoFrequency(7000000, 0);
-            radio.getVfoFrequency(0); // after setting the frequency let's ask which will update our display
+            radio.setFrequency(7000000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "10":
-            radio.setVfoFrequency(10000000, 0);
-            radio.getVfoFrequency(0); // after setting the frequency let's ask which will update our display
+            radio.setFrequency(10000000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "14":
-            radio.setVfoFrequency(14000000, 0);
-            radio.getVfoFrequency(0); // after setting the frequency let's ask which will update our display
+            radio.setFrequency(14000000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "18":
-            radio.setVfoFrequency(18000000, 0);
-            radio.getVfoFrequency(0); // after setting the frequency let's ask which will update our display
+            radio.setFrequency(18000000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "21":
-            radio.setVfoFrequency(21000000, 0);
-            radio.getVfoFrequency(0); // after setting the frequency let's ask which will update our display
+            radio.setFrequency(21000000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "24":
-            radio.setVfoFrequency(24000000, 0);
-            radio.getVfoFrequency(0); // after setting the frequency let's ask which will update our display
+            radio.setFrequency(24000000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "28":
-            radio.setVfoFrequency(28000000, 0);
-            radio.getVfoFrequency(0); // after setting the frequency let's ask which will update our display
+            radio.setFrequency(28000000, 0);
+            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
 
         }
@@ -553,8 +560,8 @@ public class SimpleRadioPanel extends javax.swing.JFrame
       String mode = modesCombobox.getSelectedItem().toString();
       try
       {
-        radio.setVfoMode(mode, 0);
-        radio.getVfoMode(0); // after setting the frequency let's ask which will update our display
+        radio.setMode(mode, 0);
+        radio.getMode(0); // after setting the frequency let's ask which will update our display
       } catch (Exception ex)
       {
         logger.log(Level.SEVERE, null, ex);

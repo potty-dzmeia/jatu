@@ -1,6 +1,7 @@
 package org.lz1aq.rsi;
 
-import java.util.Iterator;
+import org.lz1aq.rsi.event.*;
+import java.util.ArrayList;
 import org.lz1aq.utils.Misc;
 import org.lz1aq.utils.DynamicByteArray;
 import org.lz1aq.pyrig_interfaces.I_Radio;
@@ -14,7 +15,7 @@ import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import org.lz1aq.pyrig_interfaces.I_Rig.I_DecodedTransaction;
 import org.lz1aq.pyrig_interfaces.I_Rig.I_EncodedTransaction;
-import org.json.*;
+import org.lz1aq.rsi.event.EmptyRadioListener;
 /**
  * Class for controlling a radio through the serial interface
  
@@ -26,20 +27,20 @@ public class Radio
 {
   private static final int QUEUE_SIZE = 30;   // Max number of commands that queueWithTransactions can hold
   
-  private boolean                 isConnected = false;  // If there is a com port open
-  private RadioListener           eventListener;        // TODO: make multiple event listeners
-  private final String            serialPortName;       // 
-  private       SerialPort        serialPort;           // Used for writing to serialPort
-  private final I_Radio           radioProtocolParser;  // Used for decoding/encoding msg from/to the radio (jython object)
-  private final Thread            threadPortWriter;     // Thread that writes transaction to the serial port
-  private final DynamicByteArray  receiveBuffer;        // Where bytes received through the serial port will be put
+  private boolean                   isConnected = false;  // If there is a com port open
+  private ArrayList<RadioListener>  eventListeners;      // 
+  private final String              serialPortName;       // 
+  private       SerialPort          serialPort;           // Used for writing to serialPort
+  private final I_Radio             radioProtocolParser;  // Used for decoding/encoding msg from/to the radio (jython object)
+  private final Thread              threadPortWriter;     // Thread that writes transaction to the serial port
+  private final DynamicByteArray    receiveBuffer;        // Where bytes received through the serial port will be put
    
   private final BlockingQueue<I_EncodedTransaction>  queueWithTransactions; // Transactions waiting to be sent to the radio
   
-  private static final Logger     logger = Logger.getLogger(Radio.class.getName());
+  private static final Logger       logger = Logger.getLogger(Radio.class.getName());
  
   private enum CfmType{EMPTY, POSITIVE, NEGATIVE}
-  private CfmType                 confirmation = CfmType.EMPTY; // Variable holding the last positive or negative confirmation from the rig
+  private CfmType  confirmation = CfmType.EMPTY; // Variable holding the last positive or negative confirmation from the rig
   
   /**   
    * Constructor 
@@ -50,10 +51,11 @@ public class Radio
   public Radio(I_Radio protocolParser, String portName)
   {
     radioProtocolParser   = protocolParser;           // Store the reference to the jython object
-    this.serialPortName   = portName;
+    serialPortName   = portName;
     queueWithTransactions = new LinkedBlockingQueue<>(); 
     threadPortWriter      = new Thread(new PortWriter(), "threadPortWrite");    
     receiveBuffer         = new DynamicByteArray(200);  // Set the initial size to some reasonable value
+    eventListeners        = new ArrayList<>();
   }
   
     
@@ -76,13 +78,18 @@ public class Radio
       throw new Exception("Please create a new Radio object");
     
    
+    // Open the serial port using the settings from the python file
     serialPort = new SerialPort(serialPortName);
     serialPort.openPort();
     setComPortParams(serialPort, radioProtocolParser.getSerialPortSettings());
     
+    // Register a listener - we are interested in the confirmation events
+    eventListeners.add(new LocalRadioListener());
+    
+    // Start the thread responsible of sending the data to the radio
     threadPortWriter.start();
     
-    // Register the serial port reader
+    // Register the serial port reader which is responsible for handling the incoming data
     serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
     serialPort.addEventListener(new PortReader());
     
@@ -130,7 +137,7 @@ public class Radio
    * @param vfo - VFO which frequency will be changed
    * @throws Exception 
    */
-  public void setVfoFrequency(long freq, int vfo) throws Exception
+  public void setFrequency(long freq, int vfo) throws Exception
   {
     if(isConnected==false) 
       throw new Exception("Not connected to radio!");
@@ -163,7 +170,7 @@ public class Radio
    * @param vfo - for which VFO we would like to get the frequency
    * @throws Exception 
    */
-  public void getVfoFrequency(int vfo) throws Exception
+  public void getFrequency(int vfo) throws Exception
   {
     if(isConnected==false) 
       throw new Exception("Not connected to radio!");
@@ -192,7 +199,7 @@ public class Radio
    * @param vfo - VFO which mode will be changed
    * @throws Exception 
    */
-  public void setVfoMode(String mode, int vfo) throws Exception
+  public void setMode(String mode, int vfo) throws Exception
   {
    if(isConnected==false) 
       throw new Exception("Not connected to radio!");
@@ -224,7 +231,7 @@ public class Radio
    * @param vfo - VFO of which we want to read the mode
    * @throws Exception 
    */
-  public void getVfoMode(int vfo) throws Exception
+  public void getMode(int vfo) throws Exception
   {
    if(isConnected==false) 
       throw new Exception("Not connected to radio!");
@@ -235,13 +242,13 @@ public class Radio
   
   public void addEventListener(RadioListener listener) throws Exception
   {
-    this.eventListener = listener;
+    this.eventListeners.add(listener);
   }
   
   
   public void removeEventListener(RadioListener listener)
   { 
-    this.eventListener = null;
+    this.eventListeners.remove(listener);
   }
   
   
@@ -275,8 +282,8 @@ public class Radio
       
       if(trans.getBytesRead() > 0)
       { 
-        // Let the dispatcher notify the interested parties
-        dispatchEvent(trans.getTransaction());
+        // This will parseAndNotify the JSON string and notify all the interested parties
+        JsonCommandParser.parseAndNotify(trans.getTransaction(), eventListeners);
         // Remove the processed bytes from the received buffer
         receiveBuffer.remove(trans.getBytesRead());
       }
@@ -348,7 +355,7 @@ public class Radio
     /**
      * Blocks the thread until the confirmation flag is updated or until the
      * timeout specified in trans expires.
-     * getTransaction
+     * 
      * @param trans - holds the timeout value for the confirmation
      * @throws InterruptedException 
      */
@@ -367,6 +374,23 @@ public class Radio
   }// class
   
   
+  
+  private class LocalRadioListener extends EmptyRadioListener
+  {
+    @Override
+    public void confirmationEvent(ConfirmationEvent e)
+    {
+      updateConfirmation(e.getConfirmation());
+    }
+    
+    @Override
+    public void notsupportedEvent(NotsupportedEvent e)
+    {
+      logger.log(Level.WARNING, "The following transaction couldn't be decoded: " + e.getData());
+    }
+  }
+          
+            
   /**
    * 
    * @param trans
@@ -385,68 +409,7 @@ public class Radio
     queueWithTransactions.offer(trans); // Insert the transaction in the queue
   }
   
-  
-  /**
-   * Parses the JSON event and notifies the interested listeners
-   * 
-   * @param jsonEvent JSON formatted string. Example:
-   *                  {
-   *                    "command_name_here": {
-   *                      ......data.....
-   *                    }
-   *                  }
-   * @see For more info on the format of the JSON transactions see at the end of "I_Radio.java"
-   */
-  private void dispatchEvent(String jsonEvent)
-  {
-    if(eventListener==null)
-    {
-      logger.log(Level.WARNING, "dispatchEvent(): There is no registered RadioListener!");
-      return;
-    }
-    
-    // Get the command (i.e. the name of the object) that the radio has sent us
-    JSONObject jso = new JSONObject(jsonEvent);
-    Iterator<?> keys = jso.keys();
-    
-    if(keys.hasNext()==false)
-    {
-      logger.log(Level.SEVERE, "dispatchEvent(): We received an empty decoded transaction");
-      return;
-    }
-    
-    String command = (String)keys.next();
-    
-    switch (command)
-    {
-      // -----------------------------
-      case JsonCommandParser.CONFIRMATION:
-        
-        updateConfirmation(JsonCommandParser.parseConfirmation(jso.getJSONObject(command)));
-        break;
-       
-      // -----------------------------
-      case JsonCommandParser.FREQUENCY:
-      // -----------------------------
-        eventListener.frequency(JsonCommandParser.parseFrequency(jso.getJSONObject(command)));
-        break;
-        
-      // -----------------------------
-      case JsonCommandParser.MODE:
-      // -----------------------------
-        eventListener.mode(JsonCommandParser.parseMode(jso.getJSONObject(command)));
-        break;  
-        
-      // -----------------------------
-      case JsonCommandParser.NOT_SUPPORTED:
-      // -----------------------------
-        logger.log(Level.WARNING, "Received not supported transaction: " + JsonCommandParser.parseNotSupported(jso.getJSONObject(command)));
-        break;  
-        
-    }
-  }
-
-  
+ 
   /**
    *  Stores the confirmation received from the radio and notifies the threadPortWriter
    * 
@@ -454,7 +417,6 @@ public class Radio
    */
   private void updateConfirmation(boolean cfm)
   {
-    // -----------------------------
     // Inform portWriter that we have received confirmation for last command we have sent
     synchronized(threadPortWriter)
     {
@@ -472,7 +434,7 @@ public class Radio
    /**
    * Sets Com port parameters
    * 
-   * @param port The serial port which params will be adjusted
+   * @param port The serial port which parameters will be adjusted
    * @param settings Source from which the values will be taken
    */
   private void setComPortParams(SerialPort port, I_Radio.I_SerialSettings settings) throws SerialPortException

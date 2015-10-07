@@ -75,7 +75,7 @@ class DecodedTransaction(I_Rig.I_DecodedTransaction):
         Creates a JSON formatted transaction indicating that the decoded command is not supported
         :param data: The transaction that couldn't be decoded in hex format
         :type data: str
-        :return: The following string {"command": "not-supported"}
+        :return: The following string {"not-supported": {"not-supported":"the data that couldn't be decoded in hex format"}}
         :rtype: str
         """
         if data is not None:

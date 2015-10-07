@@ -1,6 +1,3 @@
-#! /usr/bin/python
-from itertools import combinations
-
 import radio
 from serial_settings import SerialSettings
 from encoded_transaction import EncodedTransaction
@@ -15,18 +12,19 @@ class Icom(radio.Radio):
     #+--------------------------------------------------------------------------+
     #|  User configuration fields - change if needed                               |
     #+--------------------------------------------------------------------------+
+    MANUFACTURER = "Icom"
+    MODEL_NAME = "None"
 
     # Get default serial port settings
-    serial_settings = SerialSettings()
-    # If different values than the default ones are need - uncomment and set to desired value
+    serial_settings = SerialSettings() # If different values than the default ones are need - uncomment and set to desired value
+    serial_settings.baudrate_max_   = 9600
+    serial_settings.rts_            = SerialSettings.RTS_STATE_ON  # This is used to power the electronics
     # serial_settings.baudrate_min_ = 2400
-    serial_settings.baudrate_max_ = 9600
-    # serial_settings.data_bits_ = SerialSettings.DATABITS_EIGTH
-    # serial_settings.stop_bits_ = SerialSettings.STOPBITS_ONE
-    # serial_settings.handshake_ = SerialSettings.HANDSHAKE_CTSRTS
-    # serial_settings.parity_ = SerialSettings.PARITY_NONE
-    serial_settings.rts_ = SerialSettings.RTS_STATE_ON      # This is used to power the electronics
-    #serial_settings.dtr_ = SerialSettings.DTR_STATE_NONE
+    # serial_settings.data_bits_    = SerialSettings.DATABITS_EIGTH
+    # serial_settings.stop_bits_    = SerialSettings.STOPBITS_ONE
+    # serial_settings.handshake_    = SerialSettings.HANDSHAKE_CTSRTS
+    # serial_settings.parity_       = SerialSettings.PARITY_NONE
+    #serial_settings.dtr_           = SerialSettings.DTR_STATE_NONE
 
     # The address of the Icom transceiver. Value of 0x5c is good for 756Pro
     CIV_ADDRESS = 0x5c
@@ -65,7 +63,7 @@ class Icom(radio.Radio):
         :return: The model of the Rig - E.g. "IC-756PRO"
         :rtype: str
         """
-        return cls.ICOM_MODEL_NAME
+        return cls.MODEL_NAME
 
     @classmethod
     def getSerialPortSettings(cls):
@@ -275,9 +273,6 @@ class Icom(radio.Radio):
     #     return " ".join("%s" % key for key in cls.mode_codes)
 
 
-
-    MANUFACTURER = "Icom"
-    ICOM_MODEL_NAME = "None"
 
     #+--------------------------------------------------------------------------+
     #|   Icom command codes
