@@ -8,15 +8,6 @@ class Rig(I_Rig):
     send from the program to the rig. The Rig can also send data backwards.
     """
 
-    
-    @classmethod
-    def getFilename(cls):
-        """
-        Returns the file name in which this class is defined
-        :return: module name
-        :rtype: str
-        """
-        return __name__
         
     @classmethod
     def getManufacturer(cls):

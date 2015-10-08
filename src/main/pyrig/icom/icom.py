@@ -3,6 +3,10 @@ from serial_settings import SerialSettings
 from encoded_transaction import EncodedTransaction
 from decoded_transaction import DecodedTransaction
 import utils
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 class Icom(radio.Radio):
     """
@@ -54,6 +58,7 @@ class Icom(radio.Radio):
         :return: The manufacturer of the rig - E.g. "Kenwood"
         :rtype: str
         """
+        logger.critical('getManufacturer was called!')
         return cls.MANUFACTURER
 
 
@@ -202,11 +207,11 @@ class Icom(radio.Radio):
             result = DecodedTransaction.createNegativeCfm()
 
         elif trans[cmd_idx] == cls.SEND_FREQ:       # <------------------------- frequency
-            freq = cls.__decodeFrequency(trans[(cmd_idx + 1):trans_end_index])
+            freq = cls.__frequency_from_bcd_to_string(trans[(cmd_idx + 1):trans_end_index])
             result = DecodedTransaction.createFreq(freq)
 
         elif trans[cmd_idx] == cls.SEND_MODE:       # <------------------------- mode
-            mode = cls.__decodeMode(trans[cmd_idx+1])
+            mode = cls.__mode_from_byte_to_string(trans[cmd_idx+1])
             result = DecodedTransaction.createMode(mode)
 
         else:                                       # <------------------------- not-supported
@@ -218,7 +223,7 @@ class Icom(radio.Radio):
 
 
     @classmethod
-    def __decodeMode(cls, mode):
+    def __mode_from_byte_to_string(cls, mode):
         """
         Returns a string describing the current working mode
         :param mode: Byte describing the mode see cls.mode_codes
@@ -238,9 +243,9 @@ class Icom(radio.Radio):
 
 
     @classmethod
-    def __decodeFrequency(cls, frequency):
+    def __frequency_from_bcd_to_string(cls, frequency):
         """
-        Converts the bytearray with the frequency to a string representation
+        Converts the byte array with the frequency to a string representation
         Example: 0x00, 0x02, 0x10, 0x14, 0x00 is converted to "14,100,200"
         :param frequency: Bytearray containing the frequency in a little endian format bcd format
         :type frequency: bytearray
@@ -250,7 +255,7 @@ class Icom(radio.Radio):
         return utils.fromBcd(frequency).__str__()
 
     @classmethod
-    def getModes(cls):
+    def getAvailableModes(cls):
         """
         The function returns a string with all the modes that the radio supports.
         Example: "cw ssb lsb"
@@ -262,7 +267,7 @@ class Icom(radio.Radio):
 
 
     # @classmethod
-    # def getBands(cls):
+    # def getAvailableBands(cls):
     #     """
     #     The function returns a string with all the bands that it supports.
     #     Example: "3.5 7 14"

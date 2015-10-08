@@ -10,7 +10,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * DynamicByteArray extends ByteArrayOutputStream and add one additional method
+ * remove() which removes desired number of bytes starting from the beginning 
+ * of the array.
+ * 
  * @author chavdar
  */
 public class DynamicByteArray extends ByteArrayOutputStream 

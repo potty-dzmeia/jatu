@@ -1,8 +1,8 @@
-from org.lz1aq.pyrig_interfaces import I_Rig
+from org.lz1aq.pyrig_interfaces import I_DecodedTransaction
 from radio import Radio
 import json
 
-class DecodedTransaction(I_Rig.I_DecodedTransaction):
+class DecodedTransaction(I_DecodedTransaction):
     """
     Contains the decoded transaction coming from the rig together
     with some additional control information

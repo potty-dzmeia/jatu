@@ -1,4 +1,4 @@
-import radio
+from radio import *
 from serial_settings import SerialSettings
 from encoded_transaction import EncodedTransaction
 from decoded_transaction import DecodedTransaction
@@ -136,9 +136,9 @@ class Elecraft(radio.Radio):
         """
         Get the command that must be send to the radio in order to set mode (e.g. CW)
 
-        :param mode: Specifies the mode - see Radio.modes
+        :param mode: Specifies the mode - see Radio.MODES for expected values
         :type mode: str
-        :param vfo: The vfo which mode must be changed
+        :param vfo: The vfo which mode must be changed - see Radio.VFO_....
         :type vfo: int
         :return: Object containing transaction with some additional control settings
         :rtype: EncodedTransaction
@@ -147,8 +147,14 @@ class Elecraft(radio.Radio):
         if not cls.mode_codes.__contains__(new_mode):
             raise ValueError("Unsupported mode: "+mode+"!")
 
-        result = cls.__transaction(0x06, sub_command=cls.mode_codes[new_mode])
-        return EncodedTransaction(bytearray(result).__str__())
+        if vfo == Radio.VFO_A:
+            result = "MD%d;"%(new_mode)
+        elif vfo == Radio.VFO_B:
+            result = "MD$%d;"%(new_mode)
+        else:
+            raise Exception("encodeSetVfoMode(): Set VFO_NONE is not supported")
+
+        return EncodedTransaction(result, confirmation_expected=0)
 
 
     # @classmethod
@@ -210,29 +216,29 @@ class Elecraft(radio.Radio):
     #
     #     # return the object with the decoded transaction and the amount of bytes that we have read from the supplied buffer(string)
     #     return DecodedTransaction(result, trans_end_index+1)
-    #
-    #
-    #
-    # @classmethod
-    # def __decodeMode(cls, mode):
-    #     """
-    #     Returns a string describing the current working mode
-    #     :param mode: Byte describing the mode see cls.mode_codes
-    #     :type mode: int
-    #     :return: String describing the working mode (e.g. "CW"). "none" if we couldn't recognize the mode.
-    #     :rtype: str
-    #     """
-    #
-    #     # Convert the "mode" to valid string
-    #     for key, value in cls.mode_codes.items():
-    #         if mode == value:
-    #             return key
-    #
-    #     # In case of unknown mode integer
-    #     return "none"
-    #
-    #
-    #
+
+
+
+    @classmethod
+    def __mode_from_byte_to_string(cls, mode):
+        """
+        Returns a string describing the current working mode
+        :param mode: Number describing the mode see cls.mode_codes
+        :type mode: int
+        :return: String describing the working mode (e.g. "CW"). "none" if we couldn't recognize the mode.
+        :rtype: str
+        """
+
+        # Convert the "mode" to valid string
+        for key, value in cls.mode_codes.items():
+            if mode == value:
+                return key
+
+        # In case of unknown mode integer
+        return "none"
+
+
+
     # @classmethod
     # def __decodeFrequency(cls, frequency):
     #     """
@@ -244,21 +250,21 @@ class Elecraft(radio.Radio):
     #     :rtype: str
     #     """
     #     return utils.fromBcd(frequency).__str__()
-    #
-    # @classmethod
-    # def getModes(cls):
-    #     """
-    #     The function returns a string with all the modes that the radio supports.
-    #     Example: "cw ssb lsb"
-    #
-    #     :return: A string with the supported modes. Each mode is separated from the next with space.
-    #     :rtype: str
-    #     """
-    #     return " ".join("%s" % key for key in cls.mode_codes)
+
+    @classmethod
+    def getModes(cls):
+        """
+        The function returns a string with all the modes that the radio supports.
+        Example: "cw ssb lsb"
+
+        :return: A string with the supported modes. Each mode is separated from the next with space.
+        :rtype: str
+        """
+        return " ".join("%s" % key for key in cls.mode_codes)
 
 
     # @classmethod
-    # def getBands(cls):
+    # def getAvailableBands(cls):
     #     """
     #     The function returns a string with all the bands that it supports.
     #     Example: "3.5 7 14"
@@ -306,9 +312,8 @@ class Elecraft(radio.Radio):
                  'cw':      0x03,
                  'fm':      0x04,
                  'am':      0x05,
-                 'data':    0x06,
-                 'rtty':    0x07,
-                 'cwr':     0x08,
+                 'rtty':    0x06,
+                 'cwr':     0x07,
                  'rttyr':   0x09}
 
 

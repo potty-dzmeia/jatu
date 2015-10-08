@@ -1,5 +1,6 @@
 package org.lz1aq.rsi;
 
+import java.io.IOException;
 import org.lz1aq.rsi.event.*;
 import java.util.ArrayList;
 import org.lz1aq.utils.Misc;
@@ -13,8 +14,7 @@ import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
-import org.lz1aq.pyrig_interfaces.I_Rig.I_DecodedTransaction;
-import org.lz1aq.pyrig_interfaces.I_Rig.I_EncodedTransaction;
+import org.lz1aq.pyrig_interfaces.*;
 import org.lz1aq.rsi.event.EmptyRadioListener;
 /**
  * Class for controlling a radio through the serial interface
@@ -28,7 +28,7 @@ public class Radio
   private static final int QUEUE_SIZE = 30;   // Max number of commands that queueWithTransactions can hold
   
   private boolean                   isConnected = false;  // If there is a com port open
-  private ArrayList<RadioListener>  eventListeners;      // 
+  private ArrayList<RadioListener>  eventListeners;       // 
   private final String              serialPortName;       // 
   private       SerialPort          serialPort;           // Used for writing to serialPort
   private final I_Radio             radioProtocolParser;  // Used for decoding/encoding msg from/to the radio (jython object)
@@ -39,8 +39,15 @@ public class Radio
   
   private static final Logger       logger = Logger.getLogger(Radio.class.getName());
  
-  private enum CfmType{EMPTY, POSITIVE, NEGATIVE}
-  private CfmType  confirmation = CfmType.EMPTY; // Variable holding the last positive or negative confirmation from the rig
+  
+  
+  private enum ConfirmationTypes{EMPTY,    // No confirmation has arrived yet
+                                 POSITIVE, // Positive confirmation
+                                 NEGATIVE} // Negative confirmation
+  private ConfirmationTypes  confirmationStatus = ConfirmationTypes.EMPTY; // Variable holding the last confirmation that came from rig
+  
+  
+  
   
   /**   
    * Constructor 
@@ -51,12 +58,14 @@ public class Radio
   public Radio(I_Radio protocolParser, String portName)
   {
     radioProtocolParser   = protocolParser;           // Store the reference to the jython object
-    serialPortName   = portName;
+    serialPortName        = portName;
     queueWithTransactions = new LinkedBlockingQueue<>(); 
     threadPortWriter      = new Thread(new PortWriter(), "threadPortWrite");    
     receiveBuffer         = new DynamicByteArray(200);  // Set the initial size to some reasonable value
     eventListeners        = new ArrayList<>();
   }
+  
+  
   
     
   
@@ -64,11 +73,11 @@ public class Radio
   //                           Public methods
   //----------------------------------------------------------------------
   
-  
-
   /**
-   * Opens the com port (if not already open) and starts threads
-   * The method must be called before the Radio object can be used.
+   * Establishes communication with the radio using the desired Com port
+   * 
+   * This must be the first method that we call before being able to use this
+   * class
    * 
    * @throws SerialPortException 
    */
@@ -256,7 +265,7 @@ public class Radio
   //----------------------------------------------------------------------
   //                           Private stuff
   //----------------------------------------------------------------------
-  class PortReader implements SerialPortEventListener
+  private class PortReader implements SerialPortEventListener
   {
     /**
      * Reads bytes from the serial port and tries to decode them. If decoding
@@ -272,9 +281,9 @@ public class Radio
       {  
         // Read all there is and add it to our receive buffer
         receiveBuffer.write(serialPort.readBytes());
-      } catch (Exception ex)
+      } catch (SerialPortException | IOException ex)
       {
-        logger.log(Level.SEVERE, ex.toString(), ex);
+        logger.log(Level.WARNING, ex.toString(), ex);
       }
       
       // Pass the received data to the protocol parser for decoding
@@ -296,9 +305,9 @@ public class Radio
    * Implements a Thread which is taking care of writing transactions to the
    * serial port.
    */
-  class PortWriter implements Runnable
+  private class PortWriter implements Runnable
   {
-    CfmType cfm;
+    ConfirmationTypes cfm;
     
     @Override
     public void run()
@@ -339,7 +348,7 @@ public class Radio
             }
             
             // Transaction sent successfully 
-            if(cfm == CfmType.POSITIVE)
+            if(cfm == ConfirmationTypes.POSITIVE)
             {
               break; 
             }        
@@ -363,12 +372,12 @@ public class Radio
     {
       synchronized(this)
       {
-        if(confirmation == CfmType.EMPTY)
+        if(confirmationStatus == ConfirmationTypes.EMPTY)
           wait(trans.getTimeout());
         else
           logger.log(Level.WARNING, "\"confirmation\" arrived super fast!");
-        cfm = confirmation;           // read the confirmation
-        confirmation = CfmType.EMPTY; // reset to empty for the next operation
+        cfm = confirmationStatus;           // read the confirmation
+        confirmationStatus = ConfirmationTypes.EMPTY; // reset to empty for the next operation
       }
     }
   }// class
@@ -392,7 +401,7 @@ public class Radio
           
             
   /**
-   * 
+   * Inserts a transaction into the queueWithTransactions
    * @param trans
    * @throws Exception 
    */
@@ -420,12 +429,12 @@ public class Radio
     // Inform portWriter that we have received confirmation for last command we have sent
     synchronized(threadPortWriter)
     {
-      if(confirmation != CfmType.EMPTY)
+      if(confirmationStatus != ConfirmationTypes.EMPTY)
         logger.log(Level.WARNING, "Upon receiving of confirmation from the radio the \"confirmation\" var is not empty!");
       if(cfm)
-        confirmation = CfmType.POSITIVE;
+        confirmationStatus = ConfirmationTypes.POSITIVE;
       else
-        confirmation = CfmType.NEGATIVE;
+        confirmationStatus = ConfirmationTypes.NEGATIVE;
       
       threadPortWriter.notify();
     }
@@ -437,7 +446,7 @@ public class Radio
    * @param port The serial port which parameters will be adjusted
    * @param settings Source from which the values will be taken
    */
-  private void setComPortParams(SerialPort port, I_Radio.I_SerialSettings settings) throws SerialPortException
+  private void setComPortParams(SerialPort port, I_SerialSettings settings) throws SerialPortException
   {
     int parity = SerialPort.PARITY_NONE;
     

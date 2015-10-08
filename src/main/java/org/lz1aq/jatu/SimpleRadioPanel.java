@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import jssc.SerialPortList;
-import org.lz1aq.pyrig_interfaces.I_Radio;
+import org.lz1aq.pyrig_interfaces.*;
 import org.lz1aq.rsi.Radio;
 import org.lz1aq.rsi.event.RadioListener;
 import org.apache.commons.lang3.StringUtils;
@@ -82,7 +82,7 @@ public class SimpleRadioPanel extends javax.swing.JFrame
    */
   private void initModesCombobox()
   {
-    DefaultComboBoxModel comboMode = new DefaultComboBoxModel(this.radioParser.getModes().toUpperCase().split(" "));
+    DefaultComboBoxModel comboMode = new DefaultComboBoxModel(this.radioParser.getAvailableModes().toUpperCase().split(" "));
     modesCombobox.setModel(comboMode);
   }
   
@@ -95,7 +95,7 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     infoTextarea.append("\n");
     infoTextarea.append("model: " + radioParser.getModel());
     infoTextarea.append("\n");
-    I_Radio.I_SerialSettings serialSettings = radioParser.getSerialPortSettings();
+    I_SerialSettings serialSettings = radioParser.getSerialPortSettings();
     infoTextarea.append("serial port settings: " + serialSettings.toString());
     infoTextarea.append("\n");
   }
@@ -259,7 +259,7 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     settingsPanel.add(jLabel4, gridBagConstraints);
 
     jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabel5.setText("select custom Com Port");
+    jLabel5.setText("custon Com");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 3;

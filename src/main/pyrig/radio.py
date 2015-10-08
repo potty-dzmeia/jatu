@@ -1,41 +1,30 @@
 from org.lz1aq.pyrig_interfaces import I_Radio
+import logging
 
-# class Modes
-#     CW = 1
+
+logger = logging.getLogger(__name__)
+
 
 class Radio(I_Radio):
 
 
-    # modes =['none'  ,
-    #         'am'    ,  # AM -- Amplitude Modulation
-    #         'cw'    ,  # CW - CW "normal" sideband
-    #         'usb'   ,  # USB - Upper Side Band
-    #         'lsb'   ,  # LSB - Lower Side Band
-    #         'rtty'  ,  # RTTY - Radio Teletype
-    #         'fm'    ,  # FM - "narrow" band FM
-    #         'wfm'   ,  # WFM - broadcast wide FM
-    #         'cwr'   ,  # CWR - CW "reverse" sideband
-    #         'rttyr' ,  # RTTYR - RTTY "reverse" sideband
-    #         'ams'   , # AMS - Amplitude Modulation Synchronous
-    #         'pktlsb', # PKTLSB - Packet/Digital LSB mode (dedicated port)
-    #         'pktusb', # PKTUSB - Packet/Digital USB mode (dedicated port)
-    #         'pktfm' , # PKTFM - Packet/Digital FM mode (dedicated port)
-    #         'ecssusb', # ECSSUSB - Exalted Carrier Single Sideb and USB
-    #         'ecsslsb', # ECSSLSB - Exalted Carrier Single Sideband LSB
-    #         'fax'   , # FAX - Facsimile Mode
-    #         'sam'   , # SAM - Synchronous AM double sideband
-    #         'sal'   , # SAL - Synchronous AM lower sideband
-    #         'sah'   , # SAH - Synchronous AM upper (higher) sideband
-    #         'dsb'   , # DSB - Double sideband suppressed carrier
-    # ]
+
 
     @classmethod
     def getManufacturer(cls):
+        """
+        :return: The manufacturer of the rig - E.g. "Kenwood"
+        :rtype: str
+        """
         raise NotImplementedError("getManufacturer")
 
 
     @classmethod
     def getModel(cls):
+        """
+        :return: The model of the Rig - E.g. "IC-756PRO"
+        :rtype: str
+        """
         raise NotImplementedError("getModel")
 
 
@@ -143,7 +132,7 @@ class Radio(I_Radio):
 
 
     @classmethod
-    def getModes(cls):
+    def getAvailableModes(cls):
         """
         The function returns a string with all the modes that it supports.
         Example: "cw ssb lsb"
@@ -151,11 +140,11 @@ class Radio(I_Radio):
         :return: A string with the supported modes. Each mode is separated from the next with space.
         :rtype: str
         """
-        raise NotImplementedError("getModes")
+        raise NotImplementedError("getAvailableModes")
 
 
     @classmethod
-    def getBands(cls):
+    def getAvailableBands(cls):
         """
         The function returns a string with all the bands that it supports.
         Example: "3.5 7 14"
@@ -163,7 +152,7 @@ class Radio(I_Radio):
         :return: A string with the supported bands. Each band is separated from the next with space.
         :rtype: str
         """
-        raise NotImplementedError("getBands")
+        raise NotImplementedError("getAvailableBands")
 
 
 
@@ -178,26 +167,36 @@ class Radio(I_Radio):
     #set_power(watts) -
 
 
-      # modes ={'NONE':     0,
-    #         'AM':       1,  # AM -- Amplitude Modulation
-    #         'CW':       2,  # CW - CW "normal" sideband
-    #         'USB':      3,  # USB - Upper Side Band
-    #         'LSB':      4,  # LSB - Lower Side Band
-    #         'RTTY':     5,  # RTTY - Radio Teletype
-    #         'FM':       6,  # FM - "narrow" band FM
-    #         'WFM':      7,  # WFM - broadcast wide FM
-    #         'CWR':      8,  # CWR - CW "reverse" sideband
-    #         'RTTYR':    9,  # RTTYR - RTTY "reverse" sideband
-    #         'AMS':      10, # AMS - Amplitude Modulation Synchronous
-    #         'PKTLSB':   11, # PKTLSB - Packet/Digital LSB mode (dedicated port)
-    #         'PKTUSB':   12, # PKTUSB - Packet/Digital USB mode (dedicated port)
-    #         'PKTFM':    13, # PKTFM - Packet/Digital FM mode (dedicated port)
-    #         'ECSSUSB':  14, # ECSSUSB - Exalted Carrier Single Sideband USB
-    #         'ECSSLSB':  15, # ECSSLSB - Exalted Carrier Single Sideband LSB
-    #         'FAX':      16, # FAX - Facsimile Mode
-    #         'SAM':      17, # SAM - Synchronous AM double sideband
-    #         'SAL':      18, # SAL - Synchronous AM lower sideband
-    #         'SAH':      19, # SAH - Synchronous AM upper (higher) sideband
-    #         'DSB':      20, # DSB - Double sideband suppressed carrier
-    # }
+    # Possible radio modes
+    MODES ={'none',
+            'am',        # AM -- Amplitude Modulation
+            'cw',        # CW - CW "normal" sideband
+            'usb',       # USB - Upper Side Band
+            'lsb',       # LSB - Lower Side Band
+            'rtty',      # RTTY - Radio Teletype
+            'fm',        # FM - "narrow" band FM
+            'wfm',      # WFM - broadcast wide FM
+            'cwr',       # CWR - CW "reverse" sideband
+            'rttyr',     # RTTYR - RTTY "reverse" sideband
+            'ams',       # AMS - Amplitude Modulation Synchronous
+            'pktlsb',    # PKTLSB - Packet/Digital LSB mode (dedicated port)
+            'pktusb',    # PKTUSB - Packet/Digital USB mode (dedicated port)
+            'pktfn',     # PKTFM - Packet/Digital FM mode (dedicated port)
+            'ecssusb',   # ECSSUSB - Exalted Carrier Single Sideband USB
+            'ecsslsb',   # ECSSLSB - Exalted Carrier Single Sideband LSB
+            'fax',       # FAX - Facsimile Mode
+            'sam',       # SAM - Synchronous AM double sideband
+            'sal',       # SAL - Synchronous AM lower sideband
+            'sah',       # SAH - Synchronous AM upper (higher) sideband
+            'dsb',      # DSB - Double sideband suppressed carrier
+    }
+
+    # Mapping of VFO letters to numbers
+    VFO_NONE    = -1
+    VFO_A       = 0
+    VFO_B       = 1
+    VFO_C       = 2
+    VFO_D       = 3
+    VFO_E       = 4
+    VFO_F       = 5
     

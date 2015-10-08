@@ -1,7 +1,7 @@
-from org.lz1aq.pyrig_interfaces import I_Rig
+from org.lz1aq.pyrig_interfaces import I_EncodedTransaction
 
 
-class EncodedTransaction(I_Rig.I_EncodedTransaction):
+class EncodedTransaction(I_EncodedTransaction):
     """
     Contains the transaction that is to be send to the rig together with some
     additional details of how it should be send (e.g. timeout, retry etc.)

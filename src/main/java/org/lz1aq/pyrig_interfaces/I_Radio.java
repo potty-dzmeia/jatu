@@ -95,7 +95,7 @@ public interface I_Radio extends I_Rig
    * @return A string with the supported modes. Each mode is separated from 
    * the next with space.
    */
-  public String getModes();
+  public String getAvailableModes();
   
   
   /**
@@ -105,7 +105,7 @@ public interface I_Radio extends I_Rig
    * @return A string with the supported bands. Each band is separated from the
    *  next with space.
    */
-  public String getBands();
+  public String getAvailableBands();
 }
 
 
