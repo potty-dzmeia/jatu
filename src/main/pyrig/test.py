@@ -1,19 +1,9 @@
 import json
-from utils import getListInHex
+import sys
 
 
-# TRANS_START = bytearray([0xFE, 0xFE, 0xE0])
-#
-#
-# jsonCommandContent = dict()
-#
-# jsonCommandContent["frequency"] = "14195000"
-# jsonCommandContent["vfo"] = getListInHex(TRANS_START)
-#
-# jsonBlock = dict()
-# jsonBlock["frequency"] = jsonCommandContent
-# print json.dumps(jsonBlock, indent=4)
+sys.path.append("/home/potty/development/projects/jatu/target/classes/")
+import icom
 
-
-
-print "MD%d;"%(1)
+icom.Icom.getManufacturer()
+icom.Icom.getModel()

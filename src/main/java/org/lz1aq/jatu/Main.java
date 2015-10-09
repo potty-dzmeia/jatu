@@ -19,10 +19,10 @@ public class Main
   
     public static void main(String args[]) throws Exception
     {  
-//        JythonObjectFactory f2 = new JythonObjectFactory(I_Radio.class, "icom", "Icom");
-//        I_Radio radioProtocol = (I_Radio) f2.createObject();
-//        
-//
+        JythonObjectFactory f2 = new JythonObjectFactory(I_Radio.class, "icom", "Icom");
+        I_Radio radioProtocol = (I_Radio) f2.createObject();
+        
+
 //        I_Rig.I_DecodedTransaction decoded = radioProtocol.decode(transFreq);
 //        
 //        System.err.println("bytes read: "+decoded.getBytesRead());
@@ -40,8 +40,12 @@ public class Main
 //        System.err.println("bytes read: "+decoded.getBytesRead());
 //        System.out.println("jason: "+decoded.getTransaction());
       
-      String freq = "14.100.sadf200";
-      System.out.println(freq.replaceAll("[^0-9]+", ""));
+        try{
+          radioProtocol.getManufacturer();
+        }catch(Exception e)
+        {
+          System.out.println(e.toString());
+        }
     
   }
       

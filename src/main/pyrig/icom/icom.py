@@ -4,8 +4,10 @@ from encoded_transaction import EncodedTransaction
 from decoded_transaction import DecodedTransaction
 import utils
 import logging
+import logging.config
 
 
+logging.config.fileConfig(utils.get_logging_config(), disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 
 class Icom(radio.Radio):
@@ -58,7 +60,7 @@ class Icom(radio.Radio):
         :return: The manufacturer of the rig - E.g. "Kenwood"
         :rtype: str
         """
-        logger.critical('getManufacturer was called!')
+        logger.debug("returns: " + cls.MANUFACTURER)
         return cls.MANUFACTURER
 
 
@@ -68,6 +70,7 @@ class Icom(radio.Radio):
         :return: The model of the Rig - E.g. "IC-756PRO"
         :rtype: str
         """
+        logger.debug("returns: {0}".format(cls.MODEL_NAME))
         return cls.MODEL_NAME
 
     @classmethod
@@ -78,6 +81,7 @@ class Icom(radio.Radio):
         :return: [SerialSettings] object holding the serial port settings
         :rtype: SerialSettings
         """
+        logger.debug("returns: {0}".format(cls.serial_settings))
         return cls.serial_settings
 
 
@@ -105,6 +109,8 @@ class Icom(radio.Radio):
         if data is not None:
             transaction += data
         transaction.append(0xFD)
+
+        logger.debug("returns: {0}".format(utils.getListInHex(transaction)))
         return transaction
 
 
@@ -122,6 +128,7 @@ class Icom(radio.Radio):
         :rtype: EncodedTransaction
         """
         result = cls.__transaction(0x05, data=utils.toBcd(freq,10))
+
         return EncodedTransaction(bytearray(result).__str__())
 
 
@@ -136,6 +143,7 @@ class Icom(radio.Radio):
         :rtype: EncodedTransaction
         """
         result = cls.__transaction(0x03)
+
         return EncodedTransaction(bytearray(result).__str__(), confirmation_expected=0)
 
 
@@ -157,6 +165,7 @@ class Icom(radio.Radio):
             raise ValueError("Unsupported mode: "+mode+"!")
 
         result = cls.__transaction(0x06, sub_command=cls.mode_codes[new_mode])
+
         return EncodedTransaction(bytearray(result).__str__())
 
 
@@ -171,6 +180,7 @@ class Icom(radio.Radio):
         :rtype: EncodedTransaction
         """
         result = cls.__transaction(0x04)
+
         return EncodedTransaction(bytearray(result).__str__(), confirmation_expected=0)
 
 
@@ -216,6 +226,9 @@ class Icom(radio.Radio):
 
         else:                                       # <------------------------- not-supported
             result = DecodedTransaction.createNotSupported(utils.getListInHex(trans[trans_start_index:trans_end_index+1]))
+
+        logger.debug("input bytes: {0}".format(utils.getListInHex(bytearray(string_of_bytes))))
+        logger.debug("returns: {0}; \nbytes removed: {1}".format(result, trans_end_index+1))
 
         # return the object with the decoded transaction and the amount of bytes that we have read from the supplied buffer(string)
         return DecodedTransaction(result, trans_end_index+1)

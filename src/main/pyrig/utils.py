@@ -1,4 +1,21 @@
-__author__ = 'chavdar'
+import os
+
+
+
+def get_logging_config():
+    """Returns the absolute path to the logging config file
+    """
+
+    # We need to find the path to the /pyrig
+    from java.lang import ClassLoader
+    cl = ClassLoader.getSystemClassLoader()
+    paths = map(lambda url: url.getFile(), cl.getURLs())
+
+    # Search all available paths for the one to /pyrig
+    path = next(x for x in paths if "pyrig" in x)
+
+    # Now we can return the absolute path to the logging file
+    return os.path.join(path, "logging.conf")
 
 
 def fromBcd(byte_array):

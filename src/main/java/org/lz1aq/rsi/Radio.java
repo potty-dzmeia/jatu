@@ -16,7 +16,7 @@ import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import org.lz1aq.pyrig_interfaces.*;
 import org.lz1aq.rsi.event.EmptyRadioListener;
-/**
+/**   
  * Class for controlling a radio through the serial interface
  
  After creating the radio object the connect() method must be called!
@@ -28,7 +28,7 @@ public class Radio
   private static final int QUEUE_SIZE = 30;   // Max number of commands that queueWithTransactions can hold
   
   private boolean                   isConnected = false;  // If there is a com port open
-  private ArrayList<RadioListener>  eventListeners;       // 
+  private final ArrayList<RadioListener>  eventListeners; // 
   private final String              serialPortName;       // 
   private       SerialPort          serialPort;           // Used for writing to serialPort
   private final I_Radio             radioProtocolParser;  // Used for decoding/encoding msg from/to the radio (jython object)
@@ -44,8 +44,8 @@ public class Radio
   private enum ConfirmationTypes{EMPTY,    // No confirmation has arrived yet
                                  POSITIVE, // Positive confirmation
                                  NEGATIVE} // Negative confirmation
-  private ConfirmationTypes  confirmationStatus = ConfirmationTypes.EMPTY; // Variable holding the last confirmation that came from rig
-  
+  private ConfirmationTypes  confirmationStatus = ConfirmationTypes.EMPTY; // Holds type of last confirmation that came from radio
+  private boolean            isWaitingForConfirmation = false;             // If we are waiting from the radio to send us positive or negative confirmation
   
   
   
@@ -307,12 +307,14 @@ public class Radio
    */
   private class PortWriter implements Runnable
   {
-    ConfirmationTypes cfm;
     
     @Override
     public void run()
     {
+      boolean isSent = true;
       I_EncodedTransaction trans;
+      
+      
       
       try
       {
@@ -338,7 +340,7 @@ public class Radio
             // Wait for confirmation from the radio (optional)
             if(trans.isConfirmationExpected())
             {
-              waitForConfirmation(trans);
+              isSent = waitForPositiveConfirmation(trans);
             }
 
             // Delay between transactions (optional)
@@ -348,7 +350,7 @@ public class Radio
             }
             
             // Transaction sent successfully 
-            if(cfm == ConfirmationTypes.POSITIVE)
+            if(isSent)
             {
               break; 
             }        
@@ -366,20 +368,42 @@ public class Radio
      * timeout specified in trans expires.
      * 
      * @param trans - holds the timeout value for the confirmation
+     * @return true if we received positive confirmation within the timeout
      * @throws InterruptedException 
      */
-    private void waitForConfirmation(I_EncodedTransaction trans) throws InterruptedException
-    {
+    private boolean waitForPositiveConfirmation(I_EncodedTransaction trans) throws InterruptedException
+    { 
+      boolean ret = false;
+      
+      if(confirmationStatus != ConfirmationTypes.EMPTY)
+        logger.log(Level.WARNING, "\"confirmationStatus\" is not EMPTY!");
+      if(isWaitingForConfirmation == true)
+        logger.log(Level.WARNING, "\"isWaitingForConfirmation\" is not false!");
+      
       synchronized(this)
       {
+        long start = System.nanoTime();
+        isWaitingForConfirmation = true;
+        
+        // The while loop is to protect from spurious wakeups
+        while( isWaitingForConfirmation == true                         &&   // We loop till confirmation comes
+              ((System.nanoTime()-start)/1000000 < trans.getTimeout())     ) // or till timeout expires
+            wait(trans.getTimeout());
+        
         if(confirmationStatus == ConfirmationTypes.EMPTY)
-          wait(trans.getTimeout());
-        else
-          logger.log(Level.WARNING, "\"confirmation\" arrived super fast!");
-        cfm = confirmationStatus;           // read the confirmation
-        confirmationStatus = ConfirmationTypes.EMPTY; // reset to empty for the next operation
+          logger.log(Level.SEVERE, "Timeout expired - no confirmation from the radio!");
+        
+        
+        if(confirmationStatus == ConfirmationTypes.POSITIVE)
+          ret = true;
+        
+        confirmationStatus       = ConfirmationTypes.EMPTY; // reset to empty for the next operation
+        isWaitingForConfirmation = false ;  
       }
+      
+      return ret;
     }
+    
   }// class
   
   
@@ -431,12 +455,20 @@ public class Radio
     {
       if(confirmationStatus != ConfirmationTypes.EMPTY)
         logger.log(Level.WARNING, "Upon receiving of confirmation from the radio the \"confirmation\" var is not empty!");
+      if(isWaitingForConfirmation == false)
+        logger.log(Level.WARNING, "Upon receiving of confirmation from the radio the \"isWaitingForConfirmation\" var is false!");
+      
+      
+      // signal that confirmation has arrived  
+      isWaitingForConfirmation = false; 
+      
+      // signal the type of confirmation
       if(cfm)
         confirmationStatus = ConfirmationTypes.POSITIVE;
       else
         confirmationStatus = ConfirmationTypes.NEGATIVE;
       
-      threadPortWriter.notify();
+      threadPortWriter.notify();  // wake up the thread so that it can continue sending transactions
     }
   }
   

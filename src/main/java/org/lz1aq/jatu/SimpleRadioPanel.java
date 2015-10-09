@@ -471,7 +471,7 @@ public class SimpleRadioPanel extends javax.swing.JFrame
           connectToRadioButton.setSelected(false);
           return;
         }
-        // Create the radio object usong the selected Com port
+        // Create the radio object using the selected Com port
         radio = new Radio(radioParser, String.valueOf(comportCombobox.getSelectedItem()));
         radio.addEventListener(new LocalRadioListener());
         radio.connect(); // Let's not forget to call connect(). Calling disconnects() later will close the Com Port
