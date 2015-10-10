@@ -511,7 +511,7 @@ public class SimpleRadioPanel extends javax.swing.JFrame
             radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "3.5":
-            radio.setFrequency(350000, 0);
+            radio.setFrequency(3500000, 0);
             radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "7":

@@ -279,8 +279,12 @@ public class Radio
     {
       try
       {  
+        
+        byte b[] = serialPort.readBytes();
+        logger.log(Level.INFO, "Incoming bytes ("+b.length+") -------> " + Misc.toString(b) );
         // Read all there is and add it to our receive buffer
-        receiveBuffer.write(serialPort.readBytes());
+        receiveBuffer.write(b);
+       
       } catch (SerialPortException | IOException ex)
       {
         logger.log(Level.WARNING, ex.toString(), ex);
@@ -331,7 +335,6 @@ public class Radio
             {
               serialPort.writeBytes(trans.getTransaction());
               serialPort.purgePort(SerialPort.PURGE_TXCLEAR);
-              logger.log(Level.INFO, Misc.toString(trans.getTransaction()));
             } catch (SerialPortException ex)
             {
               logger.log(Level.SEVERE, null, ex);

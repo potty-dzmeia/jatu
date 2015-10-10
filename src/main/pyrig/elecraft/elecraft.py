@@ -3,17 +3,24 @@ from serial_settings import SerialSettings
 from encoded_transaction import EncodedTransaction
 from decoded_transaction import DecodedTransaction
 import utils
+import logging
+import logging.config
 
-class Elecraft(radio.Radio):
+
+logging.config.fileConfig(utils.get_logging_config(), disable_existing_loggers=False)
+logger = logging.getLogger(__name__)
+
+
+class Elecraft(Radio):
     """
     Configuration script for Elecraft transceivers
     """
 
     #+--------------------------------------------------------------------------+
-    #|  User configuration fields - change if needed                               |
+    #|  User configuration fields - change if needed                            |
     #+--------------------------------------------------------------------------+
     MANUFACTURER = "Elecraft"
-    MODEL_NAME = "None"
+    MODEL_NAME   = "None"
 
     # Get default serial port settings
     serial_settings = SerialSettings() # If different values than the default ones are need - uncomment and set to desired value
@@ -21,10 +28,10 @@ class Elecraft(radio.Radio):
     serial_settings.baudrate_max_   = 38400
     serial_settings.stop_bits_      = SerialSettings.STOPBITS_TWO
     serial_settings.rts_            = SerialSettings.RTS_STATE_ON      # This is used to power the electronics
-     # serial_settings.data_bits_   = SerialSettings.DATABITS_EIGTH
+    # serial_settings.data_bits_    = SerialSettings.DATABITS_EIGTH
     # serial_settings.handshake_    = SerialSettings.HANDSHAKE_CTSRTS
     # serial_settings.parity_       = SerialSettings.PARITY_NONE
-    #serial_settings.dtr_           = SerialSettings.DTR_STATE_NONE
+    # serial_settings.dtr_          = SerialSettings.DTR_STATE_NONE
 
 
 
@@ -42,8 +49,6 @@ class Elecraft(radio.Radio):
     #+--------------------------------------------------------------------------+
     #|   End of user configuration fields
     #+--------------------------------------------------------------------------+
-
-
     @classmethod
     def getManufacturer(cls):
         """
@@ -61,6 +66,7 @@ class Elecraft(radio.Radio):
         """
         return cls.MODEL_NAME
 
+
     @classmethod
     def getSerialPortSettings(cls):
         """
@@ -72,32 +78,28 @@ class Elecraft(radio.Radio):
         return cls.serial_settings
 
 
+    @classmethod
+    def getAvailableModes(cls):
+        """
+        The function returns a string with all the modes that the radio supports.
+        Example: "cw ssb lsb"
+
+        :return: A string with the supported modes. Each mode is separated from the next with space.
+        :rtype: str
+        """
+        return " ".join("%s" % key for key in cls.mode_codes)
+
 
     # @classmethod
-    # def __transaction(cls, command, sub_command=None, data=None):
+    # def getAvailableBands(cls):
     #     """
-    #     Assembles an Elecraft specific transaction ready to be send to the transceiver
+    #     The function returns a string with all the bands that it supports.
+    #     Example: "3.5 7 14"
     #
-    #     Protocol is the following:
-    #     [preamble(0xFE), preamble(0xFE), ctrl_id(0xE0), civ-address, command, sub_command, data...., 0xFD]
-    #
-    #     :param command: Command code. E.g. 0x05 is set frequency)
-    #     :type command: list
-    #     :param sub_command: Sub-command code (optional)
-    #     :type sub_command: int
-    #     :param data: Additional data bytes(optional)
-    #     :type data: list
-    #     :return: The ready transaction bytes
-    #     :rtype: list
+    #     :return: A string with the supported bands. Each band is separated from the next with space.
+    #     :rtype: str
     #     """
-    #     transaction= [0xFE, 0xFE, 0xE0, cls.CIV_ADDRESS, command]
-    #     if sub_command is not None:
-    #         transaction.append(sub_command)
-    #     if data is not None:
-    #         transaction += data
-    #     transaction.append(0xFD)
-    #     return transaction
-
+    #     return " ".join("%s" % key for key in cls.mode_codes)
 
 
     @classmethod
@@ -130,7 +132,6 @@ class Elecraft(radio.Radio):
         return EncodedTransaction(result, confirmation_expected=0)
 
 
-
     @classmethod
     def encodeSetVfoMode(cls, mode, vfo):
         """
@@ -157,66 +158,81 @@ class Elecraft(radio.Radio):
         return EncodedTransaction(result, confirmation_expected=0)
 
 
-    # @classmethod
-    # def encodeGetVfoMode(cls, vfo):
-    #     """
-    #     Gets the command with which we can tell the radio to send us the current mode
-    #
-    #     :param vfo: The VFO for which we want the current mode
-    #     :type vfo: int
-    #     :return: Object containing transaction with some additional control settings
-    #     :rtype: EncodedTransaction
-    #     """
-    #     result = cls.__transaction(0x04)
-    #     return EncodedTransaction(bytearray(result).__str__(), confirmation_expected=0)
-    #
-    #
-    # @classmethod
-    # def decode(cls, string_of_bytes):
-    #     """
-    #     Decodes information coming from an Elecraft radio.
-    #     Converts string of bytes coming from the radio into a JSON formatted string with the decoded transaction.
-    #
-    #     :param string_of_bytes: Series of bytes from which we must extract the transaction. There is no guarantee
-    #     that the first byte is the beginning of the transaction (i.e. there might be some trash in the beginning).
-    #     :type string_of_bytes: str
-    #     :return: Object containing the transaction and some additional control information
-    #     :rtype: DecodedTransaction
-    #     """
-    #     trans = bytearray(string_of_bytes)
-    #
-    #     # Find the beginning of the transaction
-    #     trans_start_index = trans.find(cls.TRANS_START)
-    #     if trans_start_index == -1:
-    #         return DecodedTransaction(None, 0)
-    #
-    #     # Find the end of the transaction (must be after trans_start_index)
-    #     trans_end_index = trans.find(cls.TRANS_END, trans_start_index)
-    #     if trans_end_index == -1:
-    #         return DecodedTransaction(None, 0)
-    #
-    #     cmd_idx = trans_start_index + 4  # get the index of the command
-    #
-    #     if trans[cmd_idx] == cls.CFM_POSITIVE:      # <------------------------- positive confirm
-    #         result = DecodedTransaction.createPositiveCfm()
-    #
-    #     elif trans[cmd_idx] == cls.CFM_NEGATIVE:    # <------------------------- negative confirm
-    #         result = DecodedTransaction.createNegativeCfm()
-    #
-    #     elif trans[cmd_idx] == cls.SEND_FREQ:       # <------------------------- frequency
-    #         freq = cls.__decodeFrequency(trans[(cmd_idx + 1):trans_end_index])
-    #         result = DecodedTransaction.createFreq(freq)
-    #
-    #     elif trans[cmd_idx] == cls.SEND_MODE:       # <------------------------- mode
-    #         mode = cls.__decodeMode(trans[cmd_idx+1])
-    #         result = DecodedTransaction.createMode(mode)
-    #
-    #     else:                                       # <------------------------- not-supported
-    #         result = DecodedTransaction.createNotSupported(utils.getListInHex(trans[trans_start_index:trans_end_index+1]))
-    #
-    #     # return the object with the decoded transaction and the amount of bytes that we have read from the supplied buffer(string)
-    #     return DecodedTransaction(result, trans_end_index+1)
+    @classmethod
+    def encodeGetVfoMode(cls, vfo):
+        """
+        Gets the command with which we can tell the radio to send us the current mode
 
+        :param vfo: The VFO for which we want the current mode
+        :type vfo: int
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
+        """
+        if vfo == Radio.VFO_A:
+            result = "MD;"
+        elif vfo == Radio.VFO_B:
+            result = "MD$;"
+        else:
+            raise Exception("encodeSetVfoMode(): Set VFO_NONE is not supported")
+
+        return EncodedTransaction(result, confirmation_expected=0)
+
+
+    @classmethod
+    def decode(cls, data):
+        """
+        Decodes information coming from an Elecraft radio.
+        Converts strings coming from the radio into a JSON formatted string with the decoded transaction.
+
+        Example of incoming command: "MD$1;" - which means that vfo 2 is in LSB mode
+
+        :param data: Series of bytes from which we must extract the incoming command.
+        :type data: array
+        :return: Object containing the transaction and some additional control information
+        :rtype: DecodedTransaction
+        """
+
+        # Find the character ";" which signals the end of the command
+        data = data.tostring()
+        end = data.find(';')
+
+        # The incoming data does not contain one complete transaction...
+        if end == -1:
+            return DecodedTransaction(None, 0)
+
+        json_result = cls.__parse(data[:end+1])
+
+
+        # return the object with the decoded transaction and the amount of bytes that we have read from the supplied buffer(string)
+        return DecodedTransaction(json_result, end+1)
+
+
+    @classmethod
+    def __parse(cls, trans):
+        """
+        Parses the string data into a meaningful JSON block containing the command coming from the radio
+
+        This function actually calls the responsible parser depending on the incoming command code
+
+        :param data: A single transaction string coming from the radio that we have to parse to a meaningful JSON block
+        :type data: str
+        :return: JSON formatted block containing the parsed data
+        :rtype: str
+        """
+        result = ""
+
+        for s in cls.parsers:
+            if trans.startswith(s):  # if we have parser for the current command...
+                fn = cls.parsers[s]
+                result = getattr(fn, '__func__')(cls, trans) # call the responsible parser
+                break
+
+        if result == "":
+            result = DecodedTransaction.createNotSupported(trans)
+
+        logger.debug("input data: {0}".format(trans))
+        logger.debug("parsed result: {0}".format(result))
+        return result
 
 
     @classmethod
@@ -232,48 +248,57 @@ class Elecraft(radio.Radio):
         # Convert the "mode" to valid string
         for key, value in cls.mode_codes.items():
             if mode == value:
+                logger.info("returns = " + key)
                 return key
 
         # In case of unknown mode integer
         return "none"
 
 
-
-    # @classmethod
-    # def __decodeFrequency(cls, frequency):
-    #     """
-    #     Converts the bytearray with the frequency to a string representation
-    #     Example: 0x00, 0x02, 0x10, 0x14, 0x00 is converted to "14,100,200"
-    #     :param frequency: Bytearray containing the frequency in a little endian format bcd format
-    #     :type frequency: bytearray
-    #     :return: Frequency in string format
-    #     :rtype: str
-    #     """
-    #     return utils.fromBcd(frequency).__str__()
-
     @classmethod
-    def getModes(cls):
+    def __parse_frequency_vfo_a(cls, command):
         """
-        The function returns a string with all the modes that the radio supports.
-        Example: "cw ssb lsb"
+        Extracts the Frequency value from the command
 
-        :return: A string with the supported modes. Each mode is separated from the next with space.
+        :param command: String starting of the type "FA00007000000;"
+        :type command: str
+        :return: JSON formatted block containing the parsed data
         :rtype: str
         """
-        return " ".join("%s" % key for key in cls.mode_codes)
+        return DecodedTransaction.createFreq(command[2:-1].lstrip('0'), vfo=Radio.VFO_A)
 
 
-    # @classmethod
-    # def getAvailableBands(cls):
-    #     """
-    #     The function returns a string with all the bands that it supports.
-    #     Example: "3.5 7 14"
-    #
-    #     :return: A string with the supported bands. Each band is separated from the next with space.
-    #     :rtype: str
-    #     """
-    #     return " ".join("%s" % key for key in cls.mode_codes)
+    @classmethod
+    def __parse_frequency_vfo_b(cls, command):
+        """
+        Extracts the Frequency value from the command
 
+        :param command: String starting of the type "FB00007000000;"
+        :type command: str
+        :return: JSON formatted block containing the parsed data
+        :rtype: str
+        """
+        return DecodedTransaction.createFreq(command[2:-1].lstrip('0'), vfo=Radio.VFO_B)
+
+
+    @classmethod
+    def __parse_mode(cls, command):
+        """
+        Extracts the Mode value from the command
+
+        :param command: String starting of the type "MD1;" or "MD$1;"
+        :type command: str
+        :return: JSON formatted block containing the parsed data
+        :rtype: str
+        """
+        if command[2] != '$':
+            m = cls.__mode_from_byte_to_string(int(command[2]))
+            logger.info("m = "+m)
+            return DecodedTransaction.createMode(m, vfo=Radio.VFO_A)
+        else:
+            m = cls.__mode_from_byte_to_string(int(command[3]))
+            logger.info("m = "+m)
+            return DecodedTransaction.createMode(m, vfo=Radio.VFO_B)
 
 
     @classmethod
@@ -293,19 +318,16 @@ class Elecraft(radio.Radio):
         else:
             raise Exception("Not allowed VFO number")
 
+
+    # Commands coming from the Elecraft that we can understand(parse)
+    parsers = {"FA": __parse_frequency_vfo_a,       # VFO A frequency
+               "FB": __parse_frequency_vfo_b,       # VFO B frequency
+               "MD": __parse_mode,}                 # Operating mode
+
     #+--------------------------------------------------------------------------+
     #|   Elecraft command codes
     #+--------------------------------------------------------------------------+
 
-    # TRANS_START = bytearray([0xFE, 0xFE, 0xE0, CIV_ADDRESS])  # Trans\s send by the Icom starts with: 0xFE 0xFE 0xE0 CIV
-    # TRANS_END = bytearray([0xFD])  # Transactions send by the Icom ends with: 0xFD
-    #
-    # SEND_FREQ = 0x00        # send by the Icom when frequency has changed
-    # SEND_MODE = 0x01        # send by the Icom whe mode has changed
-    # CFM_POSITIVE = 0xFB     # Positive confirmation send by the Icom radio
-    # CFM_NEGATIVE = 0xFA     # Negative confirmation send by the Icom radio
-    #
-    #
     # Codes used for changing the mode
     mode_codes ={'lsb':     0x01,
                  'usb':     0x02,

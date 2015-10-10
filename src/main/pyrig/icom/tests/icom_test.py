@@ -42,6 +42,7 @@ raw_transactions = {
 'freq_4bytes_12'        :   bytearray([0xFE, 0xFE, 0xE0, civ_address, 0x00, 0x12, 0x00, 0x00, 0x00, 0xFD]),
 'freq_4bytes_1'         :   bytearray([0xFE, 0xFE, 0xE0, civ_address, 0x00, 0x01, 0x00, 0x00, 0x00, 0xFD]),
 'freq_4bytes_0'         :   bytearray([0xFE, 0xFE, 0xE0, civ_address, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFD]),
+'not_supported1'        :   bytearray([0xfe, 0xfe, 0xe0, 0x5c,        0x05, 0x00, 0x00, 0x35, 0x00, 0x00, 0xfd])
 }
 
 import time
@@ -49,7 +50,7 @@ import serial
 
 # configure the serial connections (the parameters differs on the device you are connecting to)
 ser = serial.Serial(
-     port='/dev/ttyUSB0',
+     port='/dev/ttyUSB1',
     baudrate=9600,
     parity=serial.PARITY_NONE,
     stopbits=serial.STOPBITS_ONE,

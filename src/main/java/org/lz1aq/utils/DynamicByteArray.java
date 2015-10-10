@@ -52,7 +52,7 @@ public class DynamicByteArray extends ByteArrayOutputStream
     
     this.count -=removedBytes;
     
-    logger.log(Level.INFO, "Removed: "+removedBytes+"; Remaining: "+this.count+";  Buffer size "+this.buf.length);
+    // logger.log(Level.INFO, "Removed: "+removedBytes+"; Remaining: "+this.count+";  Buffer size "+this.buf.length);
     
   }
   

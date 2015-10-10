@@ -1,9 +1,21 @@
-import json
-import sys
+
+mode = "MD$1;"
+setFreq = "FA00007000000;"
 
 
-sys.path.append("/home/potty/development/projects/jatu/target/classes/")
-import icom
+def a(sss):
+    return sss
 
-icom.Icom.getManufacturer()
-icom.Icom.getModel()
+def b(sss):
+    return sss+"b"
+
+parsers = {"FA": a,       # VFO A frequency
+           "FB": b,       # VFO B frequency
+         }                 # Operating mode
+
+
+fn = parsers["FB"]
+print fn("111")
+
+
+

@@ -1,6 +1,15 @@
 from org.lz1aq.pyrig_interfaces import I_DecodedTransaction
 from radio import Radio
 import json
+import utils
+import logging
+import logging.config
+
+
+logging.config.fileConfig(utils.get_logging_config(), disable_existing_loggers=False)
+logger = logging.getLogger(__name__)
+
+
 
 class DecodedTransaction(I_DecodedTransaction):
     """
@@ -80,7 +89,7 @@ class DecodedTransaction(I_DecodedTransaction):
         """
         if data is not None:
             json_command_content = dict()
-            json_command_content["not_supported"] = data;
+            json_command_content["not_supported"] = data
         return cls.__create("not_supported", json_command_content)
 
 
@@ -92,7 +101,7 @@ class DecodedTransaction(I_DecodedTransaction):
         :rtype: str
         """
         json_command_content = dict()
-        json_command_content["confirmation"] = "1";
+        json_command_content["confirmation"] = "1"
         return cls.__create("confirmation", json_command_content)
 
 
@@ -104,7 +113,7 @@ class DecodedTransaction(I_DecodedTransaction):
         :rtype: str
         """
         json_command_content = dict()
-        json_command_content["confirmation"] = "0";
+        json_command_content["confirmation"] = "0"
         return cls.__create("confirmation", json_command_content)
 
 
@@ -120,9 +129,8 @@ class DecodedTransaction(I_DecodedTransaction):
         :rtype: str
         """
         json_command_content = dict()
-        json_command_content["frequency"] = freq;
+        json_command_content["frequency"] = freq
         if vfo is not None:
-            json_command_content = dict()
             json_command_content["vfo"] = str(vfo)
         return cls.__create("frequency", json_command_content)
 
@@ -138,10 +146,10 @@ class DecodedTransaction(I_DecodedTransaction):
         :return: String of the type {"mode": {"mode": "cw", "vfo": "0"}}
         :rtype: str
         """
+
         json_command_content = dict()
-        json_command_content["mode"] = mode;
+        json_command_content["mode"] = mode
         if vfo is not None:
-            json_command_content = dict()
-            json_command_content["vfo"] = str(vfo);
+            json_command_content["vfo"] = str(vfo)
         return cls.__create("mode", json_command_content)
 

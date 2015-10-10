@@ -33,8 +33,8 @@ class Icom(radio.Radio):
     #serial_settings.dtr_           = SerialSettings.DTR_STATE_NONE
 
     # The address of the Icom transceiver. Value of 0x5c is good for 756Pro
-    CIV_ADDRESS = 0x5c
-
+    CIV_ADDRESS  = 0x5c
+    CTRL_ADDRESS = 0x00
 
 
 
@@ -73,6 +73,7 @@ class Icom(radio.Radio):
         logger.debug("returns: {0}".format(cls.MODEL_NAME))
         return cls.MODEL_NAME
 
+
     @classmethod
     def getSerialPortSettings(cls):
         """
@@ -85,6 +86,29 @@ class Icom(radio.Radio):
         return cls.serial_settings
 
 
+    @classmethod
+    def getAvailableModes(cls):
+        """
+        The function returns a string with all the modes that the radio supports.
+        Example: "cw ssb lsb"
+
+        :return: A string with the supported modes. Each mode is separated from the next with space.
+        :rtype: str
+        """
+        return " ".join("%s" % key for key in cls.mode_codes)
+
+
+    # @classmethod
+    # def getAvailableBands(cls):
+    #     """
+    #     The function returns a string with all the bands that it supports.
+    #     Example: "3.5 7 14"
+    #
+    #     :return: A string with the supported bands. Each band is separated from the next with space.
+    #     :rtype: str
+    #     """
+    #     return " ".join("%s" % key for key in cls.mode_codes)
+
 
     @classmethod
     def __transaction(cls, command, sub_command=None, data=None):
@@ -92,7 +116,7 @@ class Icom(radio.Radio):
         Assembles an Icom specific transaction ready to be send to the transceiver
 
         Protocol is the following:
-        [preamble(0xFE), preamble(0xFE), ctrl_id(0xE0), civ-address, command, sub_command, data...., 0xFD]
+        [preamble(0xFE), preamble(0xFE), ctrl_id, civ-address, command, sub_command, data...., 0xFD]
 
         :param command: Command code. E.g. 0x05 is set frequency)
         :type command: list
@@ -103,7 +127,7 @@ class Icom(radio.Radio):
         :return: The ready transaction bytes
         :rtype: list
         """
-        transaction= [0xFE, 0xFE, 0xE0, cls.CIV_ADDRESS, command]
+        transaction= [0xFE, 0xFE, cls.CTRL_ADDRESS, cls.CIV_ADDRESS, command]
         if sub_command is not None:
             transaction.append(sub_command)
         if data is not None:
@@ -185,18 +209,18 @@ class Icom(radio.Radio):
 
 
     @classmethod
-    def decode(cls, string_of_bytes):
+    def decode(cls, data):
         """
         Decodes information coming from an Icom radio.
         Converts string of bytes coming from the radio into a JSON formatted string with the decoded transaction.
 
-        :param string_of_bytes: Series of bytes from which we must extract the transaction. There is no guarantee
+        :param data: Series of bytes from which we must extract the incoming command. There is no guarantee
         that the first byte is the beginning of the transaction (i.e. there might be some trash in the beginning).
-        :type string_of_bytes: str
+        :type data: array
         :return: Object containing the transaction and some additional control information
         :rtype: DecodedTransaction
         """
-        trans = bytearray(string_of_bytes)
+        trans = bytearray(data)
 
         # Find the beginning of the transaction
         trans_start_index = trans.find(cls.TRANS_START)
@@ -227,7 +251,7 @@ class Icom(radio.Radio):
         else:                                       # <------------------------- not-supported
             result = DecodedTransaction.createNotSupported(utils.getListInHex(trans[trans_start_index:trans_end_index+1]))
 
-        logger.debug("input bytes: {0}".format(utils.getListInHex(bytearray(string_of_bytes))))
+        logger.debug("input bytes: {0}".format(utils.getListInHex(bytearray(data))))
         logger.debug("returns: {0}; \nbytes removed: {1}".format(result, trans_end_index+1))
 
         # return the object with the decoded transaction and the amount of bytes that we have read from the supplied buffer(string)
@@ -267,28 +291,7 @@ class Icom(radio.Radio):
         """
         return utils.fromBcd(frequency).__str__()
 
-    @classmethod
-    def getAvailableModes(cls):
-        """
-        The function returns a string with all the modes that the radio supports.
-        Example: "cw ssb lsb"
 
-        :return: A string with the supported modes. Each mode is separated from the next with space.
-        :rtype: str
-        """
-        return " ".join("%s" % key for key in cls.mode_codes)
-
-
-    # @classmethod
-    # def getAvailableBands(cls):
-    #     """
-    #     The function returns a string with all the bands that it supports.
-    #     Example: "3.5 7 14"
-    #
-    #     :return: A string with the supported bands. Each band is separated from the next with space.
-    #     :rtype: str
-    #     """
-    #     return " ".join("%s" % key for key in cls.mode_codes)
 
 
 
@@ -296,7 +299,7 @@ class Icom(radio.Radio):
     #|   Icom command codes
     #+--------------------------------------------------------------------------+
 
-    TRANS_START = bytearray([0xFE, 0xFE, 0xE0, CIV_ADDRESS])  # Trans\s send by the Icom starts with: 0xFE 0xFE 0xE0 CIV
+    TRANS_START = bytearray([0xFE, 0xFE, CTRL_ADDRESS, CIV_ADDRESS])  # Trans\s send by the Icom starts with: 0xFE 0xFE CTRL CIV
     TRANS_END = bytearray([0xFD])  # Transactions send by the Icom ends with: 0xFD
 
     SEND_FREQ = 0x00        # send by the Icom when frequency has changed
