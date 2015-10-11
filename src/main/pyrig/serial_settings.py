@@ -18,8 +18,8 @@ class SerialSettings(I_SerialSettings):
         self.stop_bits_ = self.STOPBITS_ONE
         self.parity_ = self.PARITY_NONE
         self.handshake_ = self.HANDSHAKE_NONE
-        self.rts_ = self.RTS_STATE_NONE
-        self.dtr_ = self.DTR_STATE_NONE
+        self.rts_ = self.RTS_STATE_OFF
+        self.dtr_ = self.DTR_STATE_OFF
 
     def __str__(self):
         """Packs the class variables into a JSON formatted string
