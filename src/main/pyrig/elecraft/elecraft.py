@@ -103,6 +103,29 @@ class Elecraft(Radio):
 
 
     @classmethod
+    def encodeInit(cls):
+        """
+        If the radio needs some initialization before being able to be used.
+
+        :return: Initialization command that is to be send to the Rig
+        :rtype: EncodedTransaction
+        """
+        return EncodedTransaction("AI1;", confirmation_expected=0)
+
+
+    @classmethod
+    def encodeCleanup(cls):
+        """
+        If the radio needs some cleanup after being used.
+
+        :return: Cleanup command that is to be send to the Rig
+        :rtype: EncodedTransaction
+        """
+        logger.warning("encodeCleanup() not implemented")
+        return EncodedTransaction("")
+
+
+    @classmethod
     def encodeSetVfoFreq(cls, freq, vfo):
         """
         Gets the command with which we can tell an Elecraft radio to change frequency
@@ -144,14 +167,14 @@ class Elecraft(Radio):
         :return: Object containing transaction with some additional control settings
         :rtype: EncodedTransaction
         """
-        new_mode = mode.lower()
-        if not cls.mode_codes.__contains__(new_mode):
-            raise ValueError("Unsupported mode: "+mode+"!")
+        mode = mode.lower()
+        if not cls.mode_codes.__contains__(mode):
+            raise ValueError("Unsupported mode: " + mode + " !")
 
         if vfo == Radio.VFO_A:
-            result = "MD%d;"%(new_mode)
+            result = "MD%d;"%(cls.mode_codes[mode])
         elif vfo == Radio.VFO_B:
-            result = "MD$%d;"%(new_mode)
+            result = "MD$%d;"%(cls.mode_codes[mode])
         else:
             raise Exception("encodeSetVfoMode(): Set VFO_NONE is not supported")
 
@@ -236,26 +259,6 @@ class Elecraft(Radio):
 
 
     @classmethod
-    def __mode_from_byte_to_string(cls, mode):
-        """
-        Returns a string describing the current working mode
-        :param mode: Number describing the mode see cls.mode_codes
-        :type mode: int
-        :return: String describing the working mode (e.g. "CW"). "none" if we couldn't recognize the mode.
-        :rtype: str
-        """
-
-        # Convert the "mode" to valid string
-        for key, value in cls.mode_codes.items():
-            if mode == value:
-                logger.info("returns = " + key)
-                return key
-
-        # In case of unknown mode integer
-        return "none"
-
-
-    @classmethod
     def __parse_frequency_vfo_a(cls, command):
         """
         Extracts the Frequency value from the command
@@ -317,6 +320,28 @@ class Elecraft(Radio):
             return "B"
         else:
             raise Exception("Not allowed VFO number")
+
+
+    @classmethod
+    def __mode_from_byte_to_string(cls, mode):
+        """
+        Returns a string describing the current working mode
+        :param mode: Integer describing the mode see cls.mode_codes
+        :type mode: int
+        :return: String describing the working mode cls.mode_codes
+        :rtype: str
+        """
+
+        # Convert the "mode" to valid string
+        for key, value in cls.mode_codes.items():
+            if mode == value:
+                logger.info("returns = " + key)
+                return key
+
+        # In case of unknown mode integer
+        return "none"
+
+
 
 
     # Commands coming from the Elecraft that we can understand(parse)

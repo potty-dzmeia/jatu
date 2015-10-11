@@ -485,7 +485,7 @@ public class SimpleRadioPanel extends javax.swing.JFrame
       {
         if (radio != null)
         {
-          radio.disconnects();
+          radio.disconnect();
           radio = null;
         }
 
@@ -508,39 +508,39 @@ public class SimpleRadioPanel extends javax.swing.JFrame
         {
           case "1.8":
             radio.setFrequency(1810000, 0);
-            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "3.5":
             radio.setFrequency(3500000, 0);
-            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "7":
             radio.setFrequency(7000000, 0);
-            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "10":
             radio.setFrequency(10000000, 0);
-            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "14":
             radio.setFrequency(14000000, 0);
-            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "18":
             radio.setFrequency(18000000, 0);
-            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "21":
             radio.setFrequency(21000000, 0);
-            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "24":
             radio.setFrequency(24000000, 0);
-            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "28":
             radio.setFrequency(28000000, 0);
-            radio.getFrequency(0); // after setting the frequency let's ask which will update our display
+            //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
 
         }
@@ -561,7 +561,6 @@ public class SimpleRadioPanel extends javax.swing.JFrame
       try
       {
         radio.setMode(mode, 0);
-        radio.getMode(0); // after setting the frequency let's ask which will update our display
       } catch (Exception ex)
       {
         logger.log(Level.SEVERE, null, ex);

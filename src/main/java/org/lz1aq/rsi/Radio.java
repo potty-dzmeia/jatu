@@ -1,6 +1,7 @@
 package org.lz1aq.rsi;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import org.lz1aq.rsi.event.*;
 import java.util.ArrayList;
 import org.lz1aq.utils.Misc;
@@ -83,6 +84,8 @@ public class Radio
    */
   public void connect() throws Exception
   {
+    if(isConnected==true)
+      logger.warning("Radio already disconnected!");
     if(threadPortWriter.getState() != Thread.State.NEW )
       throw new Exception("Please create a new Radio object");
     
@@ -92,10 +95,10 @@ public class Radio
     serialPort.openPort();
     setComPortParams(serialPort, radioProtocolParser.getSerialPortSettings());
     
-    // Register a listener - we are interested in the confirmation events
+    // Register a local listener - this class is interested in the confirmation events
     eventListeners.add(new LocalRadioListener());
     
-    // Start the thread responsible of sending the data to the radio
+    // Start Writer thread responsible of sending the data to the radio
     threadPortWriter.start();
     
     // Register the serial port reader which is responsible for handling the incoming data
@@ -103,6 +106,8 @@ public class Radio
     serialPort.addEventListener(new PortReader());
     
     isConnected = true;
+    
+    this.queueTransaction(radioProtocolParser.encodeInit());
   }
   
   
@@ -115,8 +120,15 @@ public class Radio
    * 
    * @throws jssc.SerialPortException
    */
-  public void disconnects() throws SerialPortException
+  public void disconnect() throws SerialPortException
   {
+    if(isConnected==false)
+      logger.warning("Radio already disconnected!");
+    
+    this.queueTransaction(radioProtocolParser.encodeCleanup());
+    // Wait a little to give a chance for the cleanup data to be sent to the radio
+    try{Thread.sleep(150);} catch (InterruptedException ex){logger.log(Level.SEVERE, null, ex);}
+    
     threadPortWriter.interrupt();
     serialPort.removeEventListener();
     serialPort.closePort();
@@ -131,11 +143,8 @@ public class Radio
    * @param freq - frequency value
    * @throws Exception 
    */
-  public void setFrequency(long freq) throws Exception
+  public void setFrequency(long freq)
   {
-    if(isConnected==false) 
-      throw new Exception("Not connected to radio!");
-    
     this.queueTransaction(radioProtocolParser.encodeSetFreq(freq));
   }
   
@@ -148,9 +157,6 @@ public class Radio
    */
   public void setFrequency(long freq, int vfo) throws Exception
   {
-    if(isConnected==false) 
-      throw new Exception("Not connected to radio!");
-    
     this.queueTransaction(radioProtocolParser.encodeSetVfoFreq(freq, vfo));
   }
   
@@ -164,9 +170,6 @@ public class Radio
    */
   public void getFrequency() throws Exception
   {
-    if(isConnected==false) 
-      throw new Exception("Not connected to radio!");
-    
     this.queueTransaction(radioProtocolParser.encodeGetFreq());
   }
   
@@ -181,9 +184,6 @@ public class Radio
    */
   public void getFrequency(int vfo) throws Exception
   {
-    if(isConnected==false) 
-      throw new Exception("Not connected to radio!");
-    
     this.queueTransaction(radioProtocolParser.encodeGetVfoFreq(vfo));
   }
   
@@ -196,9 +196,6 @@ public class Radio
    */
   public void setMode(String mode) throws Exception
   {
-   if(isConnected==false) 
-      throw new Exception("Not connected to radio!");
-    
     this.queueTransaction(radioProtocolParser.encodeSetMode(mode));
   }
   
@@ -210,9 +207,6 @@ public class Radio
    */
   public void setMode(String mode, int vfo) throws Exception
   {
-   if(isConnected==false) 
-      throw new Exception("Not connected to radio!");
-    
     this.queueTransaction(radioProtocolParser.encodeSetVfoMode(mode, vfo));
   }
   
@@ -226,9 +220,6 @@ public class Radio
    */
   public void getMode() throws Exception
   {
-   if(isConnected==false) 
-      throw new Exception("Not connected to radio!");
-    
     this.queueTransaction(radioProtocolParser.encodeGetMode());
   }
   
@@ -242,9 +233,6 @@ public class Radio
    */
   public void getMode(int vfo) throws Exception
   {
-   if(isConnected==false) 
-      throw new Exception("Not connected to radio!");
-    
     this.queueTransaction(radioProtocolParser.encodeGetVfoMode(vfo));
   }
   
@@ -281,7 +269,7 @@ public class Radio
       {  
         
         byte b[] = serialPort.readBytes();
-        logger.log(Level.INFO, "Incoming bytes ("+b.length+") -------> " + Misc.toString(b) );
+        logger.log(Level.INFO, "Incoming bytes ("+b.length+") <------ " + Misc.toHexString(b) );
         // Read all there is and add it to our receive buffer
         receiveBuffer.write(b);
        
@@ -333,9 +321,10 @@ public class Radio
             // Write to serial port
             try
             {
+              logger.log(Level.INFO, "Outgoing bytes ("+trans.getTransaction().length+") ------> " + new String(trans.getTransaction(),"UTF-8" ));
               serialPort.writeBytes(trans.getTransaction());
               serialPort.purgePort(SerialPort.PURGE_TXCLEAR);
-            } catch (SerialPortException ex)
+            } catch (SerialPortException | UnsupportedEncodingException ex)
             {
               logger.log(Level.SEVERE, null, ex);
             }
@@ -432,17 +421,16 @@ public class Radio
    * @param trans
    * @throws Exception 
    */
-  private void queueTransaction(I_EncodedTransaction trans) throws Exception
+  private void queueTransaction(I_EncodedTransaction trans)
   {
+    if(isConnected==false) 
+      logger.warning("Not connected to radio! Please call the connect() method!");
     if(threadPortWriter.getState() == Thread.State.NEW )
-      throw new Exception("You need to call the start() method");
-     
+      logger.warning("You need to call the start() method first!");
     if(queueWithTransactions.size() >= QUEUE_SIZE)
-    {
-      throw new Exception("Max queue sized reached");
-    }
+      logger.warning("Max queue sized reached!");
     
-    queueWithTransactions.offer(trans); // Insert the transaction in the queue
+    queueWithTransactions.offer(trans);
   }
   
  

@@ -21,17 +21,17 @@ public class Misc
    * @param bytes - the bytes to be converted
    * @return String with the values represented in hex format
    */
-  public static String toString(byte[] bytes)
+  public static String toHexString(byte[] bytes)
   {
-    String resultString = "";
-    
+    StringBuilder stringBuilder = new StringBuilder();
     for(byte b : bytes)
     {
-      resultString = resultString + String.format("%02x",b) + " ";
+      stringBuilder.append(String.format("%02x ",b));
     }
     
-    return resultString;
+    return stringBuilder.toString();
   }
+  
   
   /**
    * Inserts "," between the thousands 

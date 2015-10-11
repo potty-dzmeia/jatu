@@ -12,83 +12,6 @@ package org.lz1aq.pyrig_interfaces;
 public interface I_Radio extends I_Rig
 {
    /**
-   * Gets the command with which we can tell a radio to change currently used
-   * frequency
-   * 
-   * @param freq - the frequency to which we would like to set the radio
-   * @return Packet of bytes containing the command
-   */
-  public I_EncodedTransaction encodeSetFreq(long freq);
-  
-  
-  /**
-   * Gets the command with which we can tell the radio to send us the currently
-   * set frequency
-   * 
-   * @return Packet of bytes containing the command
-   */
-  public I_EncodedTransaction encodeGetFreq();
-  
-  
-
-  /**
-   * Gets the command with which we can tell a radio to change frequency
-   *
-   * @param freq - the frequency to which we would like to set the VFO
-   * @param vfo - which VFO we would like to manipulate
-   * @return Packet of bytes containing the command
-   */
-  public I_EncodedTransaction encodeSetVfoFreq(long freq, int vfo);
-  
-  
-  /**
-   * Gets the command with which we can tell the radio to send us the frequency
-   *
-   * @param vfo - for which VFO we want the frequency
-   * @return Packet of bytes containing the command
-   */
-  public I_EncodedTransaction encodeGetVfoFreq(int vfo);
-  
-  
-  /**
-   * Gets the command that must be send to the radio in order to the mode
-   * currently in use.
-   *
-   * @param mode - the mode to which we would like to set the transceiver
-   * @return Packet of bytes containing the command
-   */
-  public I_EncodedTransaction encodeSetMode(String mode);
-  
-  /**
-   * Gets the command with which we can tell the radio to send us the current
-   * mode
-   * 
-   * @return Packet of bytes containing the command
-   */
-  public I_EncodedTransaction encodeGetMode();
-  
-  
-  /**
-   * Gets the command that must be send to the radio in order to set mode (e.g.
-   * CW)
-   *
-   * @param mode - the mode to which we would like to set the VFO (see RadioModes)
-   * @param vfo - which VFO we would like to manipulate
-   * @return Packet of bytes containing the command
-   */
-  public I_EncodedTransaction encodeSetVfoMode(String mode, int vfo);
-  
-  /**
-   * Gets the command with which we can tell the radio to send us the current
-   * mode
-   *
-   * @param vfo - for which VFO we want the mode  
-   * @return Packet of bytes containing the command
-   */
-  public I_EncodedTransaction encodeGetVfoMode(int vfo);
-
-  
-  /**
    * The function returns a string with all the modes that it supports.
    * Example: "cw ssb lsb"
    * 
@@ -106,6 +29,94 @@ public interface I_Radio extends I_Rig
    *  next with space.
    */
   public String getAvailableBands();
+  
+  
+   /**
+   * Gets the command with which we can tell a radio to change currently used
+   * frequency
+   * 
+   * @param freq - the frequency to which we would like to set the radio
+   * @return Transaction container containing the data plus some additional
+   *         control information
+   */
+  public I_EncodedTransaction encodeSetFreq(long freq);
+  
+  
+  /**
+   * Gets the command with which we can tell the radio to send us the currently
+   * set frequency
+   * 
+   * @return Transaction container containing the data plus some additional
+   *         control information
+   */
+  public I_EncodedTransaction encodeGetFreq();
+  
+
+  /**
+   * Gets the command with which we can tell a radio to change frequency
+   *
+   * @param freq - the frequency to which we would like to set the VFO
+   * @param vfo - which VFO we would like to manipulate
+   * @return Transaction container containing the data plus some additional
+   *         control information
+   */
+  public I_EncodedTransaction encodeSetVfoFreq(long freq, int vfo);
+  
+  
+  /**
+   * Gets the command with which we can tell the radio to send us the frequency
+   *
+   * @param vfo - for which VFO we want the frequency
+   * @return Transaction container containing the data plus some additional
+   *         control information
+   */
+  public I_EncodedTransaction encodeGetVfoFreq(int vfo);
+  
+  
+  /**
+   * Gets the command that must be send to the radio in order to the mode
+   * currently in use.
+   *
+   * @param mode - the mode to which we would like to set the transceiver
+   * @return Transaction container containing the data plus some additional
+   *         control information
+   */
+  public I_EncodedTransaction encodeSetMode(String mode);
+  
+  
+  /**
+   * Gets the command with which we can tell the radio to send us the current
+   * mode
+   * 
+   * @return Transaction container containing the data plus some additional
+   *         control information
+   */
+  public I_EncodedTransaction encodeGetMode();
+  
+  
+  /**
+   * Gets the command that must be send to the radio in order to set mode (e.g.
+   * CW)
+   *
+   * @param mode - the mode to which we would like to set the VFO (see RadioModes)
+   * @param vfo - which VFO we would like to manipulate
+   * @return Transaction container containing the data plus some additional
+   *         control information
+   */
+  public I_EncodedTransaction encodeSetVfoMode(String mode, int vfo);
+  
+  
+  /**
+   * Gets the command with which we can tell the radio to send us the current
+   * mode
+   *
+   * @param vfo - for which VFO we want the mode  
+   * @return Transaction container containing the data plus some additional
+   *         control information
+   */
+  public I_EncodedTransaction encodeGetVfoMode(int vfo);
+
+  
 }
 
 

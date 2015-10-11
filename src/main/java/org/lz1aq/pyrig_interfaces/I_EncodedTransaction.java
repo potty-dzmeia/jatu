@@ -23,7 +23,7 @@ package org.lz1aq.pyrig_interfaces;
 
 
 /**
- * Container for a "transaction" which is to be sent over the serial port
+ * Container for a "transaction".
  *
  * A "transaction" is a packet of bytes being sent to the rig. Usually it
  * contains some command (e.g. change frequency in case of a radio)

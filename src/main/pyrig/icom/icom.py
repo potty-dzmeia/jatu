@@ -111,32 +111,27 @@ class Icom(radio.Radio):
 
 
     @classmethod
-    def __transaction(cls, command, sub_command=None, data=None):
+    def encodeInit(cls):
         """
-        Assembles an Icom specific transaction ready to be send to the transceiver
+        If the radio needs some initialization before being able to be used.
 
-        Protocol is the following:
-        [preamble(0xFE), preamble(0xFE), ctrl_id, civ-address, command, sub_command, data...., 0xFD]
-
-        :param command: Command code. E.g. 0x05 is set frequency)
-        :type command: list
-        :param sub_command: Sub-command code (optional)
-        :type sub_command: int
-        :param data: Additional data bytes(optional)
-        :type data: list
-        :return: The ready transaction bytes
-        :rtype: list
+        :return: Initialization command that is to be send to the Rig
+        :rtype: EncodedTransaction
         """
-        transaction= [0xFE, 0xFE, cls.CTRL_ADDRESS, cls.CIV_ADDRESS, command]
-        if sub_command is not None:
-            transaction.append(sub_command)
-        if data is not None:
-            transaction += data
-        transaction.append(0xFD)
+        logger.warning("encodeInit() not implemented")
+        return EncodedTransaction("")
 
-        logger.debug("returns: {0}".format(utils.getListInHex(transaction)))
-        return transaction
 
+    @classmethod
+    def encodeCleanup(cls):
+        """
+        If the radio needs some cleanup after being used.
+
+        :return: Cleanup command that is to be send to the Rig
+        :rtype: EncodedTransaction
+        """
+        logger.warning("encodeCleanup() not implemented")
+        return EncodedTransaction("")
 
 
     @classmethod
@@ -257,6 +252,38 @@ class Icom(radio.Radio):
         # return the object with the decoded transaction and the amount of bytes that we have read from the supplied buffer(string)
         return DecodedTransaction(result, trans_end_index+1)
 
+
+    #+--------------------------------------------------------------------------+
+    #|   Private methods
+    #+--------------------------------------------------------------------------+
+
+
+    @classmethod
+    def __transaction(cls, command, sub_command=None, data=None):
+        """
+        Assembles an Icom specific transaction ready to be send to the transceiver
+
+        Protocol is the following:
+        [preamble(0xFE), preamble(0xFE), ctrl_id, civ-address, command, sub_command, data...., 0xFD]
+
+        :param command: Command code. E.g. 0x05 is set frequency)
+        :type command: int
+        :param sub_command: Sub-command code (optional)
+        :type sub_command: int
+        :param data: Additional data bytes(optional)
+        :type data: list
+        :return: The ready transaction bytes
+        :rtype: list
+        """
+        transaction= [0xFE, 0xFE, cls.CTRL_ADDRESS, cls.CIV_ADDRESS, command]
+        if sub_command is not None:
+            transaction.append(sub_command)
+        if data is not None:
+            transaction += data
+        transaction.append(0xFD)
+
+        logger.debug("returns: {0}".format(utils.getListInHex(transaction)))
+        return transaction
 
 
     @classmethod

@@ -70,10 +70,10 @@ public interface I_Rig
     public I_SerialSettings getSerialPortSettings();
  
     /** @return Initialization command that is to be send to the Rig*/
-    public byte[] encodeInit();
+    public I_EncodedTransaction encodeInit();
     
     /** @return Cleanup command that is to be send to the Rig */
-    public byte[] encodeCleanup();   
+    public I_EncodedTransaction encodeCleanup();   
  
 }
 
