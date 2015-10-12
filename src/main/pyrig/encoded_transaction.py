@@ -30,11 +30,11 @@ class EncodedTransaction(I_EncodedTransaction):
         # underscores are added because of a jython issue
         self.transaction_          = transaction;  # The data (i.e. the transaction itself)
         # Init with default data
-        self.confirmationExpected_ = 1;   # If the program should expect confirmation after sending this transaction to the rig
+        self.confirmationExpected_ = 0;   # If the program should expect confirmation after sending this transaction to the rig
         self.writeDelay_           = 0    # If there should be a delay between each byte of the transaction being sent out (in milliseconds)
         self.postWriteDelay_       = 0;   # If there should be a delay between each transaction send out (in milliseconds)
         self.timeout_              = 100; # Timeout after which we should abandon sending the transaction to the rig (in milliseconds)
-        self.retry_                = 1;   # Maximum number of retries if command fails (0 for no retry)
+        self.retry_                = 1;   # Maximum number of retries if command fails (0 for no retry). If confirmationExpected_ is 0 there will be no retries.
 
         # Now check if user wants to change some of the default values
         if confirmation_expected is not None:

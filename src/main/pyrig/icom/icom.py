@@ -118,8 +118,8 @@ class Icom(radio.Radio):
         :return: Initialization command that is to be send to the Rig
         :rtype: EncodedTransaction
         """
-        logger.warning("encodeInit() not implemented")
-        return EncodedTransaction("")
+
+        return list()
 
 
     @classmethod
@@ -130,29 +130,33 @@ class Icom(radio.Radio):
         :return: Cleanup command that is to be send to the Rig
         :rtype: EncodedTransaction
         """
-        logger.warning("encodeCleanup() not implemented")
-        return EncodedTransaction("")
+        return list()
 
 
     @classmethod
-    def encodeSetVfoFreq(cls, freq, vfo):
+    def encodeSetFreq(cls, freq, vfo):
         """
         Gets the command with which we can tell an Icom radio to change frequency
 
-        :param freq: Specifying the frequency. E.g. 7100000 for 7.1MHz
+        :param freq: Frequency in Hz. E.g. 7100000 for 7.1MHz
         :type freq: int
         :param vfo: The vfo for which we want to set the frequency
         :type vfo: int
         :return: Object containing transaction with some additional control settings
         :rtype: EncodedTransaction
         """
-        result = cls.__transaction(0x05, data=utils.toBcd(freq,10))
 
-        return EncodedTransaction(bytearray(result).__str__())
+        temp = cls.__transaction(0x07)                              # Select VFO mode
+        tr1 = EncodedTransaction(bytearray(temp).__str__())
+        temp = cls.__transaction(0x07, 0xD0 + vfo)                    # Select the desired VFO
+        tr2 = EncodedTransaction(bytearray(temp).__str__())
+        temp = cls.__transaction(0x05, data=utils.toBcd(freq, 10))  # Select the frequency
+        tr3 = EncodedTransaction(bytearray(temp).__str__())
+        return [tr1, tr2, tr3]
 
 
     @classmethod
-    def encodeGetVfoFreq(cls, vfo):
+    def encodeGetFreq(cls, vfo):
         """
         Gets the command with which we can tell the radio send us the current frequency
 
@@ -161,14 +165,20 @@ class Icom(radio.Radio):
         :return: Object containing transaction with some additional control settings
         :rtype: EncodedTransaction
         """
-        result = cls.__transaction(0x03)
 
-        return EncodedTransaction(bytearray(result).__str__(), confirmation_expected=0)
+        temp = cls.__transaction(0x07)                              # Select VFO mode
+        tr1 = EncodedTransaction(bytearray(temp).__str__())
+        temp = cls.__transaction(0x07, 0xD0 + vfo)                  # Select the desired VFO
+        tr2 = EncodedTransaction(bytearray(temp).__str__())
+        temp = cls.__transaction(0x03)                              # Read the frequency
+        tr3 = EncodedTransaction(bytearray(temp).__str__())
+
+        return [tr1, tr2, tr3]
 
 
 
     @classmethod
-    def encodeSetVfoMode(cls, mode, vfo):
+    def encodeSetMode(cls, mode, vfo):
         """
         Get the command that must be send to the radio in order to set mode (e.g. CW)
 
@@ -183,13 +193,18 @@ class Icom(radio.Radio):
         if not cls.mode_codes.__contains__(new_mode):
             raise ValueError("Unsupported mode: "+mode+"!")
 
-        result = cls.__transaction(0x06, sub_command=cls.mode_codes[new_mode])
+        temp = cls.__transaction(0x07)                              # Select VFO mode
+        tr1 = EncodedTransaction(bytearray(temp).__str__())
+        temp = cls.__transaction(0x07, 0xD0 + vfo)                  # Select the desired VFO
+        tr2 = EncodedTransaction(bytearray(temp).__str__())
+        temp = cls.__transaction(0x06, sub_command=cls.mode_codes[new_mode])   # Set the Mode
+        tr3 = EncodedTransaction(bytearray(temp).__str__())
 
-        return EncodedTransaction(bytearray(result).__str__())
+        return [tr1, tr2, tr3]
 
 
     @classmethod
-    def encodeGetVfoMode(cls, vfo):
+    def encodeGetMode(cls, vfo):
         """
         Gets the command with which we can tell the radio to send us the current mode
 
@@ -198,9 +213,14 @@ class Icom(radio.Radio):
         :return: Object containing transaction with some additional control settings
         :rtype: EncodedTransaction
         """
-        result = cls.__transaction(0x04)
+        temp = cls.__transaction(0x07)                         # Select VFO mode
+        tr1 = EncodedTransaction(bytearray(temp).__str__())
+        temp = cls.__transaction(0x07, 0xD0 + vfo)             # Select the desired VFO
+        tr2 = EncodedTransaction(bytearray(temp).__str__())
+        temp = cls.__transaction(0x04)                         # Get the Mode
+        tr3 = EncodedTransaction(bytearray(temp).__str__())
 
-        return EncodedTransaction(bytearray(result).__str__(), confirmation_expected=0)
+        return [tr1, tr2, tr3]
 
 
     @classmethod
@@ -215,6 +235,7 @@ class Icom(radio.Radio):
         :return: Object containing the transaction and some additional control information
         :rtype: DecodedTransaction
         """
+
         trans = bytearray(data)
 
         # Find the beginning of the transaction

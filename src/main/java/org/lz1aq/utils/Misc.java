@@ -58,4 +58,25 @@ public class Misc
 
     return buf.toString();
   }
+  
+  
+  /**
+   * Returns the current stack of the Thread
+   * 
+   * @return 
+   */
+  public static String getStack()
+  {
+    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+
+    StringBuilder stack = new StringBuilder();
+    
+    // Do not show the last to functions from the stack (user does not care about them)
+    for (int st=2; st<stackTrace.length; st++)
+    {
+        stack.append(stackTrace[st].toString());
+        stack.append("\n");
+    }
+    return stack.toString();
+  }
 }

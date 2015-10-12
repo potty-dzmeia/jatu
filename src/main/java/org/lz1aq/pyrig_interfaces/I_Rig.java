@@ -59,21 +59,32 @@ public interface I_Rig
      */
     public I_DecodedTransaction decode(byte[] data);
     
+    
     /** @return string specifying the manufacturer of the rig - E.g. "Kenwood"*/
     public String getManufacturer();
     
+    
     /** @return string specifying the model of the Rig - E.g. "IC-756PRO"*/
     public String getModel();
+    
     
    /** @return JSON formatted string describing the COM port settings that 
     * needs to be used when communicating with this Rig*/
     public I_SerialSettings getSerialPortSettings();
  
-    /** @return Initialization command that is to be send to the Rig*/
-    public I_EncodedTransaction encodeInit();
     
-    /** @return Cleanup command that is to be send to the Rig */
-    public I_EncodedTransaction encodeCleanup();   
- 
+    /**
+     * Initialization command(s) that is to be send to the Rig
+     * @return array of Transactions which are to be sent to the radio.
+     */
+    public I_EncodedTransaction[] encodeInit();
+    
+
+    /**
+     * Cleanup command(s) that is to be send to the Rig
+     * @return array of Transactions which are to be sent to the radio.
+     */
+    public I_EncodedTransaction[] encodeCleanup();   
+
 }
 

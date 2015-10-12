@@ -107,7 +107,7 @@ public class Radio
     
     isConnected = true;
     
-    this.queueTransaction(radioProtocolParser.encodeInit());
+    this.queueTransactions(radioProtocolParser.encodeInit());
   }
   
   
@@ -125,7 +125,7 @@ public class Radio
     if(isConnected==false)
       logger.warning("Radio already disconnected!");
     
-    this.queueTransaction(radioProtocolParser.encodeCleanup());
+    this.queueTransactions(radioProtocolParser.encodeCleanup());
     // Wait a little to give a chance for the cleanup data to be sent to the radio
     try{Thread.sleep(150);} catch (InterruptedException ex){logger.log(Level.SEVERE, null, ex);}
     
@@ -138,17 +138,6 @@ public class Radio
   
   
   /**
-   * Set the frequency of the radio
-   * 
-   * @param freq - frequency value
-   * @throws Exception 
-   */
-  public void setFrequency(long freq)
-  {
-    this.queueTransaction(radioProtocolParser.encodeSetFreq(freq));
-  }
-  
-  /**
    * Set the VFO frequency of the radio
    * 
    * @param freq - frequency value
@@ -157,21 +146,17 @@ public class Radio
    */
   public void setFrequency(long freq, int vfo) throws Exception
   {
-    this.queueTransaction(radioProtocolParser.encodeSetVfoFreq(freq, vfo));
+    I_EncodedTransaction[] arrayOfTransactions = radioProtocolParser.encodeSetFreq(freq, vfo);
+    
+    System.out.println("Size of array is = "+arrayOfTransactions.length);
+    for(I_EncodedTransaction tr: arrayOfTransactions)
+    {
+      System.out.println("transaction = "+Misc.toHexString(tr.getTransaction()));
+    }
+            
+    //this.queueTransaction(x);
   }
   
-  /**
-   * Asks the radio to send us the current frequency.
-   * 
-   * If we would like to get the frequency event when it comes we have to
-   * register an EventListener
-   * 
-   * @throws Exception 
-   */
-  public void getFrequency() throws Exception
-  {
-    this.queueTransaction(radioProtocolParser.encodeGetFreq());
-  }
   
   /**
    * Asks the radio to send us the current VFO frequency.
@@ -184,21 +169,10 @@ public class Radio
    */
   public void getFrequency(int vfo) throws Exception
   {
-    this.queueTransaction(radioProtocolParser.encodeGetVfoFreq(vfo));
+    this.queueTransactions(radioProtocolParser.encodeGetFreq(vfo));
   }
   
-  
-  /**
-   * Set the working mode of the radio (e.g. to CW)
-   * 
-   * @param mode - mode value (see I_Radio.RadioModes)
-   * @throws Exception 
-   */
-  public void setMode(String mode) throws Exception
-  {
-    this.queueTransaction(radioProtocolParser.encodeSetMode(mode));
-  }
-  
+    
   /**
    * Set the working mode of the radio (e.g. to CW)
    * @param mode - mode value (see I_Radio.RadioModes)
@@ -207,22 +181,10 @@ public class Radio
    */
   public void setMode(String mode, int vfo) throws Exception
   {
-    this.queueTransaction(radioProtocolParser.encodeSetVfoMode(mode, vfo));
+    this.queueTransactions(radioProtocolParser.encodeSetMode(mode, vfo));
   }
   
-  
-   /**
-   * Get the working mode of the radio
-   * If we would like to get the mode event when it comes from the radio we 
-   * have to register an EventListener
-   * 
-   * @throws Exception 
-   */
-  public void getMode() throws Exception
-  {
-    this.queueTransaction(radioProtocolParser.encodeGetMode());
-  }
-  
+    
   /**
    * Get the VFO mode of the radio
    * If we would like to get the mode event when it comes from the radio we 
@@ -233,7 +195,7 @@ public class Radio
    */
   public void getMode(int vfo) throws Exception
   {
-    this.queueTransaction(radioProtocolParser.encodeGetVfoMode(vfo));
+    this.queueTransactions(radioProtocolParser.encodeGetMode(vfo));
   }
   
   
@@ -284,7 +246,7 @@ public class Radio
       if(trans.getBytesRead() > 0)
       { 
         // This will parseAndNotify the JSON string and notify all the interested parties
-        JsonCommandParser.parseAndNotify(trans.getTransaction(), eventListeners);
+        JsonMsgParser.parseAndNotify(trans.getTransaction(), eventListeners);
         // Remove the processed bytes from the received buffer
         receiveBuffer.remove(trans.getBytesRead());
       }
@@ -417,20 +379,39 @@ public class Radio
           
             
   /**
-   * Inserts a transaction into the queueWithTransactions
-   * @param trans
+   * Inserts transaction(s) into the queueWithTransactions
+   * @param trans - array of I_EncodedTransaction
    * @throws Exception 
    */
-  private void queueTransaction(I_EncodedTransaction trans)
+  private void queueTransactions(I_EncodedTransaction[] trans)
   {
+    if(trans.length == 0)
+    {
+      logger.log(Level.WARNING, "I_EncodedTransaction[] is empty: \n{0}", Misc.getStack());
+      return;
+    }
     if(isConnected==false) 
+    {
       logger.warning("Not connected to radio! Please call the connect() method!");
+      return;
+    }
     if(threadPortWriter.getState() == Thread.State.NEW )
+    {
       logger.warning("You need to call the start() method first!");
-    if(queueWithTransactions.size() >= QUEUE_SIZE)
-      logger.warning("Max queue sized reached!");
+      return;
+    }
+   
     
-    queueWithTransactions.offer(trans);
+    for(I_EncodedTransaction tr: trans)
+    {
+      if(queueWithTransactions.size() >= QUEUE_SIZE)
+      {
+        logger.warning("Max queue sized reached!");
+        return;
+      }
+      queueWithTransactions.offer(tr);
+    }
+    
   }
   
  

@@ -19,7 +19,7 @@ import org.lz1aq.utils.RadioVfos;
  *
  * @author potty
  */
-public class JsonCommandParser
+public class JsonMsgParser
 {
   // Currently supported JSON messages comming from the radio
   public static final String NOT_SUPPORTED_MSG  = "not_supported";
@@ -28,7 +28,7 @@ public class JsonCommandParser
   public static final String MODE_MSG           = "mode";
 
   
-  private static final Logger logger = Logger.getLogger(JsonCommandParser.class.getName());
+  private static final Logger logger = Logger.getLogger(JsonMsgParser.class.getName());
   
   
   /**
@@ -55,14 +55,14 @@ public class JsonCommandParser
     switch (command)
     {
       // -----------------------------
-      case JsonCommandParser.CONFIRMATION_MSG:
+      case JsonMsgParser.CONFIRMATION_MSG:
         ConfirmationEvent cfmEv = parseConfirmationMsg(jso.getJSONObject(command));
         for(RadioListener listener : listeners)
           listener.confirmationEvent(cfmEv);
         break;
        
       // -----------------------------
-      case JsonCommandParser.FREQUENCY_MSG:
+      case JsonMsgParser.FREQUENCY_MSG:
       // -----------------------------
         FrequencyEvent freqEv = parseFrequencyMsg(jso.getJSONObject(command));
         for(RadioListener listener : listeners)
@@ -70,7 +70,7 @@ public class JsonCommandParser
         break;
         
       // -----------------------------
-      case JsonCommandParser.MODE_MSG:
+      case JsonMsgParser.MODE_MSG:
       // -----------------------------
         ModeEvent modeEv = parseModeMsg(jso.getJSONObject(command));
         for(RadioListener listener : listeners)
@@ -78,7 +78,7 @@ public class JsonCommandParser
         break;  
         
       // -----------------------------
-      case JsonCommandParser.NOT_SUPPORTED_MSG:
+      case JsonMsgParser.NOT_SUPPORTED_MSG:
       // -----------------------------
         NotsupportedEvent unsupportedEv = parseNotsupportedMsg(jso.getJSONObject(command));
         for(RadioListener listener : listeners)

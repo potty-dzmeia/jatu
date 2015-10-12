@@ -110,7 +110,7 @@ class Elecraft(Radio):
         :return: Initialization command that is to be send to the Rig
         :rtype: EncodedTransaction
         """
-        return EncodedTransaction("AI1;", confirmation_expected=0)
+        return EncodedTransaction("AI1;")
 
 
     @classmethod
@@ -126,7 +126,7 @@ class Elecraft(Radio):
 
 
     @classmethod
-    def encodeSetVfoFreq(cls, freq, vfo):
+    def encodeSetFreq(cls, freq, vfo):
         """
         Gets the command with which we can tell an Elecraft radio to change frequency
 
@@ -142,7 +142,7 @@ class Elecraft(Radio):
 
 
     @classmethod
-    def encodeGetVfoFreq(cls, vfo):
+    def encodeGetFreq(cls, vfo):
         """
         Gets the command with which we can tell the radio send us the current frequency
 
@@ -156,7 +156,7 @@ class Elecraft(Radio):
 
 
     @classmethod
-    def encodeSetVfoMode(cls, mode, vfo):
+    def encodeSetMode(cls, mode, vfo):
         """
         Get the command that must be send to the radio in order to set mode (e.g. CW)
 
@@ -176,13 +176,13 @@ class Elecraft(Radio):
         elif vfo == Radio.VFO_B:
             result = "MD$%d;"%(cls.mode_codes[mode])
         else:
-            raise Exception("encodeSetVfoMode(): Set VFO_NONE is not supported")
+            logger.warning("encodeSetMode(): Set VFO_NONE is not supported")
 
         return EncodedTransaction(result, confirmation_expected=0)
 
 
     @classmethod
-    def encodeGetVfoMode(cls, vfo):
+    def encodeGetMode(cls, vfo):
         """
         Gets the command with which we can tell the radio to send us the current mode
 
@@ -196,7 +196,7 @@ class Elecraft(Radio):
         elif vfo == Radio.VFO_B:
             result = "MD$;"
         else:
-            raise Exception("encodeSetVfoMode(): Set VFO_NONE is not supported")
+            logger.warning("encodeSetMode(): Get VFO_NONE is not supported")
 
         return EncodedTransaction(result, confirmation_expected=0)
 

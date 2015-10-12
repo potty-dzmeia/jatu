@@ -53,10 +53,10 @@ class Rig(I_Rig):
     @classmethod
     def encodeInit(cls):
         """
-        If a rig needs some initialization before being able to be used.
+        If a rig needs some initialization command(s) before being able to be used.
         
-        :return: Initialization command that is to be send to the Rig
-        :rtype: EncodedTransaction
+        :return: list of EncodedTransactions
+        :rtype: list
         """
         raise NotImplementedError("encode_Init")
 
@@ -64,10 +64,10 @@ class Rig(I_Rig):
     @classmethod
     def encodeCleanup(cls):
         """
-        If a rig needs some cleanup after being used.
+        If a rig needs some cleanup command(s) after being used.
         
-        :return: Cleanup command that is to be send to the Rig
-        :rtype: EncodedTransaction
+        :return: list of EncodedTransactions
+        :rtype: list
         """
         raise NotImplementedError("encode_Cleanup")
     
