@@ -35,7 +35,7 @@ class Icom(radio.Radio):
 
     # The address of the Icom transceiver. Value of 0x5c is good for 756Pro
     CIV_ADDRESS  = 0x5c
-    CTRL_ADDRESS = 0x00
+    CTRL_ADDRESS = 0xE0
 
 
 

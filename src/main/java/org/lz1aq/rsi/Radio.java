@@ -112,8 +112,7 @@ public class Radio
   
   
   /**
-   * The user of class "Radio" can choose between closing the ports manually 
-   * or calling the disconnects() method.
+   * Close the connection to the radio
    * 
    * After an object has been disconnects it can not be started again by calling 
    * the connect() method. For this purpose a new object must be created.
@@ -146,15 +145,7 @@ public class Radio
    */
   public void setFrequency(long freq, int vfo) throws Exception
   {
-    I_EncodedTransaction[] arrayOfTransactions = radioProtocolParser.encodeSetFreq(freq, vfo);
-    
-    System.out.println("Size of array is = "+arrayOfTransactions.length);
-    for(I_EncodedTransaction tr: arrayOfTransactions)
-    {
-      System.out.println("transaction = "+Misc.toHexString(tr.getTransaction()));
-    }
-            
-    //this.queueTransaction(x);
+    this.queueTransactions(radioProtocolParser.encodeSetFreq(freq, vfo));
   }
   
   
@@ -278,7 +269,7 @@ public class Radio
           trans = queueWithTransactions.take();
           
           // Retry - Try to send it the specified amount of times
-          for(int i = 0; i < trans.getRetry(); i++)
+          for(int i = 0; i < trans.getRetry()+1; i++)
           {
             // Write to serial port
             try
@@ -387,7 +378,7 @@ public class Radio
   {
     if(trans.length == 0)
     {
-      logger.log(Level.WARNING, "I_EncodedTransaction[] is empty: \n{0}", Misc.getStack());
+      logger.log(Level.WARNING, "I_EncodedTransaction[] is empty"); //, Misc.getStack()
       return;
     }
     if(isConnected==false) 
