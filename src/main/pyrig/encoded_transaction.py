@@ -7,7 +7,7 @@ class EncodedTransaction(I_EncodedTransaction):
     additional details of how it should be send (e.g. timeout, retry etc.)
     """
 
-    def __init__(self, transaction, confirmation_expected=None, write_delay=None, post_write_delay=None, timeout=None, retry=None):
+    def __init__(self, transaction, is_cfm_expected=False, write_delay=0, post_write_delay=0, timeout=100, retry=0):
         """
          Creates an object holding the transaction together with some additional control variables.
         When the object is created the control variables are given default values. When needed the
@@ -15,38 +15,25 @@ class EncodedTransaction(I_EncodedTransaction):
 
         :param transaction: String of bytes with the encoded transaction ready to be send to the rig
         :type transaction: str
-        :param confirmation_expected: If the program should expect confirmation after sending this transaction to the rig
-        :type confirmation_expected: int
+        :param is_cfm_expected: If the program should expect confirmation after sending this transaction to the rig
+        :type is_cfm_expected: bool
         :param write_delay: If there should be a delay between each byte of the transaction being sent out (in milliseconds)
         :type write_delay: int
-        :param post_write_delay: If there should be a delay between each transaction send out (in milliseconds)
+        :param post_write_delay: If there should be a delay between the transactions (in milliseconds)
         :type post_write_delay: int
-        :param timeout: Timeout after which we should abandon sending the transaction to the rig (in milliseconds)
+        :param timeout: Timeout after which we should abandon sending the transaction to the rig (in milliseconds).
+                        If confirmationExpected_ is 0 there will be no retries anyway.
         :type timeout: int
         :param retry: Maximum number of retries if command fails (0 for no retry)
         :type retry: int
         """
-
         # underscores are added because of a jython issue
-        self.transaction_          = transaction;  # The data (i.e. the transaction itself)
-        # Init with default data
-        self.confirmationExpected_ = 0;   # If the program should expect confirmation after sending this transaction to the rig
-        self.writeDelay_           = 0    # If there should be a delay between each byte of the transaction being sent out (in milliseconds)
-        self.postWriteDelay_       = 0;   # If there should be a delay between each transaction send out (in milliseconds)
-        self.timeout_              = 100; # Timeout after which we should abandon sending the transaction to the rig (in milliseconds)
-        self.retry_                = 1;   # Maximum number of retries if command fails (0 for no retry). If confirmationExpected_ is 0 there will be no retries.
-
-        # Now check if user wants to change some of the default values
-        if confirmation_expected is not None:
-            self.confirmationExpected_ = confirmation_expected
-        if write_delay is not None:
-            self.writeDelay_ = write_delay
-        if post_write_delay is not None:
-            self.postWriteDelay_ = post_write_delay
-        if timeout is not None:
-            self.timeout_ = timeout
-        if retry is not None:
-            self.retry_ = retry
+        self.transaction_          = transaction        # The data (i.e. the transaction itself)
+        self.confirmationExpected_ = int(is_cfm_expected)   # If the program should expect confirmation after sending this transaction to the rig
+        self.writeDelay_           = write_delay        # If there should be a delay between each byte of the transaction being sent out (in milliseconds)
+        self.postWriteDelay_       = post_write_delay;  # If there should be a delay between each transaction send out (in milliseconds)
+        self.timeout_              = timeout            # Timeout after which we should abandon sending the transaction to the rig (in milliseconds)
+        self.retry_                = retry              # Maximum number of retries if command fails (0 for no retry).
 
 
     def getTransaction(self):

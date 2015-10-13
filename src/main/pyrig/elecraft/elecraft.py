@@ -2,18 +2,18 @@ from radio import *
 from serial_settings import SerialSettings
 from encoded_transaction import EncodedTransaction
 from decoded_transaction import DecodedTransaction
-import utils
+import misc_utils
 import logging
 import logging.config
 
 
-logging.config.fileConfig(utils.get_logging_config(), disable_existing_loggers=False)
+logging.config.fileConfig(misc_utils.get_logging_config(), disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 
 
 class Elecraft(Radio):
     """
-    Configuration script for Elecraft transceivers
+    Configuration file for Elecraft transceivers
     """
 
     #+--------------------------------------------------------------------------+
@@ -27,13 +27,15 @@ class Elecraft(Radio):
     serial_settings.baudrate_min_   = 4800
     serial_settings.baudrate_max_   = 38400
     serial_settings.stop_bits_      = SerialSettings.STOPBITS_TWO
-    serial_settings.rts_            = SerialSettings.RTS_STATE_ON      # This is used to power the electronics
+    serial_settings.rts_            = SerialSettings.RTS_STATE_OFF
+    serial_settings.dtr_          = SerialSettings.DTR_STATE_OFF
     # serial_settings.data_bits_    = SerialSettings.DATABITS_EIGTH
     # serial_settings.handshake_    = SerialSettings.HANDSHAKE_CTSRTS
     # serial_settings.parity_       = SerialSettings.PARITY_NONE
-    # serial_settings.dtr_          = SerialSettings.DTR_STATE_NONE
 
 
+    # The AI meta-command can be used to enable automatic responses from the K3 to a computer in response to K3 front panel control changes by the operator.
+    AUTO_INFO_MODE = "AI1;" # Possible values are: "AI0;", "AI1;", "AI2;", "AI3;"
 
 
 
@@ -47,8 +49,9 @@ class Elecraft(Radio):
 
 
     #+--------------------------------------------------------------------------+
-    #|   End of user configuration fields
+    #|   End of user configuration fields                                       |
     #+--------------------------------------------------------------------------+
+
     @classmethod
     def getManufacturer(cls):
         """
@@ -102,6 +105,11 @@ class Elecraft(Radio):
     #     return " ".join("%s" % key for key in cls.mode_codes)
 
 
+    #+--------------------------------------------------------------------------+
+    #|  Encode methods below                                                    |
+    #+--------------------------------------------------------------------------+
+
+
     @classmethod
     def encodeInit(cls):
         """
@@ -110,7 +118,7 @@ class Elecraft(Radio):
         :return: Initialization command that is to be send to the Rig
         :rtype: EncodedTransaction
         """
-        return EncodedTransaction("AI1;")
+        return list([EncodedTransaction(cls.AUTO_INFO_MODE)])
 
 
     @classmethod
@@ -121,8 +129,8 @@ class Elecraft(Radio):
         :return: Cleanup command that is to be send to the Rig
         :rtype: EncodedTransaction
         """
-        logger.warning("encodeCleanup() not implemented")
-        return EncodedTransaction("")
+        logger.info("encodeCleanup() not implemented")
+        return list()
 
 
     @classmethod
@@ -138,7 +146,8 @@ class Elecraft(Radio):
         :rtype: EncodedTransaction
         """
         result = "F%c%011ld;"%(cls.__vfo_number_to_letter(vfo), freq)
-        return EncodedTransaction(result, confirmation_expected=0)
+        logger.debug("returns: {0}".format(result))
+        return list([EncodedTransaction(result)])
 
 
     @classmethod
@@ -152,7 +161,8 @@ class Elecraft(Radio):
         :rtype: EncodedTransaction
         """
         result = "F%c;"%(cls.__vfo_number_to_letter(vfo))
-        return EncodedTransaction(result, confirmation_expected=0)
+        logger.debug("returns: {0}".format(result))
+        return list([EncodedTransaction(result)])
 
 
     @classmethod
@@ -178,7 +188,8 @@ class Elecraft(Radio):
         else:
             logger.warning("encodeSetMode(): Set VFO_NONE is not supported")
 
-        return EncodedTransaction(result, confirmation_expected=0)
+        logger.debug("returns: {0}".format(result))
+        return list([EncodedTransaction(result)])
 
 
     @classmethod
@@ -196,9 +207,16 @@ class Elecraft(Radio):
         elif vfo == Radio.VFO_B:
             result = "MD$;"
         else:
+            result = ""
             logger.warning("encodeSetMode(): Get VFO_NONE is not supported")
 
-        return EncodedTransaction(result, confirmation_expected=0)
+        logger.debug("returns: {0}".format(result))
+        return list([EncodedTransaction(result)])
+
+
+    #+--------------------------------------------------------------------------+
+    #|  Decode methods below                                                    |
+    #+--------------------------------------------------------------------------+
 
 
     @classmethod
@@ -224,7 +242,6 @@ class Elecraft(Radio):
             return DecodedTransaction(None, 0)
 
         json_result = cls.__parse(data[:end+1])
-
 
         # return the object with the decoded transaction and the amount of bytes that we have read from the supplied buffer(string)
         return DecodedTransaction(json_result, end+1)
@@ -304,6 +321,37 @@ class Elecraft(Radio):
             return DecodedTransaction.createMode(m, vfo=Radio.VFO_B)
 
 
+     @classmethod
+    def __parse_info(cls, command):
+        """
+        Extract the frequency and mode from the IF command.
+
+        The format of the incoming command is the following:
+        IF[f]*****+yyyyrx*00tmvspbd1*; where the fields are defined as follows:
+
+        [f]     Operating frequency, excluding any RIT/XIT offset (11 digits; see FA command format)
+        *       represents a space (BLANK, or ASCII 0x20)
+        +       either "+" or "-" (sign of RIT/XIT offset)
+        yyyy    RIT/XIT offset in Hz (range is -9999 to +9999 Hz when computer-controlled)
+        r       1 if RIT is on, 0 if off
+        x       1 if XIT is on, 0 if off
+        t       1 if the K3 is in transmit mode, 0 if receive
+        m       operating mode (see MD command)
+        v       receive-mode VFO selection, 0 for VFO A, 1 for VFO B
+        s       1 if scan is in progress, 0 otherwise
+        p       1 if the transceiver is in split mode, 0 otherwise
+        b       Basic RSP format: always 0; K2 Extended RSP format (K22): 1 if present IF response is due to a band change; 0 otherwise
+        d       Basic RSP format: always 0; K3 Extended RSP format (K31): DATA sub-mode, if applicable (0=DATA A, 1=AFSK A, 2= FSK D, 3=PSK D)
+
+        :param command: The "IF" command
+        :type command: str
+        :return: JSON formatted block containing the parsed data
+        :rtype: str
+        """
+
+        return DecodedTransaction.createFreq(command[2:-1].lstrip('0'), vfo=Radio.VFO_B)
+
+
     @classmethod
     def __vfo_number_to_letter(cls, vfo_number):
         """
@@ -320,6 +368,11 @@ class Elecraft(Radio):
             return "B"
         else:
             raise Exception("Not allowed VFO number")
+
+
+    #+--------------------------------------------------------------------------+
+    #|   Private methods                                                        |
+    #+--------------------------------------------------------------------------+
 
 
     @classmethod
@@ -345,9 +398,11 @@ class Elecraft(Radio):
 
 
     # Commands coming from the Elecraft that we can understand(parse)
-    parsers = {"FA": __parse_frequency_vfo_a,       # VFO A frequency
-               "FB": __parse_frequency_vfo_b,       # VFO B frequency
-               "MD": __parse_mode,}                 # Operating mode
+    parsers = { "FA": __parse_frequency_vfo_a,       # VFO A frequency
+                "FB": __parse_frequency_vfo_b,       # VFO B frequency
+                "MD": __parse_mode,                  # Operating mode
+                "IF": __parse_info,}                 # IF (Transceiver Information; GET only)
+
 
     #+--------------------------------------------------------------------------+
     #|   Elecraft command codes

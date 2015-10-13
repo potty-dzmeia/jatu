@@ -2,17 +2,18 @@ import radio
 from serial_settings import SerialSettings
 from encoded_transaction import EncodedTransaction
 from decoded_transaction import DecodedTransaction
-import utils
+import misc_utils
 import logging
 import logging.config
 
 
-logging.config.fileConfig(utils.get_logging_config(), disable_existing_loggers=False)
+logging.config.fileConfig(misc_utils.get_logging_config(), disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
+
 
 class Icom(radio.Radio):
     """
-    Configuration script for Icom transceivers
+    Configuration file for Icom transceivers
     """
 
     #+--------------------------------------------------------------------------+
@@ -50,7 +51,7 @@ class Icom(radio.Radio):
 
 
     #+--------------------------------------------------------------------------+
-    #|   End of user configuration fields
+    #|   End of user configuration fields                                       |
     #+--------------------------------------------------------------------------+
 
 
@@ -110,6 +111,12 @@ class Icom(radio.Radio):
     #     return " ".join("%s" % key for key in cls.mode_codes)
 
 
+
+    #+--------------------------------------------------------------------------+
+    #|  Encode methods below                                                    |
+    #+--------------------------------------------------------------------------+
+
+
     @classmethod
     def encodeInit(cls):
         """
@@ -147,11 +154,11 @@ class Icom(radio.Radio):
         """
 
         temp = cls.__transaction(0x07)                              # Select VFO mode
-        tr1 = EncodedTransaction(bytearray(temp).__str__())
-        temp = cls.__transaction(0x07, 0xD0 + vfo)                    # Select the desired VFO
-        tr2 = EncodedTransaction(bytearray(temp).__str__())
-        temp = cls.__transaction(0x05, data=utils.toBcd(freq, 10))  # Select the frequency
-        tr3 = EncodedTransaction(bytearray(temp).__str__())
+        tr1 = EncodedTransaction(bytearray(temp).__str__(), is_cfm_expected=True)
+        temp = cls.__transaction(0x07, 0xD0 + vfo)                  # Select the desired VFO
+        tr2 = EncodedTransaction(bytearray(temp).__str__(), is_cfm_expected=True)
+        temp = cls.__transaction(0x05, data=misc_utils.toBcd(freq, 10))  # Select the frequency
+        tr3 = EncodedTransaction(bytearray(temp).__str__(), is_cfm_expected=True)
         return [tr1, tr2, tr3]
 
 
@@ -167,11 +174,11 @@ class Icom(radio.Radio):
         """
 
         temp = cls.__transaction(0x07)                              # Select VFO mode
-        tr1 = EncodedTransaction(bytearray(temp).__str__())
+        tr1 = EncodedTransaction(bytearray(temp).__str__(), is_cfm_expected=True)
         temp = cls.__transaction(0x07, 0xD0 + vfo)                  # Select the desired VFO
-        tr2 = EncodedTransaction(bytearray(temp).__str__())
+        tr2 = EncodedTransaction(bytearray(temp).__str__(), is_cfm_expected=True)
         temp = cls.__transaction(0x03)                              # Read the frequency
-        tr3 = EncodedTransaction(bytearray(temp).__str__())
+        tr3 = EncodedTransaction(bytearray(temp).__str__(), post_write_delay=100) # Add delay to give the radio time to send the Freq
 
         return [tr1, tr2, tr3]
 
@@ -194,11 +201,11 @@ class Icom(radio.Radio):
             raise ValueError("Unsupported mode: "+mode+"!")
 
         temp = cls.__transaction(0x07)                              # Select VFO mode
-        tr1 = EncodedTransaction(bytearray(temp).__str__())
+        tr1 = EncodedTransaction(bytearray(temp).__str__(), is_cfm_expected=True)
         temp = cls.__transaction(0x07, 0xD0 + vfo)                  # Select the desired VFO
-        tr2 = EncodedTransaction(bytearray(temp).__str__())
+        tr2 = EncodedTransaction(bytearray(temp).__str__(), is_cfm_expected=True)
         temp = cls.__transaction(0x06, sub_command=cls.mode_codes[new_mode])   # Set the Mode
-        tr3 = EncodedTransaction(bytearray(temp).__str__())
+        tr3 = EncodedTransaction(bytearray(temp).__str__(), is_cfm_expected=True)
 
         return [tr1, tr2, tr3]
 
@@ -214,13 +221,19 @@ class Icom(radio.Radio):
         :rtype: EncodedTransaction
         """
         temp = cls.__transaction(0x07)                         # Select VFO mode
-        tr1 = EncodedTransaction(bytearray(temp).__str__())
+        tr1 = EncodedTransaction(bytearray(temp).__str__(), is_cfm_expected=True)
         temp = cls.__transaction(0x07, 0xD0 + vfo)             # Select the desired VFO
-        tr2 = EncodedTransaction(bytearray(temp).__str__())
+        tr2 = EncodedTransaction(bytearray(temp).__str__(), is_cfm_expected=True)
         temp = cls.__transaction(0x04)                         # Get the Mode
-        tr3 = EncodedTransaction(bytearray(temp).__str__())
+        tr3 = EncodedTransaction(bytearray(temp).__str__(), post_write_delay=100) # Add a delay to give the radio time to send the Mode back
 
         return [tr1, tr2, tr3]
+
+
+
+    #+--------------------------------------------------------------------------+
+    #|  Decode methods below                                                    |
+    #+--------------------------------------------------------------------------+
 
 
     @classmethod
@@ -265,9 +278,9 @@ class Icom(radio.Radio):
             result = DecodedTransaction.createMode(mode)
 
         else:                                       # <------------------------- not-supported
-            result = DecodedTransaction.createNotSupported(utils.getListInHex(trans[trans_start_index:trans_end_index+1]))
+            result = DecodedTransaction.createNotSupported(misc_utils.getListInHex(trans[trans_start_index:trans_end_index+1]))
 
-        logger.debug("input bytes: {0}".format(utils.getListInHex(bytearray(data))))
+        logger.debug("input bytes: {0}".format(misc_utils.getListInHex(bytearray(data))))
         logger.debug("returns: {0}; \nbytes removed: {1}".format(result, trans_end_index+1))
 
         # return the object with the decoded transaction and the amount of bytes that we have read from the supplied buffer(string)
@@ -275,7 +288,7 @@ class Icom(radio.Radio):
 
 
     #+--------------------------------------------------------------------------+
-    #|   Private methods
+    #|   Private methods                                                        |
     #+--------------------------------------------------------------------------+
 
 
@@ -303,7 +316,7 @@ class Icom(radio.Radio):
             transaction += data
         transaction.append(0xFD)
 
-        logger.debug("returns: {0}".format(utils.getListInHex(transaction)))
+        logger.debug("returns: {0}".format(misc_utils.getListInHex(transaction)))
         return transaction
 
 
@@ -337,7 +350,7 @@ class Icom(radio.Radio):
         :return: Frequency in string format
         :rtype: str
         """
-        return utils.fromBcd(frequency).__str__()
+        return misc_utils.fromBcd(frequency).__str__()
 
 
 

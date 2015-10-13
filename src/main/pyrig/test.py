@@ -1,5 +1,3 @@
+import misc_utils
 
-
-print "".join(my_list)
-
-
+print misc_utils.get_as_hex_string(['a','b'])

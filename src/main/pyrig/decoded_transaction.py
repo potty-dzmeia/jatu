@@ -1,12 +1,12 @@
 from org.lz1aq.pyrig_interfaces import I_DecodedTransaction
 from radio import Radio
 import json
-import utils
+import misc_utils
 import logging
 import logging.config
 
 
-logging.config.fileConfig(utils.get_logging_config(), disable_existing_loggers=False)
+logging.config.fileConfig(misc_utils.get_logging_config(), disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 
 
@@ -89,7 +89,7 @@ class DecodedTransaction(I_DecodedTransaction):
         """
         if data is not None:
             json_command_content = dict()
-            json_command_content["not_supported"] = data
+            json_command_content["not_supported"] = misc_utils.get_as_hex_string(data)
         return cls.__create("not_supported", json_command_content)
 
 

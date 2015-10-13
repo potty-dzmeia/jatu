@@ -71,12 +71,19 @@ def toBcd(number, bcd_len):
     return result
 
 
-def printListInHex(list):
-    print ' '.join('0x%02x' % b for b in list)
+def printListInHex(lst):
+    print ' '.join('0x%02x' % b for b in lst)
 
 
 def getListInHex(list):
     return ' '.join('0x%02x' % b for b in list)
+
+def get_as_hex_string(data):
+    if type(data) == str:
+        return ' '.join('0x%02x' % ord(b) for b in data)
+    elif type(data) == list:
+        return ' '.join('0x%02x' % b for b in data)
+
 
 #----------------------------------------------------------------
 # Unit testing below
