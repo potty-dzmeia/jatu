@@ -222,10 +222,9 @@ class Elecraft(Radio):
     @classmethod
     def decode(cls, data):
         """
-        Decodes information coming from an Elecraft radio.
-        Converts strings coming from the radio into a JSON formatted string with the decoded transaction.
+        Extracts and decodes the first Elecraft command found within the supplied buffer.
 
-        Example of incoming command: "MD$1;" - which means that vfo 2 is in LSB mode
+        Example of an Elecraft command: "MD$1;" - which means that vfo 2 is in LSB mode
 
         :param data: Series of bytes from which we must extract the incoming command.
         :type data: array
@@ -259,7 +258,7 @@ class Elecraft(Radio):
         :return: JSON formatted block containing the parsed data
         :rtype: str
         """
-        result = ""
+        result = dict()
 
         for s in cls.parsers:
             if trans.startswith(s):  # if we have parser for the current command...
@@ -267,9 +266,10 @@ class Elecraft(Radio):
                 result = getattr(fn, '__func__')(cls, trans) # call the responsible parser
                 break
 
-        if result == "":
-            result = DecodedTransaction.createNotSupported(trans)
+        if result.__len__() == 0:
+            DecodedTransaction.insertNotSupported(result, trans)
 
+        result = DecodedTransaction.toJson(result)
         logger.debug("input data: {0}".format(trans))
         logger.debug("parsed result: {0}".format(result))
         return result
@@ -285,7 +285,9 @@ class Elecraft(Radio):
         :return: JSON formatted block containing the parsed data
         :rtype: str
         """
-        return DecodedTransaction.createFreq(command[2:-1].lstrip('0'), vfo=Radio.VFO_A)
+        result = dict()
+        DecodedTransaction.insertFreq(result, command[2:-1].lstrip('0'), vfo=Radio.VFO_A)
+        return DecodedTransaction.toJson(result)
 
 
     @classmethod
@@ -298,7 +300,9 @@ class Elecraft(Radio):
         :return: JSON formatted block containing the parsed data
         :rtype: str
         """
-        return DecodedTransaction.createFreq(command[2:-1].lstrip('0'), vfo=Radio.VFO_B)
+        result = dict()
+        DecodedTransaction.insertFreq(result, command[2:-1].lstrip('0'), vfo=Radio.VFO_B)
+        return DecodedTransaction.toJson(result)
 
 
     @classmethod
@@ -311,17 +315,19 @@ class Elecraft(Radio):
         :return: JSON formatted block containing the parsed data
         :rtype: str
         """
+        result = dict()
+
         if command[2] != '$':
             m = cls.__mode_from_byte_to_string(int(command[2]))
-            logger.info("m = "+m)
-            return DecodedTransaction.createMode(m, vfo=Radio.VFO_A)
+            DecodedTransaction.insertMode(result, m, vfo=Radio.VFO_A)
         else:
             m = cls.__mode_from_byte_to_string(int(command[3]))
-            logger.info("m = "+m)
-            return DecodedTransaction.createMode(m, vfo=Radio.VFO_B)
+            DecodedTransaction.insertMode(result, m, vfo=Radio.VFO_B)
+
+        return DecodedTransaction.toJson(result)
 
 
-     @classmethod
+    @classmethod
     def __parse_info(cls, command):
         """
         Extract the frequency and mode from the IF command.

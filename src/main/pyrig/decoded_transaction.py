@@ -52,104 +52,87 @@ class DecodedTransaction(I_DecodedTransaction):
         return self.bytes_read_
 
 
-
     #+--------------------------------------------------------------------------+
-    #|   Helper Class methods for creating the JSON string                      |
+    #|  Helper functions for building decoded transactions                      |
     #+--------------------------------------------------------------------------+
-    @classmethod
-    def __create(cls, command, data=None):
-        """
-        Creates a JSON formatted string holding the decoded data coming from the radio
-        :param command: The command that was send by the radio (e.g. "frequency")
-        :type command: str
-        :param data: JSON object holding additional data that the radio has send (e.g. "14,000,000")
-        :type data: dict
-        :return: JSON formatted string holding the command and the data
-        :rtype: str
-        """
-        if data is not None:
-            if type(data) is not dict:
-                raise ValueError("Parameter 'data' should be dictionary")
-        if command not in cls.supported_commands:
-            raise ValueError("Unknown command")
-
-        jsonBlock = dict()
-        jsonBlock[command] = data
-        return json.dumps(jsonBlock, indent=4)
 
 
     @classmethod
-    def createNotSupported(cls, data=None):
+    def insertNotSupported(cls, dest, data=""):
         """
-        Creates a JSON formatted transaction indicating that the decoded command is not supported
+        Inserts a decoded command coming from the radio into the supplied dictionary
         :param data: The transaction that couldn't be decoded in hex format
         :type data: str
-        :return: The following string {"not-supported": {"not-supported":"the data that couldn't be decoded in hex format"}}
-        :rtype: str
+        :param dest: The dict to which the following item will be added:
+                     "not-supported":"the data that couldn't be decoded in hex format"
+        :type dest: dict
         """
-        if data is not None:
-            json_command_content = dict()
-            json_command_content["not_supported"] = misc_utils.get_as_hex_string(data)
-        return cls.__create("not_supported", json_command_content)
+        dest["not_supported"] = misc_utils.get_as_hex_string(data)
 
 
     @classmethod
-    def createPositiveCfm(cls):
+    def insertPositiveCfm(cls, dest):
         """
-        Creates a JSON formatted transaction indicating that the decoded command is not supported
-        :return: The following string {"confirmation": {"confirmation": "1"}}
-        :rtype: str
+        Inserts a decoded command coming from the radio into the supplied dictionary
+        :param dest: The dict to which the following item will be added: "confirmation": "1"
+        :type dest: dict
         """
-        json_command_content = dict()
-        json_command_content["confirmation"] = "1"
-        return cls.__create("confirmation", json_command_content)
+        dest["confirmation"] = "1"
 
 
     @classmethod
-    def createNegativeCfm(cls):
+    def insertNegativeCfm(cls, dest):
         """
-        Creates a JSON formatted transaction indicating that the decoded command is not supported
-        :return: The following string  {"confirmation": {"confirmation": "0"}}
-        :rtype: str
+        Inserts a decoded command coming from the radio into the supplied dictionary
+        :param dest: The dict to which the following item will be added: "confirmation": "0"
+        :type dest: dict
         """
-        json_command_content = dict()
-        json_command_content["confirmation"] = "0"
-        return cls.__create("confirmation", json_command_content)
+        dest["confirmation"] = "0"
 
 
     @classmethod
-    def createFreq(cls, freq, vfo=None):
+    def insertFreq(cls, dest, freq, vfo=Radio.VFO_NONE):
         """
-        Creates a JSON formatted transaction holding  frequency
+        Inserts a decoded command coming from the radio into the supplied dictionary
+
         :param freq: frequency
         :type freq: str
         :param vfo: VFO that changed frequency (optional). Possible values are "0", "1" and so on...
         :type vfo: int
-        :return: String of the type {"frequency": {"frequency": "14195000", "vfo": "0"}}
-        :rtype: str
+        :param dest: The dict to which the following item will be added: "frequency": {"frequency": "14195000", "vfo": "0"}
+        :type dest: dict
         """
-        json_command_content = dict()
-        json_command_content["frequency"] = freq
-        if vfo is not None:
-            json_command_content["vfo"] = str(vfo)
-        return cls.__create("frequency", json_command_content)
+        sub = dict()
+        sub["frequency"] = freq
+        sub["vfo"] = str(vfo)
+        dest["frequency"] = sub
 
 
     @classmethod
-    def createMode(cls, mode, vfo=None):
+    def insertMode(cls, dest, mode, vfo=Radio.VFO_NONE):
         """
-        Creates a JSON formatted transaction holding  mode
+        Inserts a decoded command coming from the radio into the supplied dictionary
+
         :param mode: A string describing the working mode of the radio
         :type mode: str
         :param vfo: VFO that changed mode (optional). Possible values are "0", "1" and so on...
         :type vfo: int
-        :return: String of the type {"mode": {"mode": "cw", "vfo": "0"}}
+        :param dest: The dict to which the following item will be added: "mode": {"mode": "cw", "vfo": "0"}
+        :type dest: dict
+        """
+        sub = dict()
+        sub["mode"] = mode
+        sub["vfo"] = str(vfo)
+        dest["mode"] = sub
+
+
+    @classmethod
+    def toJson(cls, dictionary):
+        """
+        Converts the supplied dict to JSON formatted string
+        :param dictionary:  dict to be converted to JSON
+        :type dictionary: dict
+        :return: JSON formatted string
         :rtype: str
         """
-
-        json_command_content = dict()
-        json_command_content["mode"] = mode
-        if vfo is not None:
-            json_command_content["vfo"] = str(vfo)
-        return cls.__create("mode", json_command_content)
-
+        json.dumps(dictionary, indent=4)

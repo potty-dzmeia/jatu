@@ -1,3 +1,6 @@
 import misc_utils
 
-print misc_utils.get_as_hex_string(['a','b'])
+
+aa = dict()
+aa["dfd"] = 1
+print  aa.__len__()
