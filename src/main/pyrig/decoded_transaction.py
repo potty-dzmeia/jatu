@@ -139,4 +139,4 @@ class DecodedTransaction(I_DecodedTransaction):
         :return: JSON formatted string
         :rtype: str
         """
-        json.dumps(dictionary, indent=4)
+        return json.dumps(dictionary, indent=4)

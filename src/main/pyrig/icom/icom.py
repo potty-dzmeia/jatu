@@ -262,32 +262,32 @@ class Icom(radio.Radio):
 
         cmd_idx = trans_start_index + 4  # get the index of the command
 
-        result = dict()
+        result_dic = dict()
         if trans[cmd_idx] == cls.CFM_POSITIVE:      # <------------------------- positive confirm
-            result = DecodedTransaction.insertPositiveCfm(result)
+            DecodedTransaction.insertPositiveCfm(result_dic)
 
         elif trans[cmd_idx] == cls.CFM_NEGATIVE:    # <------------------------- negative confirm
-            result = DecodedTransaction.insertNegativeCfm(result)
+            DecodedTransaction.insertNegativeCfm(result_dic)
 
         elif trans[cmd_idx] == cls.SEND_FREQ:       # <------------------------- frequency
             freq = cls.__frequency_from_bcd_to_string(trans[(cmd_idx + 1):trans_end_index])
-            result = DecodedTransaction.insertFreq(result, freq)
+            DecodedTransaction.insertFreq(result_dic, freq)
 
         elif trans[cmd_idx] == cls.SEND_MODE:       # <------------------------- mode
             mode = cls.__mode_from_byte_to_string(trans[cmd_idx+1])
-            result = DecodedTransaction.insertMode(result, mode)
+            DecodedTransaction.insertMode(result_dic, mode)
 
         else:                                       # <------------------------- not-supported
-            result = DecodedTransaction.insertNotSupported(result, misc_utils.getListInHex(trans[trans_start_index:trans_end_index+1]))
+            DecodedTransaction.insertNotSupported(result_dic, misc_utils.getListInHex(trans[trans_start_index:trans_end_index+1]))
 
         # Convert to JSON string
-        result = DecodedTransaction.toJson()
+        result_json = DecodedTransaction.toJson(result_dic)
 
         logger.debug("input bytes: {0}".format(misc_utils.getListInHex(bytearray(data))))
-        logger.debug("returns: {0}; \nbytes removed: {1}".format(result, trans_end_index+1))
+        logger.debug("returns: {0}; \nbytes removed: {1}".format(result_json, trans_end_index+1))
 
         # return the object with the decoded transaction and the amount of bytes that we have read from the supplied buffer(string)
-        return DecodedTransaction(result, trans_end_index+1)
+        return DecodedTransaction(result_json, trans_end_index+1)
 
 
     #+--------------------------------------------------------------------------+

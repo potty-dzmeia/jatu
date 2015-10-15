@@ -18,6 +18,7 @@ import org.lz1aq.rsi.event.FrequencyEvent;
 import org.lz1aq.rsi.event.ModeEvent;
 import org.lz1aq.rsi.event.NotsupportedEvent;
 import org.lz1aq.utils.Misc;
+import org.lz1aq.utils.RadioVfos;
 
 
 
@@ -121,7 +122,16 @@ public class SimpleRadioPanel extends javax.swing.JFrame
         @Override
         public void run()
         {
-          frequencyTextfield.setText(Misc.formatFrequency(e.getFrequency()));
+          if(e.getVfo() == RadioVfos.A)
+            frequencyATextfield.setText(Misc.formatFrequency(e.getFrequency()));
+          else if(e.getVfo() == RadioVfos.B)
+            frequencyBTextfield.setText(Misc.formatFrequency(e.getFrequency()));
+          else
+          {
+            frequencyATextfield.setText(Misc.formatFrequency(e.getFrequency()));
+            logger.warning("Frequency event from unknown VFO!");
+          }
+            
         }
       });
     }
@@ -135,7 +145,16 @@ public class SimpleRadioPanel extends javax.swing.JFrame
         @Override
         public void run()
         {
-          modeTextfield.setText(e.getMode().toString());
+          if(e.getVfo() == RadioVfos.A)
+            modeATextfield.setText(e.getMode().toString());
+          else if(e.getVfo() == RadioVfos.B)
+            modeBTextfield.setText(e.getMode().toString());
+          else
+          {
+            modeATextfield.setText(e.getMode().toString());
+            logger.warning("Mode event from unknown VFO!");
+          }
+          
         }
       });
     }
@@ -157,8 +176,12 @@ public class SimpleRadioPanel extends javax.swing.JFrame
 
     radioPanel = new javax.swing.JPanel();
     displayPanel = new javax.swing.JPanel();
-    frequencyTextfield = new javax.swing.JTextField();
-    modeTextfield = new javax.swing.JTextField();
+    vfoAPanel = new javax.swing.JPanel();
+    frequencyATextfield = new javax.swing.JTextField();
+    modeATextfield = new javax.swing.JTextField();
+    vfoBPanel = new javax.swing.JPanel();
+    frequencyBTextfield = new javax.swing.JTextField();
+    modeBTextfield = new javax.swing.JTextField();
     settingsPanel = new javax.swing.JPanel();
     comportCombobox = new javax.swing.JComboBox();
     comportTextfield = new javax.swing.JTextField();
@@ -186,34 +209,88 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     displayPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
     displayPanel.setLayout(new java.awt.GridBagLayout());
 
-    frequencyTextfield.setBackground(new java.awt.Color(1, 1, 1));
-    frequencyTextfield.setFont(new java.awt.Font("Dialog", 0, 36)); // NOI18N
-    frequencyTextfield.setForeground(new java.awt.Color(230, 230, 230));
-    frequencyTextfield.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-    frequencyTextfield.setText("frequency");
-    frequencyTextfield.setCaretColor(new java.awt.Color(230, 230, 230));
+    vfoAPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("VFO A"));
+    vfoAPanel.setLayout(new java.awt.GridBagLayout());
+
+    frequencyATextfield.setBackground(new java.awt.Color(1, 1, 1));
+    frequencyATextfield.setFont(new java.awt.Font("Dialog", 0, 36)); // NOI18N
+    frequencyATextfield.setForeground(new java.awt.Color(230, 230, 230));
+    frequencyATextfield.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+    frequencyATextfield.setText("frequency");
+    frequencyATextfield.setCaretColor(new java.awt.Color(230, 230, 230));
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-    displayPanel.add(frequencyTextfield, gridBagConstraints);
+    vfoAPanel.add(frequencyATextfield, gridBagConstraints);
 
-    modeTextfield.setBackground(new java.awt.Color(1, 1, 1));
-    modeTextfield.setFont(new java.awt.Font("Dialog", 0, 36)); // NOI18N
-    modeTextfield.setForeground(new java.awt.Color(230, 230, 230));
-    modeTextfield.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-    modeTextfield.setText("mode");
-    modeTextfield.setCaretColor(new java.awt.Color(230, 230, 230));
+    modeATextfield.setBackground(new java.awt.Color(1, 1, 1));
+    modeATextfield.setFont(new java.awt.Font("Dialog", 0, 36)); // NOI18N
+    modeATextfield.setForeground(new java.awt.Color(230, 230, 230));
+    modeATextfield.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+    modeATextfield.setText("mode");
+    modeATextfield.setCaretColor(new java.awt.Color(230, 230, 230));
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    vfoAPanel.add(modeATextfield, gridBagConstraints);
+
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 0.1;
+    gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-    displayPanel.add(modeTextfield, gridBagConstraints);
+    gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+    displayPanel.add(vfoAPanel, gridBagConstraints);
+
+    vfoBPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("VFO B"));
+    vfoBPanel.setLayout(new java.awt.GridBagLayout());
+
+    frequencyBTextfield.setBackground(new java.awt.Color(1, 1, 1));
+    frequencyBTextfield.setFont(new java.awt.Font("Dialog", 0, 36)); // NOI18N
+    frequencyBTextfield.setForeground(new java.awt.Color(230, 230, 230));
+    frequencyBTextfield.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+    frequencyBTextfield.setText("frequency");
+    frequencyBTextfield.setCaretColor(new java.awt.Color(230, 230, 230));
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    vfoBPanel.add(frequencyBTextfield, gridBagConstraints);
+
+    modeBTextfield.setBackground(new java.awt.Color(1, 1, 1));
+    modeBTextfield.setFont(new java.awt.Font("Dialog", 0, 36)); // NOI18N
+    modeBTextfield.setForeground(new java.awt.Color(230, 230, 230));
+    modeBTextfield.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+    modeBTextfield.setText("mode");
+    modeBTextfield.setCaretColor(new java.awt.Color(230, 230, 230));
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    vfoBPanel.add(modeBTextfield, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+    displayPanel.add(vfoBPanel, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -426,11 +503,11 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(radioPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 869, Short.MAX_VALUE)
+      .addComponent(radioPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(radioPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE)
+      .addComponent(radioPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
     );
 
     pack();
@@ -641,8 +718,9 @@ public class SimpleRadioPanel extends javax.swing.JFrame
   private javax.swing.JToggleButton connectToRadioButton;
   private javax.swing.JPanel controlPanel;
   private javax.swing.JPanel displayPanel;
+  private javax.swing.JTextField frequencyATextfield;
+  private javax.swing.JTextField frequencyBTextfield;
   private javax.swing.JLabel frequencyTextLabel;
-  private javax.swing.JTextField frequencyTextfield;
   private javax.swing.JTextArea infoTextarea;
   private javax.swing.JLabel jLabel4;
   private javax.swing.JLabel jLabel5;
@@ -650,10 +728,13 @@ public class SimpleRadioPanel extends javax.swing.JFrame
   private javax.swing.JMenu jMenu2;
   private javax.swing.JMenuBar jMenuBar1;
   private javax.swing.JScrollPane jScrollPane1;
+  private javax.swing.JTextField modeATextfield;
+  private javax.swing.JTextField modeBTextfield;
   private javax.swing.JLabel modeTextLabel;
-  private javax.swing.JTextField modeTextfield;
   private javax.swing.JComboBox modesCombobox;
   private javax.swing.JPanel radioPanel;
   private javax.swing.JPanel settingsPanel;
+  private javax.swing.JPanel vfoAPanel;
+  private javax.swing.JPanel vfoBPanel;
   // End of variables declaration//GEN-END:variables
 }

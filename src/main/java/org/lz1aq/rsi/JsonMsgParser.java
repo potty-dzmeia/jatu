@@ -26,6 +26,9 @@ public class JsonMsgParser
   public static final String CONFIRMATION_MSG   = "confirmation";
   public static final String FREQUENCY_MSG      = "frequency";
   public static final String MODE_MSG           = "mode";
+  
+  // A field wich can be found inside the FREQUENCY_MSG and MODE_MSG
+  public static final String VFO_PAR            = "vfo";
 
   
   private static final Logger logger = Logger.getLogger(JsonMsgParser.class.getName());
@@ -50,7 +53,7 @@ public class JsonMsgParser
       return;
     }
     
-    // We can have several commands inside the JSON block...
+    // We can have several messages inside the JSON block...
     while(keys.hasNext())
     {
       String command = (String)keys.next();
@@ -59,7 +62,7 @@ public class JsonMsgParser
       {
         // -----------------------------
         case JsonMsgParser.CONFIRMATION_MSG:
-          ConfirmationEvent cfmEv = parseConfirmationMsg(jso.getJSONObject(command));
+          ConfirmationEvent cfmEv = parseConfirmationMsg(jso);
           for (RadioListener listener : listeners)
           {
             listener.confirmationEvent(cfmEv);
@@ -89,7 +92,7 @@ public class JsonMsgParser
         // -----------------------------
         case JsonMsgParser.NOT_SUPPORTED_MSG:
           // -----------------------------
-          NotsupportedEvent unsupportedEv = parseNotsupportedMsg(jso.getJSONObject(command));
+          NotsupportedEvent unsupportedEv = parseNotsupportedMsg(jso);
           for (RadioListener listener : listeners)
           {
             listener.notsupportedEvent(unsupportedEv);
@@ -102,9 +105,7 @@ public class JsonMsgParser
           logger.log(Level.SEVERE, "JSON message contained an unknown command: " + command);
           break;
       }
-    }
-    
-    
+    }// for each message
     
   }
   
@@ -112,9 +113,9 @@ public class JsonMsgParser
   /**
    * Parses an object containing data that couldn't be decoded by
    * @param jso - JSON object of the type: {"not-supported":"the data that couldn't be decoded in hex format"}
-   * @return 
+   * @return event holding the parsed data
    */
-  public static NotsupportedEvent parseNotsupportedMsg(JSONObject jso)
+  private static NotsupportedEvent parseNotsupportedMsg(JSONObject jso)
   {
     if(jso.has(NOT_SUPPORTED_MSG))
     {
@@ -126,13 +127,15 @@ public class JsonMsgParser
       return new NotsupportedEvent("");
     }
   }
+  
+  
   /**
    * Parser an object containing positive or negative Confirmation
    * 
    * @param jso - JSON object of the type: {"confirmation": "0" or "1"}     <-- "0" is for negative; "1" is for positive
-   * @return Object colding the confirmation data
+   * @return event holding the parsed data
    */
-  public static ConfirmationEvent parseConfirmationMsg(JSONObject jso)
+  private static ConfirmationEvent parseConfirmationMsg(JSONObject jso)
   {
     if(jso.has(CONFIRMATION_MSG))
     {
@@ -145,6 +148,7 @@ public class JsonMsgParser
     }
   }
   
+  
   /**
    * Parser an object containing Frequency and some additional data (e.g. VFO)
    * 
@@ -153,14 +157,12 @@ public class JsonMsgParser
    *      "frequency": "14190000"
    *      "vfo": "0" or "1" and so on..     <--Optional - indicates which VFO changed its frequency
    *    }
-   * @return Oject containing the parsed data
+   * @return event holding the parsed data
    */
-  public static FrequencyEvent parseFrequencyMsg(JSONObject jso)
+  private static FrequencyEvent parseFrequencyMsg(JSONObject jso)
   {
-    RadioVfos vfo;
-    String    freq;
-    
-    
+    String  freq = "0";
+
     if(jso.has(FREQUENCY_MSG))
     {
       freq = jso.getString(FREQUENCY_MSG);
@@ -168,19 +170,9 @@ public class JsonMsgParser
     else
     {
       logger.log(Level.SEVERE, "JSON object didn't contained " + FREQUENCY_MSG + " key as expected");
-      freq = "0";
     }
     
-    if(jso.has("vfo"))
-    {
-      vfo= RadioVfos.values()[Integer.parseInt(jso.getString("vfo"))];
-    }
-    else
-    {
-      vfo = RadioVfos.NONE;
-    }
-    
-    return new FrequencyEvent(freq, vfo);
+    return new FrequencyEvent(freq, parseVfoField(jso));
   }
   
   
@@ -192,34 +184,46 @@ public class JsonMsgParser
    *      "mode": "cw"
    *      "vfo": "0" or "1" and so on..     <--Optional - indicates which VFO changed its frequency
    *    }
-   * @return Oject containing the parsed data
+   * @return event holding the parsed data
    */
-  public static ModeEvent parseModeMsg(JSONObject jso)
+  private static ModeEvent parseModeMsg(JSONObject jso)
   {
-    RadioModes  mode;
-    RadioVfos   vfo;
- 
+    RadioModes  mode = RadioModes.NONE;
+    
     if(jso.has(MODE_MSG))
     {    
       mode = RadioModes.valueOf(jso.getString(MODE_MSG).toUpperCase());
     }
     else
     {
-      logger.log(Level.SEVERE, "JSON object didn't contained " + MODE_MSG + " key as expected");
-      mode = RadioModes.NONE;
+      logger.severe("JSON object didn't contained " + MODE_MSG + " key as expected");
     }
     
-    
-    if(jso.has("vfo"))
-    {
-      vfo= RadioVfos.values()[Integer.parseInt(jso.getString("vfo"))];
-    }
-    else
-    {
-      vfo = RadioVfos.NONE;
-    }
-    
-    return new ModeEvent(mode, vfo);
+    return new ModeEvent(mode, parseVfoField(jso));
   }
 
+  
+  /**
+   *  Extracts the string from the "VFO" field
+   * 
+   * @param jso - JSON object containing that we will try to extract the field from
+   * @return RadioVfos object specifying the VFO. RadioVfos.NONE in case the 
+   *         field was missing or was set to None
+   */
+  private static RadioVfos parseVfoField(JSONObject jso)
+  {
+    if (jso.has(VFO_PAR))
+    {
+      int i = Integer.parseInt(jso.getString(VFO_PAR));
+      for(RadioVfos vfo: RadioVfos.values())
+      {
+        if(vfo.getCode() == i)
+          return vfo;
+      }
+    } 
+    
+    logger.warning("SON object didn't contained " + VFO_PAR +" key.");  
+    return RadioVfos.NONE;
+  }
+  
 }

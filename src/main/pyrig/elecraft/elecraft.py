@@ -258,21 +258,25 @@ class Elecraft(Radio):
         :return: JSON formatted block containing the parsed data
         :rtype: str
         """
-        result = dict()
+        logger.debug("input data: {0}".format(trans))
 
+        result_dic = None
         for s in cls.parsers:
             if trans.startswith(s):  # if we have parser for the current command...
                 fn = cls.parsers[s]
-                result = getattr(fn, '__func__')(cls, trans) # call the responsible parser
+                result_dic = getattr(fn, '__func__')(cls, trans) # call the responsible parser
                 break
 
-        if result.__len__() == 0:
-            DecodedTransaction.insertNotSupported(result, trans)
+        logger.debug(result_dic.__str__())
 
-        result = DecodedTransaction.toJson(result)
-        logger.debug("input data: {0}".format(trans))
-        logger.debug("parsed result: {0}".format(result))
-        return result
+        if result_dic is None:
+            result_dic = dict()
+            DecodedTransaction.insertNotSupported(result_dic, trans)
+
+        result_json = DecodedTransaction.toJson(result_dic)
+        logger.debug(result_json.__str__())
+        logger.debug("parsed result: {0}".format(result_json))
+        return result_json
 
 
     @classmethod
@@ -282,12 +286,13 @@ class Elecraft(Radio):
 
         :param command: String starting of the type "FA00007000000;"
         :type command: str
-        :return: JSON formatted block containing the parsed data
-        :rtype: str
+        :return: The dict with the parsed data
+        :rtype: dict
         """
-        result = dict()
-        DecodedTransaction.insertFreq(result, command[2:-1].lstrip('0'), vfo=Radio.VFO_A)
-        return DecodedTransaction.toJson(result)
+        res = dict()
+        DecodedTransaction.insertFreq(res, command[2:-1].lstrip('0'), vfo=Radio.VFO_A)
+        return res;
+
 
 
     @classmethod
@@ -297,12 +302,12 @@ class Elecraft(Radio):
 
         :param command: String starting of the type "FB00007000000;"
         :type command: str
-        :return: JSON formatted block containing the parsed data
-        :rtype: str
+        :return: The dict with the parsed data
+        :rtype: dict
         """
         result = dict()
         DecodedTransaction.insertFreq(result, command[2:-1].lstrip('0'), vfo=Radio.VFO_B)
-        return DecodedTransaction.toJson(result)
+        return result
 
 
     @classmethod
@@ -312,8 +317,8 @@ class Elecraft(Radio):
 
         :param command: String starting of the type "MD1;" or "MD$1;"
         :type command: str
-        :return: JSON formatted block containing the parsed data
-        :rtype: str
+        :return: The dict with the parsed data
+        :rtype: dict
         """
         result = dict()
 
@@ -324,7 +329,7 @@ class Elecraft(Radio):
             m = cls.__mode_from_byte_to_string(int(command[3]))
             DecodedTransaction.insertMode(result, m, vfo=Radio.VFO_B)
 
-        return DecodedTransaction.toJson(result)
+        return result
 
 
     @classmethod
@@ -349,19 +354,20 @@ class Elecraft(Radio):
         b       Basic RSP format: always 0; K2 Extended RSP format (K22): 1 if present IF response is due to a band change; 0 otherwise
         d       Basic RSP format: always 0; K3 Extended RSP format (K31): DATA sub-mode, if applicable (0=DATA A, 1=AFSK A, 2= FSK D, 3=PSK D)
 
-        :param command: The "IF" command
+        :param command: String containing the "IF" command
         :type command: str
-        :return: JSON formatted block containing the parsed data
-        :rtype: str
+        :return: The dict with the parsed data
+        :rtype: dict
         """
         result = dict()
         ###   command IF00000000000+yyyyrx*00tmvspbd1*;
         ###   index   0123456789012345678901234567890
-        vfo = command[25]
+        mode = cls.__mode_from_byte_to_string(int(command[24]))
+        vfo  = command[25]
         freq = command[2:13]
-
         DecodedTransaction.insertFreq(result, freq.lstrip('0'), vfo)
-        return DecodedTransaction.toJson(result)
+        DecodedTransaction.insertMode(result, mode, vfo)
+        return result
 
 
 
