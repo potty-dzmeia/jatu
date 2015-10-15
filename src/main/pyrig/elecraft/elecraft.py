@@ -354,8 +354,14 @@ class Elecraft(Radio):
         :return: JSON formatted block containing the parsed data
         :rtype: str
         """
+        result = dict()
+        ###   command IF00000000000+yyyyrx*00tmvspbd1*;
+        ###   index   0123456789012345678901234567890
+        vfo = command[25]
+        freq = command[2:13]
 
-        return DecodedTransaction.createFreq(command[2:-1].lstrip('0'), vfo=Radio.VFO_B)
+        DecodedTransaction.insertFreq(result, freq.lstrip('0'), vfo)
+        return DecodedTransaction.toJson(result)
 
 
 
@@ -409,7 +415,7 @@ class Elecraft(Radio):
     parsers = { "FA": __parse_frequency_vfo_a,       # VFO A frequency
                 "FB": __parse_frequency_vfo_b,       # VFO B frequency
                 "MD": __parse_mode,                  # Operating mode
-                "IF": __parse_info,}                 # IF (Transceiver Information; GET only)
+                "IF": __parse_info}                  # IF (Transceiver Information; GET only)
 
 
     #+--------------------------------------------------------------------------+

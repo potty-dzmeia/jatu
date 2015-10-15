@@ -33,9 +33,9 @@ class Icom(radio.Radio):
     # serial_settings.parity_       = SerialSettings.PARITY_NONE
     #serial_settings.dtr_           = SerialSettings.DTR_STATE_NONE
 
-    # The address of the Icom transceiver. Value of 0x5c is good for 756Pro
-    CIV_ADDRESS  = 0x5c
-    CTRL_ADDRESS = 0xE0
+
+    CIV_ADDRESS  = 0x5c # The address of the Icom transceiver. Value of 0x5c is good for 756Pro
+    CTRL_ADDRESS = 0xE0 # Controller's address (default is 0xE0).
 
 
 
