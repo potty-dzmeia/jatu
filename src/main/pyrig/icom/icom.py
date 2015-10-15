@@ -239,8 +239,7 @@ class Icom(radio.Radio):
     @classmethod
     def decode(cls, data):
         """
-        Decodes information coming from an Icom radio.
-        Converts string of bytes coming from the radio into a JSON formatted string with the decoded transaction.
+        Extracts and decodes the first Icom command found within the supplied buffer.
 
         :param data: Series of bytes from which we must extract the incoming command. There is no guarantee
         that the first byte is the beginning of the transaction (i.e. there might be some trash in the beginning).
@@ -263,22 +262,26 @@ class Icom(radio.Radio):
 
         cmd_idx = trans_start_index + 4  # get the index of the command
 
+        result = dict()
         if trans[cmd_idx] == cls.CFM_POSITIVE:      # <------------------------- positive confirm
-            result = DecodedTransaction.createPositiveCfm()
+            result = DecodedTransaction.insertPositiveCfm(result)
 
         elif trans[cmd_idx] == cls.CFM_NEGATIVE:    # <------------------------- negative confirm
-            result = DecodedTransaction.createNegativeCfm()
+            result = DecodedTransaction.insertNegativeCfm(result)
 
         elif trans[cmd_idx] == cls.SEND_FREQ:       # <------------------------- frequency
             freq = cls.__frequency_from_bcd_to_string(trans[(cmd_idx + 1):trans_end_index])
-            result = DecodedTransaction.createFreq(freq)
+            result = DecodedTransaction.insertFreq(result, freq)
 
         elif trans[cmd_idx] == cls.SEND_MODE:       # <------------------------- mode
             mode = cls.__mode_from_byte_to_string(trans[cmd_idx+1])
-            result = DecodedTransaction.createMode(mode)
+            result = DecodedTransaction.insertMode(result, mode)
 
         else:                                       # <------------------------- not-supported
-            result = DecodedTransaction.createNotSupported(misc_utils.getListInHex(trans[trans_start_index:trans_end_index+1]))
+            result = DecodedTransaction.insertNotSupported(result, misc_utils.getListInHex(trans[trans_start_index:trans_end_index+1]))
+
+        # Convert to JSON string
+        result = DecodedTransaction.toJson()
 
         logger.debug("input bytes: {0}".format(misc_utils.getListInHex(bytearray(data))))
         logger.debug("returns: {0}; \nbytes removed: {1}".format(result, trans_end_index+1))

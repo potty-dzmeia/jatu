@@ -13,15 +13,14 @@ logger = logging.getLogger(__name__)
 
 class DecodedTransaction(I_DecodedTransaction):
     """
-    Contains the decoded transaction coming from the rig together
-    with some additional control information
+    Contains the decoded transaction coming from the rig together with some additional control information
     """
 
-    # Supported commands coming from the radio
-    supported_commands = ["not_supported",  # When the transaction contained unknown data
-                          "confirmation",   # Radio has sent positive for negative confirmation
-                          "frequency",      # Radio has sent new frequency
-                          "mode"]           # Radio has sent new mode
+    # Supported commands that can be found inside the decoded transaction
+    NOT_SUPPORTED_CMD = "not_supported"  # When the transaction contained unknown data
+    CFM_CMD           = "confirmation"   # Radio has sent positive for negative confirmation
+    FREQUENCY         = "frequency"      # Radio has sent new frequency
+    MODE              = "mode"           # Radio has sent new mode
 
 
     def __init__(self, transaction, bytes_read):
@@ -38,6 +37,11 @@ class DecodedTransaction(I_DecodedTransaction):
 
     def getTransaction(self):
         """
+        Function returns the decoded transaction as JSON formatted string
+
+        In order to create the JSON formatted string please use the classmethod functions of this
+        class.
+
         :return: JSON formatted string with the decoded transaction
         :rtype: str
         """
@@ -67,7 +71,7 @@ class DecodedTransaction(I_DecodedTransaction):
                      "not-supported":"the data that couldn't be decoded in hex format"
         :type dest: dict
         """
-        dest["not_supported"] = misc_utils.get_as_hex_string(data)
+        dest[cls.NOT_SUPPORTED_CMD] = misc_utils.get_as_hex_string(data)
 
 
     @classmethod
@@ -77,7 +81,7 @@ class DecodedTransaction(I_DecodedTransaction):
         :param dest: The dict to which the following item will be added: "confirmation": "1"
         :type dest: dict
         """
-        dest["confirmation"] = "1"
+        dest[cls.CFM_CMD] = "1"
 
 
     @classmethod
@@ -87,7 +91,7 @@ class DecodedTransaction(I_DecodedTransaction):
         :param dest: The dict to which the following item will be added: "confirmation": "0"
         :type dest: dict
         """
-        dest["confirmation"] = "0"
+        dest[cls.CFM_CMD] = "0"
 
 
     @classmethod

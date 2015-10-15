@@ -358,6 +358,13 @@ class Elecraft(Radio):
         return DecodedTransaction.createFreq(command[2:-1].lstrip('0'), vfo=Radio.VFO_B)
 
 
+
+
+    #+--------------------------------------------------------------------------+
+    #|   Private methods                                                        |
+    #+--------------------------------------------------------------------------+
+
+
     @classmethod
     def __vfo_number_to_letter(cls, vfo_number):
         """
@@ -374,11 +381,6 @@ class Elecraft(Radio):
             return "B"
         else:
             raise Exception("Not allowed VFO number")
-
-
-    #+--------------------------------------------------------------------------+
-    #|   Private methods                                                        |
-    #+--------------------------------------------------------------------------+
 
 
     @classmethod

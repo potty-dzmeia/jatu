@@ -50,47 +50,62 @@ public class JsonMsgParser
       return;
     }
     
-    String command = (String)keys.next();
-    
-    switch (command)
+    // We can have several commands inside the JSON block...
+    while(keys.hasNext())
     {
-      // -----------------------------
-      case JsonMsgParser.CONFIRMATION_MSG:
-        ConfirmationEvent cfmEv = parseConfirmationMsg(jso.getJSONObject(command));
-        for(RadioListener listener : listeners)
-          listener.confirmationEvent(cfmEv);
-        break;
-       
-      // -----------------------------
-      case JsonMsgParser.FREQUENCY_MSG:
-      // -----------------------------
-        FrequencyEvent freqEv = parseFrequencyMsg(jso.getJSONObject(command));
-        for(RadioListener listener : listeners)
-          listener.frequencyEvent(freqEv);
-        break;
-        
-      // -----------------------------
-      case JsonMsgParser.MODE_MSG:
-      // -----------------------------
-        ModeEvent modeEv = parseModeMsg(jso.getJSONObject(command));
-        for(RadioListener listener : listeners)
-          listener.modeEvent(modeEv);
-        break;  
-        
-      // -----------------------------
-      case JsonMsgParser.NOT_SUPPORTED_MSG:
-      // -----------------------------
-        NotsupportedEvent unsupportedEv = parseNotsupportedMsg(jso.getJSONObject(command));
-        for(RadioListener listener : listeners)
-          listener.notsupportedEvent(unsupportedEv);
-        break;  
+      String command = (String)keys.next();
       
-      // -----------------------------
-      default:
-      // -----------------------------
-        logger.log(Level.SEVERE, "JSON message contained an unknown command: " + command);
-        break;
-    } 
+      switch (command)
+      {
+        // -----------------------------
+        case JsonMsgParser.CONFIRMATION_MSG:
+          ConfirmationEvent cfmEv = parseConfirmationMsg(jso.getJSONObject(command));
+          for (RadioListener listener : listeners)
+          {
+            listener.confirmationEvent(cfmEv);
+          }
+          break;
+
+        // -----------------------------
+        case JsonMsgParser.FREQUENCY_MSG:
+          // -----------------------------
+          FrequencyEvent freqEv = parseFrequencyMsg(jso.getJSONObject(command));
+          for (RadioListener listener : listeners)
+          {
+            listener.frequencyEvent(freqEv);
+          }
+          break;
+
+        // -----------------------------
+        case JsonMsgParser.MODE_MSG:
+          // -----------------------------
+          ModeEvent modeEv = parseModeMsg(jso.getJSONObject(command));
+          for (RadioListener listener : listeners)
+          {
+            listener.modeEvent(modeEv);
+          }
+          break;
+
+        // -----------------------------
+        case JsonMsgParser.NOT_SUPPORTED_MSG:
+          // -----------------------------
+          NotsupportedEvent unsupportedEv = parseNotsupportedMsg(jso.getJSONObject(command));
+          for (RadioListener listener : listeners)
+          {
+            listener.notsupportedEvent(unsupportedEv);
+          }
+          break;
+
+        // -----------------------------
+        default:
+          // -----------------------------
+          logger.log(Level.SEVERE, "JSON message contained an unknown command: " + command);
+          break;
+      }
+    }
+    
+    
+    
   }
   
  
