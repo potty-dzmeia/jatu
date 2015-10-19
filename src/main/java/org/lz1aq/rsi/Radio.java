@@ -3,11 +3,11 @@ package org.lz1aq.rsi;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import org.lz1aq.rsi.event.*;
-import java.util.ArrayList;
 import org.lz1aq.utils.Misc;
 import org.lz1aq.utils.DynamicByteArray;
 import org.lz1aq.pyrig_interfaces.I_Radio;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +29,7 @@ public class Radio
   private static final int QUEUE_SIZE = 30;   // Max number of commands that queueWithTransactions can hold
   
   private boolean                   isConnected = false;  // If there is a com port open
-  private final ArrayList<RadioListener>  eventListeners; // 
+  private final CopyOnWriteArrayList<RadioListener>  eventListeners;    // 
   private final String              serialPortName;       // 
   private       SerialPort          serialPort;           // Used for writing to serialPort
   private final I_Radio             radioProtocolParser;  // Used for decoding/encoding msg from/to the radio (jython object)
@@ -63,7 +63,7 @@ public class Radio
     queueWithTransactions = new LinkedBlockingQueue<>(); 
     threadPortWriter      = new Thread(new PortWriter(), "threadPortWrite");    
     receiveBuffer         = new DynamicByteArray(200);  // Set the initial size to some reasonable value
-    eventListeners        = new ArrayList<>();
+    eventListeners        = new CopyOnWriteArrayList<>();
   }
   
   

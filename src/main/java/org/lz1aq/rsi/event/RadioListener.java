@@ -2,7 +2,6 @@ package org.lz1aq.rsi.event;
 
 
 import java.util.EventListener;
-import org.lz1aq.rsi.event.*;
 
 /**
  *

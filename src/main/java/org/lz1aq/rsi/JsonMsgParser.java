@@ -6,8 +6,8 @@
 package org.lz1aq.rsi;
 
 import org.lz1aq.rsi.event.RadioListener;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.JSONObject;
@@ -40,7 +40,7 @@ public class JsonMsgParser
    * @param jsoString - JSON formatted string of the type: {"some_command_name": { ...data...}}
    * @param listeners - Listeners which will be notified for the content of the JSON message
    */
-  public static void parseAndNotify(String jsoString, ArrayList<RadioListener> listeners)
+  public static void parseAndNotify(String jsoString, CopyOnWriteArrayList<RadioListener> listeners)
   {
     
      // Get the command (i.e. the name of the object) that the radio has sent us
