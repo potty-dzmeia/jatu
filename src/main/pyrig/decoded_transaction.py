@@ -71,7 +71,7 @@ class DecodedTransaction(I_DecodedTransaction):
                      "not-supported":"the data that couldn't be decoded in hex format"
         :type dest: dict
         """
-        dest[cls.NOT_SUPPORTED_CMD] = misc_utils.get_as_hex_string(data)
+        dest[cls.NOT_SUPPORTED_CMD] = data
 
 
     @classmethod

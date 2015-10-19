@@ -75,8 +75,8 @@ def printListInHex(lst):
     print ' '.join('0x%02x' % b for b in lst)
 
 
-def getListInHex(list):
-    return ' '.join('0x%02x' % b for b in list)
+def getListInHex(lst):
+    return ' '.join('0x%02x' % b for b in lst)
 
 def get_as_hex_string(data):
     if type(data) == str:

@@ -184,7 +184,7 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     modeBTextfield = new javax.swing.JTextField();
     settingsPanel = new javax.swing.JPanel();
     comportCombobox = new javax.swing.JComboBox();
-    comportTextfield = new javax.swing.JTextField();
+    customComportTextfield = new javax.swing.JTextField();
     jLabel4 = new javax.swing.JLabel();
     jLabel5 = new javax.swing.JLabel();
     connectToRadioButton = new javax.swing.JToggleButton();
@@ -315,7 +315,7 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(20, 20, 0, 5);
     settingsPanel.add(comportCombobox, gridBagConstraints);
 
-    comportTextfield.setToolTipText("");
+    customComportTextfield.setToolTipText("");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 2;
@@ -323,10 +323,10 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 0.1;
     gridBagConstraints.insets = new java.awt.Insets(20, 5, 0, 5);
-    settingsPanel.add(comportTextfield, gridBagConstraints);
+    settingsPanel.add(customComportTextfield, gridBagConstraints);
 
     jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabel4.setText("select Com Port");
+    jLabel4.setText("select ComPort");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 3;
@@ -336,7 +336,7 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     settingsPanel.add(jLabel4, gridBagConstraints);
 
     jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabel5.setText("custon Com");
+    jLabel5.setText("custom ComPort");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 3;
@@ -548,13 +548,16 @@ public class SimpleRadioPanel extends javax.swing.JFrame
           connectToRadioButton.setSelected(false);
           return;
         }
+        
+        // Get comm port name
+        String name = customComportTextfield.getText();
+        if(name.isEmpty())
+          name = String.valueOf(comportCombobox.getSelectedItem());
+        
         // Create the radio object using the selected Com port
-        radio = new Radio(radioParser, String.valueOf(comportCombobox.getSelectedItem()));
+        radio = new Radio(radioParser, name);
         radio.addEventListener(new LocalRadioListener());
         radio.connect(); // Let's not forget to call connect(). Calling disconnects() later will close the Com Port
-        
-        // Now add listeners for the events comming from the radio (e.g. frequency change, mode change, etc...)
-        //radio.addEventListener(new TestJFrame.LocalRadioListener());
       } 
       // Disconnect
       // ----------
@@ -714,9 +717,9 @@ public class SimpleRadioPanel extends javax.swing.JFrame
   private javax.swing.JComboBox bandsCombobox;
   private javax.swing.JButton chooseRadioButton;
   private javax.swing.JComboBox comportCombobox;
-  private javax.swing.JTextField comportTextfield;
   private javax.swing.JToggleButton connectToRadioButton;
   private javax.swing.JPanel controlPanel;
+  private javax.swing.JTextField customComportTextfield;
   private javax.swing.JPanel displayPanel;
   private javax.swing.JTextField frequencyATextfield;
   private javax.swing.JTextField frequencyBTextfield;

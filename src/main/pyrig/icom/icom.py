@@ -263,6 +263,7 @@ class Icom(radio.Radio):
         cmd_idx = trans_start_index + 4  # get the index of the command
 
         result_dic = dict()
+
         if trans[cmd_idx] == cls.CFM_POSITIVE:      # <------------------------- positive confirm
             DecodedTransaction.insertPositiveCfm(result_dic)
 
@@ -284,7 +285,7 @@ class Icom(radio.Radio):
         result_json = DecodedTransaction.toJson(result_dic)
 
         logger.debug("input bytes: {0}".format(misc_utils.getListInHex(bytearray(data))))
-        logger.debug("returns: {0}; \nbytes removed: {1}".format(result_json, trans_end_index+1))
+        logger.debug("returns: {0}; bytes removed: {1}".format(result_json, trans_end_index+1))
 
         # return the object with the decoded transaction and the amount of bytes that we have read from the supplied buffer(string)
         return DecodedTransaction(result_json, trans_end_index+1)
