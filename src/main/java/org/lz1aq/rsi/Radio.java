@@ -231,15 +231,23 @@ public class Radio
         logger.log(Level.WARNING, ex.toString(), ex);
       }
       
-      // Pass the received data to the protocol parser for decoding
-      I_DecodedTransaction trans = radioProtocolParser.decode(receiveBuffer.toByteArray());
+      // Do parsing till we stop getting results...
+      while(true)
+      {
+        // Pass the received data to the protocol parser for decoding
+        I_DecodedTransaction trans = radioProtocolParser.decode(receiveBuffer.toByteArray());
       
-      if(trans.getBytesRead() > 0)
-      { 
-        // This will parseAndNotify the JSON string and notify all the interested parties
-        JsonMsgParser.parseAndNotify(trans.getTransaction(), eventListeners);
-        // Remove the processed bytes from the received buffer
-        receiveBuffer.remove(trans.getBytesRead());
+        if(trans.getBytesRead() > 0) 
+        {
+          // This will parseAndNotify the JSON string and notify all the interested parties
+          JsonMsgParser.parseAndNotify(trans.getTransaction(), eventListeners);
+          // Remove the processed bytes from the received buffer
+          receiveBuffer.remove(trans.getBytesRead());
+        }
+        else
+        {
+          break;
+        }
       }
     }
   }

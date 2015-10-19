@@ -7,7 +7,7 @@ class EncodedTransaction(I_EncodedTransaction):
     additional details of how it should be send (e.g. timeout, retry etc.)
     """
 
-    def __init__(self, transaction, is_cfm_expected=False, write_delay=0, post_write_delay=0, timeout=100, retry=0):
+    def __init__(self, transaction, is_cfm_expected=False, write_delay=0, post_write_delay=0, timeout=200, retry=0):
         """
          Creates an object holding the transaction together with some additional control variables.
         When the object is created the control variables are given default values. When needed the

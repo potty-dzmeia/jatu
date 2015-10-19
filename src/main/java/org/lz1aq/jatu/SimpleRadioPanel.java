@@ -66,7 +66,25 @@ public class SimpleRadioPanel extends javax.swing.JFrame
   {
     return new DefaultComboBoxModel(new String[] { "1.8", "3.5", "7", "10", "14", "18", "21", "24", "28" });
   }
+  /**
+   * @return Returns a new DefaultComboBoxModel containing all available bands
+   */
+  private DefaultComboBoxModel getVfoComboboxModel()
+  {
+    return new DefaultComboBoxModel(new String[] { "VFO A", "VFO B" });
+  }
   
+  private int getVfo()
+  {
+    if(String.valueOf(vfoCombobox.getSelectedItem()).equals("VFO A"))
+    {
+      return 0;
+    }
+    else
+    {
+      return 1;
+    }
+  }
   
   /**
    * @return Returns a new DefaultComboBoxModel containing all available COM ports
@@ -194,10 +212,10 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     controlPanel = new javax.swing.JPanel();
     bandsCombobox = new javax.swing.JComboBox();
     modesCombobox = new javax.swing.JComboBox();
-    antennasCombobox = new javax.swing.JComboBox();
+    vfoCombobox = new javax.swing.JComboBox();
     frequencyTextLabel = new javax.swing.JLabel();
     modeTextLabel = new javax.swing.JLabel();
-    antennaTextLabel = new javax.swing.JLabel();
+    vfoTextLabel = new javax.swing.JLabel();
     jMenuBar1 = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     jMenu2 = new javax.swing.JMenu();
@@ -440,13 +458,13 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(20, 20, 3, 20);
     controlPanel.add(modesCombobox, gridBagConstraints);
 
-    antennasCombobox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+    vfoCombobox.setModel(getVfoComboboxModel());
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(20, 20, 3, 20);
-    controlPanel.add(antennasCombobox, gridBagConstraints);
+    controlPanel.add(vfoCombobox, gridBagConstraints);
 
     frequencyTextLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     frequencyTextLabel.setText("select Band");
@@ -469,15 +487,15 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(1, 20, 1, 20);
     controlPanel.add(modeTextLabel, gridBagConstraints);
 
-    antennaTextLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    antennaTextLabel.setText("select Antenna");
+    vfoTextLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    vfoTextLabel.setText("select VFO");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 1;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(1, 20, 1, 20);
-    controlPanel.add(antennaTextLabel, gridBagConstraints);
+    controlPanel.add(vfoTextLabel, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -587,39 +605,39 @@ public class SimpleRadioPanel extends javax.swing.JFrame
         switch(freq)
         {
           case "1.8":
-            radio.setFrequency(1810000, 0);
+            radio.setFrequency(1810000, getVfo());
             //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "3.5":
-            radio.setFrequency(3500000, 0);
+            radio.setFrequency(3500000, getVfo());
             //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "7":
-            radio.setFrequency(7000000, 0);
+            radio.setFrequency(7000000, getVfo());
             //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "10":
-            radio.setFrequency(10000000, 0);
+            radio.setFrequency(10000000, getVfo());
             //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "14":
-            radio.setFrequency(14000000, 0);
+            radio.setFrequency(14000000, getVfo());
             //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "18":
-            radio.setFrequency(18000000, 0);
+            radio.setFrequency(18000000, getVfo());
             //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "21":
-            radio.setFrequency(21000000, 0);
+            radio.setFrequency(21000000, getVfo());
             //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "24":
-            radio.setFrequency(24000000, 0);
+            radio.setFrequency(24000000, getVfo());
             //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
           case "28":
-            radio.setFrequency(28000000, 0);
+            radio.setFrequency(28000000, getVfo());
             //radio.getFrequency(0); // after setting the frequency let's ask which will update our display
             break;
 
@@ -640,7 +658,7 @@ public class SimpleRadioPanel extends javax.swing.JFrame
       String mode = modesCombobox.getSelectedItem().toString();
       try
       {
-        radio.setMode(mode, 0);
+        radio.setMode(mode, getVfo());
       } catch (Exception ex)
       {
         logger.log(Level.SEVERE, null, ex);
@@ -712,8 +730,6 @@ public class SimpleRadioPanel extends javax.swing.JFrame
   }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JLabel antennaTextLabel;
-  private javax.swing.JComboBox antennasCombobox;
   private javax.swing.JComboBox bandsCombobox;
   private javax.swing.JButton chooseRadioButton;
   private javax.swing.JComboBox comportCombobox;
@@ -739,5 +755,7 @@ public class SimpleRadioPanel extends javax.swing.JFrame
   private javax.swing.JPanel settingsPanel;
   private javax.swing.JPanel vfoAPanel;
   private javax.swing.JPanel vfoBPanel;
+  private javax.swing.JComboBox vfoCombobox;
+  private javax.swing.JLabel vfoTextLabel;
   // End of variables declaration//GEN-END:variables
 }

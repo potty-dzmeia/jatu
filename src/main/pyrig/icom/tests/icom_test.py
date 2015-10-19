@@ -6,7 +6,7 @@ import sys
 
 
 civ_address = 0x5C
-ctrl_address = 0x00
+ctrl_address = 0xE0
 
 raw_transactions = {
 'empty_transaction':        bytearray([0xFE, 0xFE, ctrl_address, civ_address, 0xFD]),

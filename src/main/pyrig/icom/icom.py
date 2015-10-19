@@ -17,7 +17,7 @@ class Icom(radio.Radio):
     """
 
     #+--------------------------------------------------------------------------+
-    #|  User configuration fields - change if needed                               |
+    #|  User configuration fields - change if needed                            |
     #+--------------------------------------------------------------------------+
     MANUFACTURER = "Icom"
     MODEL_NAME = "None"
@@ -313,7 +313,7 @@ class Icom(radio.Radio):
         :return: The ready transaction bytes
         :rtype: list
         """
-        transaction= [0xFE, 0xFE, cls.CTRL_ADDRESS, cls.CIV_ADDRESS, command]
+        transaction= [0xFE, 0xFE, cls.CIV_ADDRESS, cls.CTRL_ADDRESS, command]
         if sub_command is not None:
             transaction.append(sub_command)
         if data is not None:
@@ -364,8 +364,8 @@ class Icom(radio.Radio):
     #|   Icom command codes
     #+--------------------------------------------------------------------------+
 
-    TRANS_START = bytearray([0xFE, 0xFE, CTRL_ADDRESS, CIV_ADDRESS])  # Trans\s send by the Icom starts with: 0xFE 0xFE CTRL CIV
-    TRANS_END = bytearray([0xFD])  # Transactions send by the Icom ends with: 0xFD
+    TRANS_START = bytearray([0xFE, 0xFE, CTRL_ADDRESS, CIV_ADDRESS])  # Trans send by the Icom starts with: 0xFE 0xFE CTRL CIV
+    TRANS_END = bytearray([0xFD])  # Transactions ends with: 0xFD
 
     SEND_FREQ = 0x00        # send by the Icom when frequency has changed
     SEND_MODE = 0x01        # send by the Icom whe mode has changed
