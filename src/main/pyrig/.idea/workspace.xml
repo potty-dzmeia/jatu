@@ -24,23 +24,25 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="icom.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="icom.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/icom/icom.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="5.9583335" vertical-offset="0" max-vertical-offset="7056">
-              <caret line="286" column="45" selection-start-line="286" selection-start-column="44" selection-end-line="286" selection-end-column="45" />
+            <state vertical-scroll-proportion="-12.0" vertical-offset="4290" max-vertical-offset="5880">
+              <caret line="306" column="50" selection-start-line="306" selection-start-column="50" selection-end-line="306" selection-end-column="50" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
+                <marker date="1445316333101" expanded="true" signature="13029:13458" placeholder="..." />
+                <marker date="1445316333101" expanded="true" signature="13038:13403" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="elecraft_test.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="elecraft_test.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/elecraft/tests/elecraft_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-26.28" vertical-offset="945" max-vertical-offset="1854">
-              <caret line="89" column="1" selection-start-line="89" selection-start-column="1" selection-end-line="89" selection-end-column="1" />
+            <state vertical-scroll-proportion="0.8215548" vertical-offset="0" max-vertical-offset="1545">
+              <caret line="31" column="4" selection-start-line="31" selection-start-column="4" selection-end-line="31" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -49,13 +51,9 @@
       <file leaf-file-name="decoded_transaction.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/decoded_transaction.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1224" max-vertical-offset="2556">
+            <state vertical-scroll-proportion="0.0" vertical-offset="1020" max-vertical-offset="2130">
               <caret line="73" column="42" selection-start-line="73" selection-start-column="42" selection-end-line="73" selection-end-column="42" />
-              <folding>
-                <marker date="1445278515413" expanded="true" signature="331:4844" placeholder="..." />
-                <marker date="1445278515413" expanded="true" signature="2177:2610" placeholder="..." />
-                <marker date="1445278515413" expanded="true" signature="4811:4844" placeholder="..." />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -63,7 +61,7 @@
       <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="162" max-vertical-offset="270">
+            <state vertical-scroll-proportion="0.0" vertical-offset="135" max-vertical-offset="225">
               <caret line="9" column="44" selection-start-line="9" selection-start-column="44" selection-end-line="9" selection-end-column="44" />
               <folding />
             </state>
@@ -100,17 +98,17 @@
         <option value="$PROJECT_DIR$/misc_utils.py" />
         <option value="$PROJECT_DIR$/test.py" />
         <option value="$PROJECT_DIR$/decoded_transaction.py" />
-        <option value="$PROJECT_DIR$/elecraft/tests/elecraft_test.py" />
         <option value="$PROJECT_DIR$/encoded_transaction.py" />
-        <option value="$PROJECT_DIR$/icom/icom.py" />
         <option value="$PROJECT_DIR$/icom/tests/icom_test.py" />
+        <option value="$PROJECT_DIR$/icom/icom.py" />
+        <option value="$PROJECT_DIR$/elecraft/tests/elecraft_test.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="50" />
-    <option name="width" value="1870" />
-    <option name="height" value="1036" />
+    <option name="x" value="48" />
+    <option name="width" value="1233" />
+    <option name="height" value="997" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -151,7 +149,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -236,6 +233,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -633,16 +631,18 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="50" y="0" width="1870" height="1036" extended-state="6" />
-    <editor active="false" />
+    <frame x="48" y="0" width="1233" height="997" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21657754" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21608448" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39893618" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3744681" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32383123" sideWeight="0.58895206" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32383123" sideWeight="0.41104794" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
@@ -650,9 +650,7 @@
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32839224" sideWeight="0.49959382" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39893618" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32383123" sideWeight="0.58895206" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
     </layout>
@@ -696,6 +694,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
+            <marker date="1445316333101" expanded="true" signature="13029:13458" placeholder="..." />
+            <marker date="1445316333101" expanded="true" signature="13038:13403" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>
@@ -711,11 +711,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="144" max-vertical-offset="2808">
           <caret line="13" column="6" selection-start-line="13" selection-start-column="6" selection-end-line="13" selection-end-column="6" />
-          <folding>
-            <marker date="1445278515413" expanded="true" signature="331:4844" placeholder="..." />
-            <marker date="1445278515413" expanded="true" signature="2177:2610" placeholder="..." />
-            <marker date="1445278515413" expanded="true" signature="4811:4844" placeholder="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -768,6 +764,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
+            <marker date="1445316333101" expanded="true" signature="13029:13458" placeholder="..." />
+            <marker date="1445316333101" expanded="true" signature="13038:13403" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>
@@ -792,6 +790,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
+            <marker date="1445316333101" expanded="true" signature="13029:13458" placeholder="..." />
+            <marker date="1445316333101" expanded="true" signature="13038:13403" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>
@@ -816,6 +816,8 @@
           <caret line="26" column="16" selection-start-line="26" selection-start-column="16" selection-end-line="26" selection-end-column="16" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
+            <marker date="1445316333101" expanded="true" signature="13029:13458" placeholder="..." />
+            <marker date="1445316333101" expanded="true" signature="13038:13403" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>
@@ -847,6 +849,8 @@
           <caret line="10" column="29" selection-start-line="10" selection-start-column="26" selection-end-line="10" selection-end-column="44" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
+            <marker date="1445316333101" expanded="true" signature="13029:13458" placeholder="..." />
+            <marker date="1445316333101" expanded="true" signature="13038:13403" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>
@@ -1025,18 +1029,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="697" max-vertical-offset="2130">
           <caret line="73" column="42" selection-start-line="73" selection-start-column="42" selection-end-line="73" selection-end-column="42" />
-          <folding>
-            <marker date="1445278515413" expanded="true" signature="331:4844" placeholder="..." />
-            <marker date="1445278515413" expanded="true" signature="2177:2610" placeholder="..." />
-            <marker date="1445278515413" expanded="true" signature="4811:4844" placeholder="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/elecraft/tests/elecraft_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-26.28" vertical-offset="945" max-vertical-offset="1854">
-          <caret line="89" column="1" selection-start-line="89" selection-start-column="1" selection-end-line="89" selection-end-column="1" />
           <folding />
         </state>
       </provider>
@@ -1045,7 +1037,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.31683168" vertical-offset="0" max-vertical-offset="2124">
           <caret line="17" column="37" selection-start-line="17" selection-start-column="37" selection-end-line="17" selection-end-column="37" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1067,11 +1058,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/icom/icom.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="5.9583335" vertical-offset="0" max-vertical-offset="7056">
-          <caret line="286" column="45" selection-start-line="286" selection-start-column="44" selection-end-line="286" selection-end-column="45" />
+        <state vertical-scroll-proportion="-12.0" vertical-offset="4290" max-vertical-offset="5880">
+          <caret line="306" column="50" selection-start-line="306" selection-start-column="50" selection-end-line="306" selection-end-column="50" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
+            <marker date="1445316333101" expanded="true" signature="13029:13458" placeholder="..." />
+            <marker date="1445316333101" expanded="true" signature="13038:13403" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/elecraft/tests/elecraft_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.8215548" vertical-offset="0" max-vertical-offset="1545">
+          <caret line="31" column="4" selection-start-line="31" selection-start-column="4" selection-end-line="31" selection-end-column="4" />
+          <folding />
         </state>
       </provider>
     </entry>

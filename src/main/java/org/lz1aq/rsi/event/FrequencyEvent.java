@@ -21,9 +21,7 @@ package org.lz1aq.rsi.event;
 
 import org.lz1aq.utils.RadioVfos;
 
-/**
- * Radio has send us the Frequency
- */
+
 public class FrequencyEvent
 {
 

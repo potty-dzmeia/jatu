@@ -22,14 +22,12 @@ package org.lz1aq.rsi.event;
 import org.lz1aq.utils.RadioModes;
 import org.lz1aq.utils.RadioVfos;
 
-/**
- * Radio has send us the Mode
- */
+
 public class ModeEvent
 {
 
   private final RadioModes mode;  // The new mode
-  private final RadioVfos vfo;    // Which VFO changed its frequency
+  private final RadioVfos vfo;    // Which VFO changed its mode
 
   public ModeEvent(RadioModes mode, RadioVfos vfo)
   {

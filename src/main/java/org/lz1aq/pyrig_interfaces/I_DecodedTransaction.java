@@ -42,7 +42,7 @@ public interface I_DecodedTransaction
    * Typical usage is: 1) decodedTransaction1 = I_Rig.decode(receiveBuffer); to
    * decode the transaction
    *
-   * 2) receiveBuffer.removeBytes(decodedTransaction.getBytesRea d()); to remove
+   * 2) receiveBuffer.removeBytes(decodedTransaction.getBytesRead()); to remove
    * the already decoded bytes from the receive buffer
    *
    * 3) decodedTransaction2 = I_Rig.decode(receiveBuffer); to decode next

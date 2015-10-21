@@ -1,3 +1,22 @@
+// ***************************************************************************
+// *   Copyright (C) 2015 by Chavdar Levkov                              
+// *   ch.levkov@gmail.com                                                   
+// *                                                                         
+// *   This program is free software; you can redistribute it and/or modify  
+// *   it under the terms of the GNU General Public License as published by  
+// *   the Free Software Foundation; either version 2 of the License, or     
+// *   (at your option) any later version.                                   
+// *                                                                         
+// *   This program is distributed in the hope that it will be useful,       
+// *   but WITHOUT ANY WARRANTY; without even the implied warranty of        
+// *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         
+// *   GNU General Public License for more details.                          
+// *                                                                         
+// *   You should have received a copy of the GNU General Public License     
+// *   along with this program; if not, write to the                         
+// *   Free Software Foundation, Inc.,                                       
+// *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             
+// ***************************************************************************
 package org.lz1aq.rsi;
 
 import java.io.IOException;
@@ -17,12 +36,15 @@ import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import org.lz1aq.pyrig_interfaces.*;
 import org.lz1aq.rsi.event.EmptyRadioListener;
+
+
+
+
+
 /**   
  * Class for controlling a radio through the serial interface
- 
- After creating the radio object the connect() method must be called!
- * 
- * @author potty
+ *
+ * After creating the radio object the connect() method must be called!
  */
 public class Radio
 {
@@ -206,6 +228,13 @@ public class Radio
   //----------------------------------------------------------------------
   //                           Private stuff
   //----------------------------------------------------------------------
+  
+  
+  
+  /**
+   * Implements a Listener which is taking care of processing serial port
+   * data
+   */
   private class PortReader implements SerialPortEventListener
   {
     /**
@@ -219,8 +248,7 @@ public class Radio
     public void serialEvent(SerialPortEvent event)
     {
       try
-      {  
-        
+      {   
         byte b[] = serialPort.readBytes();
         logger.log(Level.INFO, "Incoming bytes ("+b.length+") <------ " + Misc.toHexString(b) );
         // Read all there is and add it to our receive buffer
@@ -231,7 +259,7 @@ public class Radio
         logger.log(Level.WARNING, ex.toString(), ex);
       }
       
-      // Do parsing till we stop getting results...
+      // Do parsing till there is nothing to be parsed...
       while(true)
       {
         // Pass the received data to the protocol parser for decoding
@@ -360,7 +388,10 @@ public class Radio
   }// class
   
   
-  
+  /**
+   * Listener for processing confirmation responses  (positive or negative) from 
+   * the radio
+   */
   private class LocalRadioListener extends EmptyRadioListener
   {
     @Override
