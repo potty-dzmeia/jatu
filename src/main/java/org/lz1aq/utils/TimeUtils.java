@@ -19,11 +19,33 @@
 // ***************************************************************************
 package org.lz1aq.utils;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 /**
  *
  * @author chavdar
  */
 public class TimeUtils
 {
+  private static DateTimeFormatter qsoTime = DateTimeFormat.forPattern("HHmm");
+  private static DateTimeFormatter qsoDate = DateTimeFormat.forPattern("yyyy-MM-dd");
   
+  
+  static public DateTime getUTC()
+  {
+    return new DateTime(DateTimeZone.UTC);
+  }
+  
+  static public String toQsoString(DateTime dt)
+  {
+    return qsoTime.print(dt);
+  }
+  
+  static public String toQsoDate(DateTime dt)
+  {
+    return qsoDate.print(dt);
+  }
 }

@@ -19,12 +19,55 @@
 // ***************************************************************************
 package org.lz1aq.utils;
 
+import org.joda.time.DateTime;
+
+
+
 /**
  *
  * @author chavdar
  */
 public class Qso
 {
-  Date 
+  private String time;        // hhmm (24hour format)
+  private String date;        // yyyy-mm-dd
+  private long   freq;        // Frequency on Hz
+  private String mode;        // see class RadioModes
+  private String myCall;      // 
+  private String hisCall;       
+//  private String sntInfo;     // additional sent data
+//  private String rcvInfo;     // additional received data
   
+  
+  public Qso(long freq, String mode, String myCall, String hisCall)
+  {
+    DateTime utc = TimeUtils.getUTC();
+    
+    this.date = TimeUtils.toQsoDate(utc);
+    this.time = TimeUtils.toQsoString(utc);
+    this.freq = freq;
+    this.mode = mode;
+    this.myCall = myCall;
+    this.hisCall = hisCall;
+  }
+  
+  
+  @Override
+  public String toString()
+  {
+    StringBuilder str = new StringBuilder(60);
+    str.append(date);
+    str.append(' ');
+    str.append(time);
+    str.append(' ');
+    str.append(Long.toString(freq));
+    str.append(' ');
+    str.append(mode);
+    str.append(' ');
+    str.append(myCall);
+    str.append(' ');
+    str.append(hisCall);
+    
+    return str.toString();
+  }
 }

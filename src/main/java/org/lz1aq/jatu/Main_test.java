@@ -23,6 +23,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.lz1aq.utils.Qso;
 
 
 /**
@@ -33,13 +34,18 @@ public class Main_test
 {
    public static void main(String args[]) throws Exception
    {  
-      DateTimeFormatter drFormatter = DateTimeFormat.shortDateTime();
-      
-      DateTime dt = new DateTime(DateTimeZone.UTC);
-      System.out.println(drFormatter.print(dt));
-      System.out.println("-=====");
-      System.out.println(drFormatter.print(dt).toString());
-      System.out.println("-=====");
+//      DateTimeFormatter drFormatter = DateTimeFormat.shortDateTime();
+//      
+//      DateTime dt = new DateTime(DateTimeZone.UTC);
+//      System.out.println(drFormatter.print(dt));
+//      System.out.println("-=====");
+//      System.out.println(drFormatter.print(dt).toString());
+//      System.out.println("-=====");
+     
+     Qso qso = new Qso(14190000, "cw", "lz1abc", "lz1aq");
+     
+     System.out.println(qso);
+     System.out.println(qso.toString().length());
    }
   
 }
