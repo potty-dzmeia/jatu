@@ -17,37 +17,24 @@
 // *   Free Software Foundation, Inc.,                                       
 // *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             
 // ***************************************************************************
-package org.lz1aq.jatu;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.lz1aq.qso.Qso;
+package org.lz1aq.qso;
 
 
 /**
- *
- * @author chavdar
+ * A Qso has the following standard params: date, time, mode, frequency, myCall and 
+ * hisCall.
+ * However there could some extra info which was exchanged during the QSO like
+ * for example "sent RST=599". This class is used to describe all such extra
+ * parameters.
  */
-public class Main_test
+public class QsoParameter
 {
-   public static void main(String args[]) throws Exception
-   {  
-//      DateTimeFormatter drFormatter = DateTimeFormat.shortDateTime();
-//      
-//      DateTime dt = new DateTime(DateTimeZone.UTC);
-//      System.out.println(drFormatter.print(dt));
-//      System.out.println("-=====");
-//      System.out.println(drFormatter.print(dt).toString());
-//      System.out.println("-=====");
-     
-     Qso qso = new Qso(14190000, "cw", "lz1abc", "lz1aq");
-     
-     System.out.println(qso);
-     System.out.println(qso.toString().length());
-     System.out.println("param count = "+qso.getParamsCount());
-   
-   }
+  public String  name;  // The name describing the extra param (e.g. "sntRst")
+  public String  value; // The value of the param (e.g. "599")
   
+  public QsoParameter(String name, String value)
+  {
+    this.name = name;
+    this.value = value;
+  }
 }

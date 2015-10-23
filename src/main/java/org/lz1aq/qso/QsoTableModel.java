@@ -17,57 +17,64 @@
 // *   Free Software Foundation, Inc.,                                       
 // *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             
 // ***************************************************************************
-package org.lz1aq.utils;
+package org.lz1aq.qso;
 
-import org.joda.time.DateTime;
-
-
+import java.util.ArrayList;
+import javax.swing.table.AbstractTableModel;
 
 /**
- *
- * @author chavdar
+ * Class used for inserting Qso objects into a table
+ * 
  */
-public class Qso
+public class QsoTableModel extends AbstractTableModel
 {
-  private String time;        // hhmm (24hour format)
-  private String date;        // yyyy-mm-dd
-  private long   freq;        // Frequency on Hz
-  private String mode;        // see class RadioModes
-  private String myCall;      // 
-  private String hisCall;       
-//  private String sntInfo;     // additional sent data
-//  private String rcvInfo;     // additional received data
+  private ArrayList<Qso> qsoList;
   
-  
-  public Qso(long freq, String mode, String myCall, String hisCall)
+  public QsoTableModel(ArrayList<Qso> qsoList)
   {
-    DateTime utc = TimeUtils.getUTC();
-    
-    this.date = TimeUtils.toQsoDate(utc);
-    this.time = TimeUtils.toQsoString(utc);
-    this.freq = freq;
-    this.mode = mode;
-    this.myCall = myCall;
-    this.hisCall = hisCall;
+    this.qsoList = qsoList;
   }
   
   
   @Override
-  public String toString()
+  public int getRowCount()
   {
-    StringBuilder str = new StringBuilder(60);
-    str.append(date);
-    str.append(' ');
-    str.append(time);
-    str.append(' ');
-    str.append(Long.toString(freq));
-    str.append(' ');
-    str.append(mode);
-    str.append(' ');
-    str.append(myCall);
-    str.append(' ');
-    str.append(hisCall);
-    
-    return str.toString();
+    return qsoList.size();
   }
+
+  @Override
+  public int getColumnCount()
+  {
+    Qso qso = qsoList.get(0); // We will use the first Qso from the list as an example
+    return qso.getParamsCount();
+  }
+
+  @Override
+  public Object getValueAt(int row, int col)
+  {
+    Qso qso = qsoList.get(row);
+    return qso.getParam(col).value;
+  }
+  
+  @Override
+  public String getColumnName(int col)
+  {
+    Qso qso = qsoList.get(0); // We will use the first Qso from the list as an example
+    return qso.getParam(col).name;
+  }
+  
+  
+  @Override
+  public boolean isCellEditable(int row, int col)
+  {
+    return true;
+  }
+   
+  @Override
+  public void setValueAt(Object value, int row, int col)
+  {
+    Qso qso = qsoList.get(row); 
+    qso.getParam(col).value = (String) value;
+  }
+
 }

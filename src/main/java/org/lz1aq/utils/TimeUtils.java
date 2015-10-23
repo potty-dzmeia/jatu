@@ -39,7 +39,7 @@ public class TimeUtils
     return new DateTime(DateTimeZone.UTC);
   }
   
-  static public String toQsoString(DateTime dt)
+  static public String toQsoTime(DateTime dt)
   {
     return qsoTime.print(dt);
   }
