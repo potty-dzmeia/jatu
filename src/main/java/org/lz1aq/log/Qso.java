@@ -17,7 +17,7 @@
 // *   Free Software Foundation, Inc.,                                       
 // *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             
 // ***************************************************************************
-package org.lz1aq.qso;
+package org.lz1aq.log;
 
 import java.util.ArrayList;
 import org.joda.time.DateTime;
@@ -26,28 +26,34 @@ import org.lz1aq.utils.TimeUtils;
 
 
 /**
- *
- * @author chavdar
+ * The Qso class is describing a contact between two radio station by using 
+ * QsoParameters (e.g. "date", "time", "frequency" and so on ...)
  */
 public class Qso
 {
   /**Used for accessing Date parameter - the Date parameter has the format yyyy-mm-dd */
   static private final int DATE_INDEX = 0;
+  static private final String DATE_NAME = "date";
   
   /** Used for accessing Time parameter. The Time parameter has the format hhmm (24hour format) */
   static private final int TIME_INDEX = 1;
+  static private final String TIME_NAME = "time";
   
   /** Used for accessing Frequency parameter - The Freq param is in Hz */
   static private final int FREQ_INDEX = 2;
+  static private final String FREQ_NAME = "frequency";
   
   /** Used for accessing Mode parameter - see class RadioModes for the expected values */
   static private final int MODE_INDEX = 3;
+  static private final String MODE_NAME = "mode";
   
   /** Used for accessing MyCall parameter - the callsign of the user of this program */
   static private final int MYCALL_INDEX = 4;
+  static private final String MYCALL_NAME = "myCall";
   
   /** Used for accessing Time parameter - the callsign of the correspondent */
   static private final int HISCALL_INDEX = 5;
+  static private final String HISCALL_NAME = "hisCall";
   
    /** Used for accessing Extra parameters */
   static private final int FIRST_EXTRA_PARAM_INDEX = 6;
@@ -59,25 +65,18 @@ public class Qso
   private ArrayList<QsoParameter> qsoParams;
   
   
-  public Qso(ArrayList<QsoParameter> qsoParams)
-  {
-    qsoParams = new ArrayList<>();
-    
-    this.qsoParams = qsoParams;
-  }
-  
   
   public Qso(long freq, String mode, String myCall, String hisCall)
   {
     qsoParams = new ArrayList<>();
     
     DateTime utc = TimeUtils.getUTC();
-    qsoParams.add(new QsoParameter("date", TimeUtils.toQsoDate(utc)));
-    qsoParams.add(new QsoParameter("time", TimeUtils.toQsoTime(utc)));
-    qsoParams.add(new QsoParameter("frequency", Long.toString(freq)));
-    qsoParams.add(new QsoParameter("mode", mode));
-    qsoParams.add(new QsoParameter("myCall", myCall));
-    qsoParams.add(new QsoParameter("hisCall", hisCall));
+    qsoParams.add(new QsoParameter(DATE_NAME, TimeUtils.toQsoDate(utc)));
+    qsoParams.add(new QsoParameter(TIME_NAME, TimeUtils.toQsoTime(utc)));
+    qsoParams.add(new QsoParameter(FREQ_NAME, Long.toString(freq)));
+    qsoParams.add(new QsoParameter(MODE_NAME, mode));
+    qsoParams.add(new QsoParameter(MYCALL_NAME, myCall));
+    qsoParams.add(new QsoParameter(HISCALL_NAME, hisCall));
   }
   
   
@@ -85,13 +84,13 @@ public class Qso
   {
     qsoParams = new ArrayList<>();
     
-    DateTime utc = TimeUtils.getUTC();
-    qsoParams.add(new QsoParameter("date", TimeUtils.toQsoDate(utc)));
-    qsoParams.add(new QsoParameter("time", TimeUtils.toQsoTime(utc)));
-    qsoParams.add(new QsoParameter("frequency", Long.toString(freq)));
-    qsoParams.add(new QsoParameter("mode", mode));
-    qsoParams.add(new QsoParameter("myCall", myCall));
-    qsoParams.add(new QsoParameter("hisCall", hisCall));
+   DateTime utc = TimeUtils.getUTC();
+    qsoParams.add(new QsoParameter(DATE_NAME, TimeUtils.toQsoDate(utc)));
+    qsoParams.add(new QsoParameter(TIME_NAME, TimeUtils.toQsoTime(utc)));
+    qsoParams.add(new QsoParameter(FREQ_NAME, Long.toString(freq)));
+    qsoParams.add(new QsoParameter(MODE_NAME, mode));
+    qsoParams.add(new QsoParameter(MYCALL_NAME, myCall));
+    qsoParams.add(new QsoParameter(HISCALL_NAME, hisCall));
     
     qsoParams.addAll(extraQsoParams);
   }

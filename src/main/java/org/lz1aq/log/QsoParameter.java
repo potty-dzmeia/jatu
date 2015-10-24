@@ -17,64 +17,22 @@
 // *   Free Software Foundation, Inc.,                                       
 // *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             
 // ***************************************************************************
-package org.lz1aq.qso;
+package org.lz1aq.log;
 
-import java.util.ArrayList;
-import javax.swing.table.AbstractTableModel;
 
 /**
- * Class used for inserting Qso objects into a table
- * 
+ * This class is used for describing a Qso parameter. This is a parameter which
+ * has a name and a String value.
+ * For example: name=sntRST, value=599
  */
-public class QsoTableModel extends AbstractTableModel
+public class QsoParameter
 {
-  private ArrayList<Qso> qsoList;
+  public String  name;  // The name describing the parameter (e.g. "Frequency")
+  public String  value; // The value of the param (e.g. "14190000")
   
-  public QsoTableModel(ArrayList<Qso> qsoList)
+  public QsoParameter(String name, String value)
   {
-    this.qsoList = qsoList;
+    this.name = name;
+    this.value = value;
   }
-  
-  
-  @Override
-  public int getRowCount()
-  {
-    return qsoList.size();
-  }
-
-  @Override
-  public int getColumnCount()
-  {
-    Qso qso = qsoList.get(0); // We will use the first Qso from the list as an example
-    return qso.getParamsCount();
-  }
-
-  @Override
-  public Object getValueAt(int row, int col)
-  {
-    Qso qso = qsoList.get(row);
-    return qso.getParam(col).value;
-  }
-  
-  @Override
-  public String getColumnName(int col)
-  {
-    Qso qso = qsoList.get(0); // We will use the first Qso from the list as an example
-    return qso.getParam(col).name;
-  }
-  
-  
-  @Override
-  public boolean isCellEditable(int row, int col)
-  {
-    return true;
-  }
-   
-  @Override
-  public void setValueAt(Object value, int row, int col)
-  {
-    Qso qso = qsoList.get(row); 
-    qso.getParam(col).value = (String) value;
-  }
-
 }

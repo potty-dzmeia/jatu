@@ -20,9 +20,11 @@
 package org.lz1aq.jatu;
 
 import java.util.ArrayList;
-import org.lz1aq.qso.Qso;
-import org.lz1aq.qso.QsoParameter;
-import org.lz1aq.qso.QsoTableModel;
+import javax.swing.text.DefaultCaret;
+import org.lz1aq.log.Log;
+import org.lz1aq.log.Qso;
+import org.lz1aq.log.QsoParameter;
+import org.lz1aq.log.LogTableModel;
 
 /**
  *
@@ -30,27 +32,27 @@ import org.lz1aq.qso.QsoTableModel;
  */
 public class TableTester extends javax.swing.JFrame
 {
-  ArrayList<Qso> qsoList;
-  QsoTableModel qsoTableModel;
+  Log log;
+  LogTableModel qsoTableModel;
   /**
    * Creates new form TableTester
    */
   public TableTester()
   {
-    
-    
-    qsoList = new ArrayList<>(0);
-    ArrayList<QsoParameter> extraQsoParams = new ArrayList<QsoParameter>(0);
-    for(int i=0; i<10000; i++)
+    log = new Log();
+    qsoTableModel = new LogTableModel(log);
+   
+
+    for(int i=0; i<10; i++)
     {
+      ArrayList<QsoParameter> extraQsoParams = new ArrayList<>();
       extraQsoParams.add(new QsoParameter("sntRST", "599"));
       extraQsoParams.add(new QsoParameter("rcvRST", "599"));
       Qso qso = new Qso(14190000, "cw", "lz1abc", "lz1aq", extraQsoParams);
-      qsoList.add(qso);
-       
+      log.add(qso);
     }
-    qsoTableModel  = new QsoTableModel(qsoList);
     
+   
     
     initComponents();
   }
@@ -64,25 +66,58 @@ public class TableTester extends javax.swing.JFrame
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents()
   {
+    java.awt.GridBagConstraints gridBagConstraints;
 
     jPanel1 = new javax.swing.JPanel();
     jScrollPane1 = new javax.swing.JScrollPane();
     jTable1 = new javax.swing.JTable();
+    jButton1 = new javax.swing.JButton();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     getContentPane().setLayout(new java.awt.GridLayout(1, 0));
 
-    jPanel1.setLayout(new java.awt.GridLayout(1, 0));
+    jPanel1.setLayout(new java.awt.GridBagLayout());
+
+    jScrollPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
     jTable1.setModel(qsoTableModel);
     jScrollPane1.setViewportView(jTable1);
 
-    jPanel1.add(jScrollPane1);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    jPanel1.add(jScrollPane1, gridBagConstraints);
+
+    jButton1.setText("jButton1");
+    jButton1.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton1ActionPerformed(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 0.1;
+    jPanel1.add(jButton1, gridBagConstraints);
 
     getContentPane().add(jPanel1);
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
+
+  private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton1ActionPerformed
+  {//GEN-HEADEREND:event_jButton1ActionPerformed
+    ArrayList<QsoParameter> extraQsoParams = new ArrayList<>();
+    extraQsoParams.add(new QsoParameter("sntRST", "598"));
+    extraQsoParams.add(new QsoParameter("rcvRST", "598"));
+    Qso qso = new Qso(14190000, "cw", "lz1aaaa", "lz1aq", extraQsoParams);
+    qsoTableModel.addRow(qso);
+  }//GEN-LAST:event_jButton1ActionPerformed
 
   /**
    * @param args the command line arguments
@@ -130,6 +165,7 @@ public class TableTester extends javax.swing.JFrame
   }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JButton jButton1;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JTable jTable1;
