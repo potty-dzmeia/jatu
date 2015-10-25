@@ -19,7 +19,9 @@
 // ***************************************************************************
 package org.lz1aq.jatu;
 
+import com.db4o.*;
 import org.lz1aq.log.Qso;
+import org.lz1aq.log.QsoParameter;
 
 
 /**
@@ -38,11 +40,19 @@ public class Main_test
 //      System.out.println(drFormatter.print(dt).toString());
 //      System.out.println("-=====");
      
-     Qso qso = new Qso(14190000, "cw", "lz1abc", "lz1aq");
+    // accessDb4o
+    ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded
+             .newConfiguration(), "test.db4o");
+     try
+     {
+       QsoParameter qsoParam = new QsoParameter("date", "12/12/12");
+       db.store(qsoParam);
+     } finally
+     {
+       db.close();
+     }
      
-     System.out.println(qso);
-     System.out.println(qso.toString().length());
-     System.out.println("param count = "+qso.getParamsCount());
+     
    
    }
   
