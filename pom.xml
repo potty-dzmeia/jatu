@@ -75,6 +75,16 @@
     </plugins>
   </build>
 
+
+  <!-- ============================Repositories============================ -->
+  <repositories> 
+    <!-- My local repository  -->
+    <repository>
+      <id>local_mvn_repo</id>
+      <url>file:${project.basedir}/local_mvn_repo</url>
+    </repository>
+  </repositories>
+  
   <!-- ============================Dependencies============================ -->
   <dependencies>
     <dependency>
@@ -112,6 +122,12 @@
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
         <version>2.8.2</version>
+    </dependency>
+        
+    <dependency>
+        <groupId>com.db4o</groupId>
+        <artifactId>db4o-all-java5</artifactId>
+        <version>8.0.276.16149</version>
     </dependency>
   </dependencies>
   

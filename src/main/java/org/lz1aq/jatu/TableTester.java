@@ -21,6 +21,8 @@ package org.lz1aq.jatu;
 
 import java.util.ArrayList;
 import javax.swing.text.DefaultCaret;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 import org.lz1aq.log.Log;
 import org.lz1aq.log.Qso;
 import org.lz1aq.log.QsoParameter;
