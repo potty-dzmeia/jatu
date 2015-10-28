@@ -20,8 +20,11 @@
 package org.lz1aq.jatu;
 
 import com.db4o.*;
+import java.util.ArrayList;
+import org.lz1aq.log.Log;
 import org.lz1aq.log.Qso;
 import org.lz1aq.log.QsoParameter;
+import org.lz1aq.utils.TimeUtils;
 
 
 /**
@@ -32,6 +35,7 @@ public class Main_test
 {
    public static void main(String args[]) throws Exception
    {  
+     
 //      DateTimeFormatter drFormatter = DateTimeFormat.shortDateTime();
 //      
 //      DateTime dt = new DateTime(DateTimeZone.UTC);
@@ -40,17 +44,51 @@ public class Main_test
 //      System.out.println(drFormatter.print(dt).toString());
 //      System.out.println("-=====");
      
-    // accessDb4o
-    ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded
-             .newConfiguration(), "test.db4o");
+
+      // accessDb4o
+     ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), "test_params_only.db4o");
      try
      {
-       QsoParameter qsoParam = new QsoParameter("date", "12/12/12");
-       db.store(qsoParam);
+       ArrayList<QsoParameter> extraQsoParams = new ArrayList<>();
+       for (int i = 0; i < 10000; i++)
+       {
+
+         extraQsoParams.add(new QsoParameter("date", "12-12-12"));
+         extraQsoParams.add(new QsoParameter("time", "1111"));
+         extraQsoParams.add(new QsoParameter("frequency", "14140000"));
+         extraQsoParams.add(new QsoParameter("mode", "cw"));
+         extraQsoParams.add(new QsoParameter("myCall", "lz1abc"));
+         extraQsoParams.add(new QsoParameter("hisCall", "lz1aq"));
+         extraQsoParams.add(new QsoParameter("sntRST", "599"));
+         extraQsoParams.add(new QsoParameter("rcvRST", "599"));
+
+       }
+       db.store(extraQsoParams);
+
      } finally
      {
        db.close();
      }
+     
+     
+//     Log log;
+//     log = new Log();
+//     for (int i = 0; i < 10000; i++)
+//     {
+//       ArrayList<QsoParameter> extraQsoParams = new ArrayList<>();
+//       extraQsoParams.add(new QsoParameter("sntRST", "599"));
+//       extraQsoParams.add(new QsoParameter("rcvRST", "599"));
+//       Qso qso = new Qso(14190000, "cw", "lz1abc", "lz1aq", extraQsoParams);
+//       log.add(qso);
+//     }
+//
+//     try
+//     {
+//       db.store(log);
+//     } finally
+//     {
+//       db.close();
+//     }
      
      
    
