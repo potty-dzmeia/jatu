@@ -20,7 +20,6 @@
 package org.lz1aq.log;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 
@@ -36,7 +35,7 @@ import java.util.List;
 public class Log
 {
   private final LogDatabase db;  // the interface to a db4o database, stand-alone or client/server. 
-  private ArrayList<Qso> qsoList;
+  private final ArrayList<Qso> qsoList;
   
   
   /**
@@ -47,21 +46,23 @@ public class Log
   public Log(LogDatabase db)
   {
     this.db = db;
-    qsoList = new ArrayList<> (db.getAll()); // Load Qsos from the databsae
+    qsoList = new ArrayList<> (db.getAll()); // Load Qsos from the database
   }
   
   
   /**
    * Inserts a QSO object inside the log.
    * 
-   * @param qso - Reference to a new Qso object. No two references pointing to the
-   * same objects should be inserted to the log as this will case a 
-   * miss-alignment with the database.
+   * No two references pointing to the same objects should be inserted to the 
+   * log as this will case a miss-alignment with the database.
+   * 
+   * @param qso - Reference to a new Qso object. Insert only newly created Qso
+   * objects.
    */
   public void add(Qso qso)
   {
     db.add(qso);      // Add the qso to the database
-    qsoList.add(qso); // Add the qso to the local list
+    qsoList.add(qso); // Add the qso to RAM (i.e local list)
   }
   
   
@@ -72,7 +73,7 @@ public class Log
    */
   public void remove(int index)
   {
-    db.remove(qsoList.get(index)); // Remove the qso from the local list
+    db.remove(qsoList.get(index)); // Remove the qso from the RAM (i.e local list)
     qsoList.remove(index);         // Remove the qso from the database
   }
   
@@ -136,7 +137,7 @@ public class Log
    */
   public String getColumnName(int col)
   {
-    Qso qso = qsoList.get(0); // We will use the first Qso from the list as an example
+    Qso qso = qsoList.get(0); // We will use the first Qso from the list as a prototype
     return qso.getParam(col).name;
   }
    
@@ -153,10 +154,14 @@ public class Log
   public void setValueAt(String value, int row, int col)
   {
     Qso qso = qsoList.get(row); 
-    qso.getParam(col).value = value;
-    db.modify(qso);
+    qso.getParam(col).value = value; // Update 
+    db.modify(qso); // Update the database
   }
   
+  
+  /**
+   * Commits all not committed changes to the database
+   */
   public void writeToDB()
   {
     db.commit();

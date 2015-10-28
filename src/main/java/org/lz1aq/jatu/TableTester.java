@@ -43,15 +43,16 @@ public class TableTester extends javax.swing.JFrame
     qsoTableModel = new LogTableModel(log);
    
 
-//    for(int i=0; i<10000; i++)
-//    {
-//      ArrayList<QsoParameter> extraQsoParams = new ArrayList<>();
-//      extraQsoParams.add(new QsoParameter("sntRST", "599"));
-//      extraQsoParams.add(new QsoParameter("rcvRST", "599"));
-//      Qso qso = new Qso(14190000, "cw", "lz1abc", "lz1aq", extraQsoParams);
-//      log.add(qso);
-//    }
-//    log.writeToDB();
+    for(int i=0; i<10; i++)
+    {
+      ArrayList<QsoParameter> extraQsoParams = new ArrayList<>();
+      extraQsoParams.add(new QsoParameter("sntRST", "599"));
+      extraQsoParams.add(new QsoParameter("rcvRST", "599"));
+      Qso qso = new Qso(14190000, "cw", "lz1abc", "lz1aq", extraQsoParams);
+      log.add(qso);
+    }
+    log.writeToDB();
+    
     initComponents();
   }
 

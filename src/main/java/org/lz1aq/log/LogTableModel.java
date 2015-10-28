@@ -31,7 +31,7 @@ public class LogTableModel extends AbstractTableModel
 {
   /** Reference to the Log that is to be mapped to the JTable*/
   private Log log;
-  /** This is holding the columns which shouldn't be visible on the table */
+  /** This is holding indeces of the columns which shouldn't be visible on the table */
   private Set<Integer> hiddenColumns;
   
   public LogTableModel(Log log)
