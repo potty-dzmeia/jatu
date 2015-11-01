@@ -19,12 +19,15 @@
 // ***************************************************************************
 package org.lz1aq.rsi;
 
+import org.lz1aq.pyrig.I_EncodedTransaction;
+import org.lz1aq.pyrig.I_SerialSettings;
+import org.lz1aq.pyrig.I_DecodedTransaction;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import org.lz1aq.rsi.event.*;
 import org.lz1aq.utils.Misc;
 import org.lz1aq.utils.DynamicByteArray;
-import org.lz1aq.pyrig_interfaces.I_Radio;
+import org.lz1aq.pyrig.I_Radio;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -34,7 +37,6 @@ import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
-import org.lz1aq.pyrig_interfaces.*;
 import org.lz1aq.rsi.event.EmptyRadioListener;
 
 

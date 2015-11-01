@@ -17,23 +17,42 @@
 // *   Free Software Foundation, Inc.,                                       
 // *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             
 // ***************************************************************************
-package org.lz1aq.log;
-
+package org.lz1aq.pyrig;
 
 /**
- * This class is used for describing a Qso parameter. This is a parameter which
- * has a name and a String value.
- * For example: name=sntRST, value=599
+ * Contains the decoded transaction together with some control information
+ *
  */
-public class QsoParameter
+public interface I_DecodedTransaction
 {
-  public String  name;  // The name describing the parameter (e.g. "Frequency")
-  public String  value; // The value of the param (e.g. "14190000")
-  
-  
-  public QsoParameter(String name, String value)
-  {
-    this.name = name;
-    this.value = value;
-  }
+
+  /**
+   * Gets the transaction which was received from the rig.
+   *
+   * @return Transaction in the form of JSON formatted string. Might be null in
+   * case the supplied buffer did not contain a complete transaction
+   */
+  public String getTransaction();
+
+  /**
+   * Returns the amount of bytes that were read from the supplied buffer in
+   * order to decode the transaction.
+   *
+   *
+   * Typical usage is: 1) decodedTransaction1 = I_Rig.decode(receiveBuffer); to
+   * decode the transaction
+   *
+   * 2) receiveBuffer.removeBytes(decodedTransaction.getBytesRead()); to remove
+   * the already decoded bytes from the receive buffer
+   *
+   * 3) decodedTransaction2 = I_Rig.decode(receiveBuffer); to decode next
+   * transaction
+   *
+   * ...and so on...
+   *
+   * @return The amount of bytes that were read. 0 if no transaction was found.
+   * If this function returns
+   */
+  public int getBytesRead();
+
 }

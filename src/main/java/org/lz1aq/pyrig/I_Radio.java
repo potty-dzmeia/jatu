@@ -17,7 +17,7 @@
 // *   Free Software Foundation, Inc.,                                       
 // *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             
 // ***************************************************************************
-package org.lz1aq.pyrig_interfaces;
+package org.lz1aq.pyrig;
 
 /**
  * Interface of a radio protocol parser.
@@ -44,7 +44,7 @@ public interface I_Radio extends I_Rig
    * The function returns a string with all the bands that it supports.
    * Example: "3.5 7 14"
    * 
-   * @return A string with the supported bands. Each band is separated from the
+   * @return A string with the supported bands in MHz. Each band is separated from the
    *  next with space.
    */
   public String getAvailableBands();

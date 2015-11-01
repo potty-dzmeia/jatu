@@ -17,42 +17,47 @@
 // *   Free Software Foundation, Inc.,                                       
 // *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             
 // ***************************************************************************
-package org.lz1aq.pyrig_interfaces;
+package org.lz1aq.pyrig;
 
 /**
- * Contains the decoded transaction together with some control information
- *
+ * Serial Port settings that must be used when connecting to a rig
  */
-public interface I_DecodedTransaction
+public interface I_SerialSettings
 {
 
-  /**
-   * Gets the transaction which was received from the rig.
-   *
-   * @return Transaction in the form of JSON formatted string. Might be null in
-   * case the supplied buffer did not contain a complete transaction
-   */
-  public String getTransaction();
+  public int getBauderateMin();
+
+  public int getBauderateMax();
+
+  public int getDataBits();
+
+  public int getStopBits();
 
   /**
-   * Returns the amount of bytes that were read from the supplied buffer in
-   * order to decode the transaction.
+   * Returns parity parameter
    *
-   *
-   * Typical usage is: 1) decodedTransaction1 = I_Rig.decode(receiveBuffer); to
-   * decode the transaction
-   *
-   * 2) receiveBuffer.removeBytes(decodedTransaction.getBytesRead()); to remove
-   * the already decoded bytes from the receive buffer
-   *
-   * 3) decodedTransaction2 = I_Rig.decode(receiveBuffer); to decode next
-   * transaction
-   *
-   * ...and so on...
-   *
-   * @return The amount of bytes that were read. 0 if no transaction was found.
-   * If this function returns
+   * @return Possible values are: 'None', 'Even', 'Odd', 'Mark', 'Space'
    */
-  public int getBytesRead();
+  public String getParity();
 
+  /**
+   * Returns handshake parameter
+   *
+   * @return Possible values are 'None', 'XonXoff', 'CtsRts'
+   */
+  public String getHandshake();
+
+  /**
+   * If the RTS line state should be changed.
+   *
+   * @return Possible values are "None", "On", "Off"
+   */
+  public String getRts();
+
+  /**
+   * If the DTR line state should be changed.
+   *
+   * @return Possible values are "None", "On", "Off"
+   */
+  public String getDtr();
 }

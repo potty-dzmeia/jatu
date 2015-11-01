@@ -21,6 +21,7 @@ package org.lz1aq.log;
 
 import java.util.ArrayList;
 import org.joda.time.DateTime;
+import org.lz1aq.pycontest.I_ProtoQso;
 import org.lz1aq.utils.TimeUtils;
 
 
@@ -29,7 +30,7 @@ import org.lz1aq.utils.TimeUtils;
  * The Qso class is describing a contact between two radio station by using 
  * QsoParameters (e.g. "date", "time", "frequency" and so on ...)
  */
-public class Qso
+public class Qso implements I_ProtoQso
 {
   /**Used for accessing Date parameter - the Date parameter has the format yyyy-mm-dd */
   static private final int DATE_INDEX = 0;
@@ -111,17 +112,26 @@ public class Qso
   }
   
   /**
-   * @return The count of qso parameters. Qso parameters
+   * @return The count of the total Qso parameters
    */
   public int getParamsCount()
   {
     return qsoParams.size();
   }
   
+   /**
+   * @return The count of the additional Qso parameters
+   */
+  public int getExtraParamsCount()
+  {
+    return qsoParams.size()-FIRST_EXTRA_PARAM_INDEX;
+  }
+  
   
   /**
    * @return  Date in  yyyy-mm-dd format
    */
+  @Override
   public String getDate()
   {
     return qsoParams.get(DATE_INDEX).value;
@@ -130,6 +140,7 @@ public class Qso
   /**
    * @return Date in hhmm 24hour format)
    */
+  @Override
   public String getTime()
   {
     return qsoParams.get(TIME_INDEX).value;
@@ -139,28 +150,32 @@ public class Qso
   /**
    * @return Frequency on Hz
    */
-  public String getFreq()
+  @Override
+  public float getFrequency()
   {
-    return qsoParams.get(FREQ_INDEX).value;
+    return Float.parseFloat(qsoParams.get(FREQ_INDEX).value);
   }
   
 
   /**
    * @return see class RadioModes for valid strings
    */
+  @Override
   public String getMode()
   {
     return qsoParams.get(MODE_INDEX).value;
   }
   
   
-  public String getMyCall()
+  @Override
+  public String getMyCallsign()
   {
     return qsoParams.get(MYCALL_INDEX).value;
   }
   
   
-  public String getHisCall()
+  @Override
+  public String getHisCallsign()
   {
     return qsoParams.get(HISCALL_INDEX).value;
   }

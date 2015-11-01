@@ -17,23 +17,62 @@
 // *   Free Software Foundation, Inc.,                                       
 // *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             
 // ***************************************************************************
-package org.lz1aq.log;
+package org.lz1aq.pyrig;
+
+
 
 
 /**
- * This class is used for describing a Qso parameter. This is a parameter which
- * has a name and a String value.
- * For example: name=sntRST, value=599
+ * Container for a "transaction".
+ *
+ * A "transaction" is a packet of bytes being sent to the rig. Usually it
+ * contains some command (e.g. change frequency in case of a radio)
  */
-public class QsoParameter
+public interface I_EncodedTransaction
 {
-  public String  name;  // The name describing the parameter (e.g. "Frequency")
-  public String  value; // The value of the param (e.g. "14190000")
-  
-  
-  public QsoParameter(String name, String value)
-  {
-    this.name = name;
-    this.value = value;
-  }
+
+  /**
+   * Gets the transaction which can be send to the rig
+   *
+   * @return Transaction in the form of array of bytes
+   */
+  public byte[] getTransaction();
+
+  /**
+   * If there should be a delay between each byte of the transaction being sent
+   * out
+   *
+   * @return The amount of delay in milliseconds
+   */
+  public int getWriteDelay();
+
+  /**
+   * If there should be a delay between each transaction send out
+   *
+   * @return The amount of delay in millisecond
+   */
+  public int getPostWriteDelay();
+
+  /**
+   * Timeout after which we should abandon sending the transaction to the rig
+   *
+   * @return Timeout, in milliseconds
+   */
+  public int getTimeout();
+
+  /**
+   * Maximum number of retries if command fails (0 for no retry)
+   *
+   * @return number of retries before abandoning the transaction
+   */
+  public int getRetry();
+
+  /**
+   * If the program should expect confirmation after sending this transaction to
+   * the rig
+   *
+   * @return TRUE - if the rig will send confirmation after receiving this
+   * transaction
+   */
+  public boolean isConfirmationExpected();
 }

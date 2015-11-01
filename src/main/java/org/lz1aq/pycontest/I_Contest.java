@@ -17,47 +17,35 @@
 // *   Free Software Foundation, Inc.,                                       
 // *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             
 // ***************************************************************************
-package org.lz1aq.pyrig_interfaces;
+package org.lz1aq.pycontest;
 
-/**
- * Serial Port settings that must be used when connecting to a rig
- */
-public interface I_SerialSettings
+
+public interface I_Contest
 {
-
-  public int getBauderateMin();
-
-  public int getBauderateMax();
-
-  public int getDataBits();
-
-  public int getStopBits();
-
+  public String getQsoExample();
+  
+  
+  public int  calculateResult(I_Log log);
+  
+  
+  public I_CallsignCheckResult checkCallsign(I_Log log, I_ProtoQso protoQso);
+  
   /**
-   * Returns parity parameter
-   *
-   * @return Possible values are: 'None', 'Even', 'Odd', 'Mark', 'Space'
+   * The function returns a string with all the modes that the contest supports
+   * Example: "cw ssb lsb"
+   * 
+   * @return A string with the supported modes. Each mode is separated from 
+   * the next with space.
    */
-  public String getParity();
-
+  public String getAvailableModes();
+  
+  
   /**
-   * Returns handshake parameter
-   *
-   * @return Possible values are 'None', 'XonXoff', 'CtsRts'
+   * The function returns a string with all the bands that the contest supports.
+   * Example: "3.5 7 14"
+   * 
+   * @return A string with the supported bands in MHz. Each band is separated from the
+   *  next with space.
    */
-  public String getHandshake();
-
-  /**
-   * If the RTS line state should be changed.
-   *
-   * @return Possible values are "None", "On", "Off"
-   */
-  public String getRts();
-
-  /**
-   * If the DTR line state should be changed.
-   *
-   * @return Possible values are "None", "On", "Off"
-   */
-  public String getDtr();
+  public String getAvailableBands();
 }

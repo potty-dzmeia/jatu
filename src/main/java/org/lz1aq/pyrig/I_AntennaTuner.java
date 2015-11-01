@@ -17,62 +17,18 @@
 // *   Free Software Foundation, Inc.,                                       
 // *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             
 // ***************************************************************************
-package org.lz1aq.pyrig_interfaces;
-
-
-
+package org.lz1aq.pyrig;
 
 /**
- * Container for a "transaction".
- *
- * A "transaction" is a packet of bytes being sent to the rig. Usually it
- * contains some command (e.g. change frequency in case of a radio)
- */
-public interface I_EncodedTransaction
+ * Automatic Antenna Tuner specific methods
+*/
+public interface I_AntennaTuner extends I_Rig
 {
+    public byte[] encodeSetTuneValues(int c1, int c2, int l);
+    public byte[] encodeSetAntenna(int ant);
+    public byte[] encodeSetThrough(boolean throught);
+    public byte[] encodeTunePa(boolean tunePa);
+    public byte[] encodeGetForwardWave();
+    public byte[] encodeGetReflectedWave();
 
-  /**
-   * Gets the transaction which can be send to the rig
-   *
-   * @return Transaction in the form of array of bytes
-   */
-  public byte[] getTransaction();
-
-  /**
-   * If there should be a delay between each byte of the transaction being sent
-   * out
-   *
-   * @return The amount of delay in milliseconds
-   */
-  public int getWriteDelay();
-
-  /**
-   * If there should be a delay between each transaction send out
-   *
-   * @return The amount of delay in millisecond
-   */
-  public int getPostWriteDelay();
-
-  /**
-   * Timeout after which we should abandon sending the transaction to the rig
-   *
-   * @return Timeout, in milliseconds
-   */
-  public int getTimeout();
-
-  /**
-   * Maximum number of retries if command fails (0 for no retry)
-   *
-   * @return number of retries before abandoning the transaction
-   */
-  public int getRetry();
-
-  /**
-   * If the program should expect confirmation after sending this transaction to
-   * the rig
-   *
-   * @return TRUE - if the rig will send confirmation after receiving this
-   * transaction
-   */
-  public boolean isConfirmationExpected();
 }

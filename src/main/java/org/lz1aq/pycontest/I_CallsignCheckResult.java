@@ -17,18 +17,17 @@
 // *   Free Software Foundation, Inc.,                                       
 // *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             
 // ***************************************************************************
-package org.lz1aq.pyrig_interfaces;
+package org.lz1aq.pycontest;
 
 /**
- * Automatic Antenna Tuner specific methods
-*/
-public interface I_AntennaTuner extends I_Rig
+ *
+ * @author potty
+ */
+public interface I_CallsignCheckResult
 {
-    public byte[] encodeSetTuneValues(int c1, int c2, int l);
-    public byte[] encodeSetAntenna(int ant);
-    public byte[] encodeSetThrough(boolean throught);
-    public byte[] encodeTunePa(boolean tunePa);
-    public byte[] encodeGetForwardWave();
-    public byte[] encodeGetReflectedWave();
-
+  public boolean  isDupe(I_Log log, I_ProtoQso protoQso);
+  public int  getPoints(I_Log log, I_ProtoQso protoQso);
+  public int  isMultiplier(I_Log log, I_ProtoQso protoQso);
+  public int  getColor(I_Log log, I_ProtoQso protoQso);
+  
 }

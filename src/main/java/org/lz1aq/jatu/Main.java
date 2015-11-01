@@ -5,8 +5,8 @@
  */
 package org.lz1aq.jatu;
 
-import org.lz1aq.pyrig_interfaces.I_Radio;
-import org.lz1aq.pyrig_interfaces.I_Rig;
+import org.lz1aq.pyrig.I_Radio;
+import org.lz1aq.pyrig.I_Rig;
 import org.lz1aq.utils.Misc;
 
 

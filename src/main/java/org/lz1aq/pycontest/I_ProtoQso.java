@@ -17,23 +17,27 @@
 // *   Free Software Foundation, Inc.,                                       
 // *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             
 // ***************************************************************************
-package org.lz1aq.log;
+package org.lz1aq.pycontest;
 
 
 /**
- * This class is used for describing a Qso parameter. This is a parameter which
- * has a name and a String value.
- * For example: name=sntRST, value=599
+ * A ProtoQso contains the following information:
+ * - myCallsign
+ * - hisCallsign
+ * - frequency
+ * - mode
+ * - date
+ * - time
+ * 
+ * This is the minimum information that a QSO should consist
+ * 
  */
-public class QsoParameter
+public interface I_ProtoQso
 {
-  public String  name;  // The name describing the parameter (e.g. "Frequency")
-  public String  value; // The value of the param (e.g. "14190000")
-  
-  
-  public QsoParameter(String name, String value)
-  {
-    this.name = name;
-    this.value = value;
-  }
+  public String getMyCallsign();
+  public String getHisCallsign();
+  public float  getFrequency();
+  public String getMode();
+  public String getTime();
+  public String getDate();
 }

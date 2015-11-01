@@ -19,6 +19,8 @@
 // ***************************************************************************
 package org.lz1aq.jatu;
 
+import org.lz1aq.pyrig.I_SerialSettings;
+import org.lz1aq.pyrig.I_Radio;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +30,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import jssc.SerialPortList;
-import org.lz1aq.pyrig_interfaces.*;
 import org.lz1aq.rsi.Radio;
 import org.lz1aq.rsi.event.RadioListener;
 import org.apache.commons.lang3.StringUtils;
@@ -236,21 +237,27 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     jMenu2 = new javax.swing.JMenu();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+    setName("Form"); // NOI18N
 
+    radioPanel.setName("radioPanel"); // NOI18N
     radioPanel.setLayout(new java.awt.GridBagLayout());
 
     displayPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+    displayPanel.setName("displayPanel"); // NOI18N
     displayPanel.setLayout(new java.awt.GridBagLayout());
 
-    vfoAPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("VFO A"));
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/lz1aq/jatu/Bundle"); // NOI18N
+    vfoAPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SimpleRadioPanel.vfoAPanel.border.title"))); // NOI18N
+    vfoAPanel.setName("vfoAPanel"); // NOI18N
     vfoAPanel.setLayout(new java.awt.GridBagLayout());
 
     frequencyATextfield.setBackground(new java.awt.Color(1, 1, 1));
     frequencyATextfield.setFont(new java.awt.Font("Dialog", 0, 36)); // NOI18N
     frequencyATextfield.setForeground(new java.awt.Color(230, 230, 230));
     frequencyATextfield.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-    frequencyATextfield.setText("frequency");
+    frequencyATextfield.setText(bundle.getString("SimpleRadioPanel.frequencyATextfield.text")); // NOI18N
     frequencyATextfield.setCaretColor(new java.awt.Color(230, 230, 230));
+    frequencyATextfield.setName("frequencyATextfield"); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
@@ -264,8 +271,9 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     modeATextfield.setFont(new java.awt.Font("Dialog", 0, 36)); // NOI18N
     modeATextfield.setForeground(new java.awt.Color(230, 230, 230));
     modeATextfield.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-    modeATextfield.setText("mode");
+    modeATextfield.setText(bundle.getString("SimpleRadioPanel.modeATextfield.text")); // NOI18N
     modeATextfield.setCaretColor(new java.awt.Color(230, 230, 230));
+    modeATextfield.setName("modeATextfield"); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 0;
@@ -283,15 +291,17 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
     displayPanel.add(vfoAPanel, gridBagConstraints);
 
-    vfoBPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("VFO B"));
+    vfoBPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SimpleRadioPanel.vfoBPanel.border.title"))); // NOI18N
+    vfoBPanel.setName("vfoBPanel"); // NOI18N
     vfoBPanel.setLayout(new java.awt.GridBagLayout());
 
     frequencyBTextfield.setBackground(new java.awt.Color(1, 1, 1));
     frequencyBTextfield.setFont(new java.awt.Font("Dialog", 0, 36)); // NOI18N
     frequencyBTextfield.setForeground(new java.awt.Color(230, 230, 230));
     frequencyBTextfield.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-    frequencyBTextfield.setText("frequency");
+    frequencyBTextfield.setText(bundle.getString("SimpleRadioPanel.frequencyBTextfield.text")); // NOI18N
     frequencyBTextfield.setCaretColor(new java.awt.Color(230, 230, 230));
+    frequencyBTextfield.setName("frequencyBTextfield"); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
@@ -305,8 +315,9 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     modeBTextfield.setFont(new java.awt.Font("Dialog", 0, 36)); // NOI18N
     modeBTextfield.setForeground(new java.awt.Color(230, 230, 230));
     modeBTextfield.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-    modeBTextfield.setText("mode");
+    modeBTextfield.setText(bundle.getString("SimpleRadioPanel.modeBTextfield.text")); // NOI18N
     modeBTextfield.setCaretColor(new java.awt.Color(230, 230, 230));
+    modeBTextfield.setName("modeBTextfield"); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 0;
@@ -336,9 +347,11 @@ public class SimpleRadioPanel extends javax.swing.JFrame
 
     settingsPanel.setBackground(new java.awt.Color(210, 210, 210));
     settingsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+    settingsPanel.setName("settingsPanel"); // NOI18N
     settingsPanel.setLayout(new java.awt.GridBagLayout());
 
     comportCombobox.setModel(getComportsComboboxModel());
+    comportCombobox.setName("comportCombobox"); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
@@ -348,7 +361,8 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(20, 20, 0, 5);
     settingsPanel.add(comportCombobox, gridBagConstraints);
 
-    customComportTextfield.setToolTipText("");
+    customComportTextfield.setToolTipText(bundle.getString("SimpleRadioPanel.customComportTextfield.toolTipText")); // NOI18N
+    customComportTextfield.setName("customComportTextfield"); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 2;
@@ -359,7 +373,8 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     settingsPanel.add(customComportTextfield, gridBagConstraints);
 
     jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabel4.setText("select ComPort");
+    jLabel4.setText(bundle.getString("SimpleRadioPanel.jLabel4.text")); // NOI18N
+    jLabel4.setName("jLabel4"); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 3;
@@ -369,7 +384,8 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     settingsPanel.add(jLabel4, gridBagConstraints);
 
     jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabel5.setText("custom ComPort");
+    jLabel5.setText(bundle.getString("SimpleRadioPanel.jLabel5.text")); // NOI18N
+    jLabel5.setName("jLabel5"); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 3;
@@ -378,7 +394,8 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(0, 5, 20, 5);
     settingsPanel.add(jLabel5, gridBagConstraints);
 
-    connectToRadioButton.setText("Connect/Disconnect");
+    connectToRadioButton.setText(bundle.getString("SimpleRadioPanel.connectToRadioButton.text")); // NOI18N
+    connectToRadioButton.setName("connectToRadioButton"); // NOI18N
     connectToRadioButton.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -396,7 +413,8 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(5, 20, 5, 5);
     settingsPanel.add(connectToRadioButton, gridBagConstraints);
 
-    chooseRadioButton.setText("choose Radio");
+    chooseRadioButton.setText(bundle.getString("SimpleRadioPanel.chooseRadioButton.text")); // NOI18N
+    chooseRadioButton.setName("chooseRadioButton"); // NOI18N
     chooseRadioButton.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -414,8 +432,11 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(5, 20, 5, 5);
     settingsPanel.add(chooseRadioButton, gridBagConstraints);
 
+    jScrollPane1.setName("jScrollPane1"); // NOI18N
+
     infoTextarea.setColumns(20);
     infoTextarea.setRows(5);
+    infoTextarea.setName("infoTextarea"); // NOI18N
     jScrollPane1.setViewportView(infoTextarea);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -440,10 +461,12 @@ public class SimpleRadioPanel extends javax.swing.JFrame
 
     controlPanel.setBackground(new java.awt.Color(200, 200, 200));
     controlPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+    controlPanel.setName("controlPanel"); // NOI18N
     controlPanel.setLayout(new java.awt.GridBagLayout());
 
     bandsCombobox.setModel(getBandsComboboxModel()
     );
+    bandsCombobox.setName("bandsCombobox"); // NOI18N
     bandsCombobox.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -459,6 +482,7 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     controlPanel.add(bandsCombobox, gridBagConstraints);
 
     modesCombobox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+    modesCombobox.setName("modesCombobox"); // NOI18N
     modesCombobox.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -474,6 +498,7 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     controlPanel.add(modesCombobox, gridBagConstraints);
 
     vfoCombobox.setModel(getVfoComboboxModel());
+    vfoCombobox.setName("vfoCombobox"); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
@@ -482,8 +507,9 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     controlPanel.add(vfoCombobox, gridBagConstraints);
 
     frequencyTextLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    frequencyTextLabel.setText("select Band");
-    frequencyTextLabel.setToolTipText("");
+    frequencyTextLabel.setText(bundle.getString("SimpleRadioPanel.frequencyTextLabel.text")); // NOI18N
+    frequencyTextLabel.setToolTipText(bundle.getString("SimpleRadioPanel.frequencyTextLabel.toolTipText")); // NOI18N
+    frequencyTextLabel.setName("frequencyTextLabel"); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -493,7 +519,8 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     controlPanel.add(frequencyTextLabel, gridBagConstraints);
 
     modeTextLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    modeTextLabel.setText("select Mode");
+    modeTextLabel.setText(bundle.getString("SimpleRadioPanel.modeTextLabel.text")); // NOI18N
+    modeTextLabel.setName("modeTextLabel"); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 1;
@@ -503,7 +530,8 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     controlPanel.add(modeTextLabel, gridBagConstraints);
 
     vfoTextLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    vfoTextLabel.setText("select VFO");
+    vfoTextLabel.setText(bundle.getString("SimpleRadioPanel.vfoTextLabel.text")); // NOI18N
+    vfoTextLabel.setName("vfoTextLabel"); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 1;
@@ -522,12 +550,15 @@ public class SimpleRadioPanel extends javax.swing.JFrame
     radioPanel.add(controlPanel, gridBagConstraints);
 
     jMenuBar1.setMargin(new java.awt.Insets(2, 2, 2, 2));
+    jMenuBar1.setName("jMenuBar1"); // NOI18N
 
-    jMenu1.setText("File");
+    jMenu1.setText(bundle.getString("SimpleRadioPanel.jMenu1.text")); // NOI18N
+    jMenu1.setName("jMenu1"); // NOI18N
     jMenuBar1.add(jMenu1);
 
-    jMenu2.setText("Show Tracer");
-    jMenu2.setToolTipText("");
+    jMenu2.setText(bundle.getString("SimpleRadioPanel.jMenu2.text")); // NOI18N
+    jMenu2.setToolTipText(bundle.getString("SimpleRadioPanel.jMenu2.toolTipText")); // NOI18N
+    jMenu2.setName("jMenu2"); // NOI18N
     jMenuBar1.add(jMenu2);
 
     setJMenuBar(jMenuBar1);
