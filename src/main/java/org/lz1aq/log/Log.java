@@ -21,6 +21,8 @@ package org.lz1aq.log;
 
 import java.util.ArrayList;
 
+
+
 /**
  * This class is a container for Qso objects. 
  * 
@@ -32,29 +34,35 @@ import java.util.ArrayList;
  */
 public class Log
 {
-  private ArrayList<Qso> qsoList;
+  private final LogDatabase db;  // the interface to a db4o database, stand-alone or client/server. 
+  private final ArrayList<Qso> qsoList;
   
   
   /**
-   * After object creation the first method to be called must be add()! This
-   * is so because the Log needs to know the amount of columns that it will be
-   * working with.
+   *
+   * 
+   * @param db interface to a already opened database
    */
-  public Log()
+  public Log(LogDatabase db)
   {
-    qsoList = new ArrayList<>(0);
+    this.db = db;
+    qsoList = new ArrayList<> (db.getAll()); // Load Qsos from the database
   }
   
   
   /**
-   * Inserts a QSO object inside the log. This must be the first method called
-   * after Log creation.
+   * Inserts a QSO object inside the log.
    * 
-   * @param qso - Reference to a Qso object.
+   * No two references pointing to the same objects should be inserted to the 
+   * log as this will case a miss-alignment with the database.
+   * 
+   * @param qso - Reference to a new Qso object. Insert only newly created Qso
+   * objects.
    */
   public void add(Qso qso)
   {
-    qsoList.add(qso);
+    db.add(qso);      // Add the qso to the database
+    qsoList.add(qso); // Add the qso to RAM (i.e local list)
   }
   
   
@@ -65,7 +73,8 @@ public class Log
    */
   public void remove(int index)
   {
-    qsoList.remove(index);
+    db.remove(qsoList.get(index)); // Remove the qso from the RAM (i.e local list)
+    qsoList.remove(index);         // Remove the qso from the database
   }
   
   
@@ -90,10 +99,14 @@ public class Log
    * (3) Then we add a second Qso which has 8 parameters 
    * (4) If now we call the method getColumnCount() it will return 7
    * 
-   * @return The number of columns inside the log
+   * @return The number of columns inside the log. If log is empty the return 
+   * value will be 0.
    */
   public int getColumnCount()
   {
+    if(qsoList.isEmpty())
+      return 0;
+    
     Qso qso = qsoList.get(0); // Use the first Qso from the list as a prototype
     return qso.getParamsCount();
   }
@@ -124,7 +137,7 @@ public class Log
    */
   public String getColumnName(int col)
   {
-    Qso qso = qsoList.get(0); // We will use the first Qso from the list as an example
+    Qso qso = qsoList.get(0); // We will use the first Qso from the list as a prototype
     return qso.getParam(col).name;
   }
    
@@ -141,7 +154,17 @@ public class Log
   public void setValueAt(String value, int row, int col)
   {
     Qso qso = qsoList.get(row); 
-    qso.getParam(col).value = value;
+    qso.getParam(col).value = value; // Update 
+    db.modify(qso); // Update the database
+  }
+  
+  
+  /**
+   * Commits all not committed changes to the database
+   */
+  public void writeToDB()
+  {
+    db.commit();
   }
  
   

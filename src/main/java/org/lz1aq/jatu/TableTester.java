@@ -19,14 +19,10 @@
 // ***************************************************************************
 package org.lz1aq.jatu;
 
+import com.db4o.Db4oEmbedded;
+import com.db4o.ObjectContainer;
 import java.util.ArrayList;
-import javax.swing.text.DefaultCaret;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import org.lz1aq.log.Log;
-import org.lz1aq.log.Qso;
-import org.lz1aq.log.QsoParameter;
-import org.lz1aq.log.LogTableModel;
+import org.lz1aq.log.*;
 
 /**
  *
@@ -35,13 +31,15 @@ import org.lz1aq.log.LogTableModel;
 public class TableTester extends javax.swing.JFrame
 {
   Log log;
+  LogDatabase logdb;
   LogTableModel qsoTableModel;
   /**
    * Creates new form TableTester
    */
   public TableTester()
   {
-    log = new Log();
+    logdb = new LogDatabase("log_test.db4o");
+    log = new Log(logdb);
     qsoTableModel = new LogTableModel(log);
    
 
@@ -53,8 +51,7 @@ public class TableTester extends javax.swing.JFrame
       Qso qso = new Qso(14190000, "cw", "lz1abc", "lz1aq", extraQsoParams);
       log.add(qso);
     }
-    
-   
+    log.writeToDB();
     
     initComponents();
   }
