@@ -85,7 +85,7 @@ public class Qso implements I_ProtoQso
   {
     qsoParams = new ArrayList<>();
     
-   DateTime utc = TimeUtils.getUTC();
+    DateTime utc = TimeUtils.getUTC();
     qsoParams.add(new QsoParameter(DATE_NAME, TimeUtils.toQsoDate(utc)));
     qsoParams.add(new QsoParameter(TIME_NAME, TimeUtils.toQsoTime(utc)));
     qsoParams.add(new QsoParameter(FREQ_NAME, Long.toString(freq)));

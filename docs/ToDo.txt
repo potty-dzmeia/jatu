@@ -1,0 +1,13 @@
+ 
+-[EntryWindow] callsigns:
+  RED - dupe
+  BLUE - OK
+  GREEN - multi
+ 
+- [EntryWindow] When EntryWindow is very small hide the F-buttons starting from the left (i.e. first hide F9-F12)
+- [EntryWindow] Option to hide the F-buttons
+- [EntryWindow] Tab - goes through all entries; Space - goes throught non-default entries
+- [EntryWindow] enter send msg mode
+- [LogWindow2] to be able to show only certain qsos (e.g. callsign filter) and edit them fast. For example like n1mm in a sub-table below the main log.
+- [EntryWindow] Size of the fonts should be proportional to entry fields size and window size.
+- [LogWindow2] To show callsigns which were worked on the current S&P frequency

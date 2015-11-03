@@ -25,6 +25,7 @@ package org.lz1aq.pycontest;
  */
 public interface I_CallsignCheckResult
 {
+  public Log
   public boolean  isDupe(I_Log log, I_ProtoQso protoQso);
   public int  getPoints(I_Log log, I_ProtoQso protoQso);
   public int  isMultiplier(I_Log log, I_ProtoQso protoQso);

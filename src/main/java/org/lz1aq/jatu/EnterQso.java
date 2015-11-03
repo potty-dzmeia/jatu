@@ -60,11 +60,9 @@ public class EnterQso extends javax.swing.JFrame
     jPanel2 = new javax.swing.JPanel();
     jPanel4 = new javax.swing.JPanel();
     jPanel6 = new javax.swing.JPanel();
-    jLabel16 = new javax.swing.JLabel();
     jLabel17 = new javax.swing.JLabel();
     jLabel18 = new javax.swing.JLabel();
     jLabel24 = new javax.swing.JLabel();
-    jLabel25 = new javax.swing.JLabel();
     jLabel26 = new javax.swing.JLabel();
     jPanel7 = new javax.swing.JPanel();
     jLabel19 = new javax.swing.JLabel();
@@ -86,10 +84,6 @@ public class EnterQso extends javax.swing.JFrame
     jButton6 = new javax.swing.JButton();
     jButton7 = new javax.swing.JButton();
     jButton8 = new javax.swing.JButton();
-    jButton9 = new javax.swing.JButton();
-    jButton10 = new javax.swing.JButton();
-    jButton11 = new javax.swing.JButton();
-    jButton12 = new javax.swing.JButton();
     jLabel1 = new javax.swing.JLabel();
     jLabel2 = new javax.swing.JLabel();
     jLabel3 = new javax.swing.JLabel();
@@ -98,10 +92,9 @@ public class EnterQso extends javax.swing.JFrame
     jLabel6 = new javax.swing.JLabel();
     jLabel7 = new javax.swing.JLabel();
     jLabel8 = new javax.swing.JLabel();
-    jLabel9 = new javax.swing.JLabel();
-    jLabel10 = new javax.swing.JLabel();
-    jLabel11 = new javax.swing.JLabel();
-    jLabel12 = new javax.swing.JLabel();
+    jMenuBar1 = new javax.swing.JMenuBar();
+    jMenu1 = new javax.swing.JMenu();
+    jMenu2 = new javax.swing.JMenu();
 
     jInternalFrame1.setVisible(true);
 
@@ -212,6 +205,7 @@ public class EnterQso extends javax.swing.JFrame
     );
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+    setTitle("20:15:31 LZ1ABC");
 
     jPanel1.setLayout(new java.awt.GridBagLayout());
 
@@ -219,24 +213,12 @@ public class EnterQso extends javax.swing.JFrame
 
     jPanel4.setLayout(new java.awt.GridBagLayout());
 
+    jPanel6.setBackground(new java.awt.Color(255, 255, 204));
     jPanel6.setLayout(new java.awt.GridBagLayout());
-
-    jLabel16.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-    jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabel16.setText("20:15:31");
-    jLabel16.setFocusable(false);
-    jLabel16.setMinimumSize(new java.awt.Dimension(0, 0));
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 0.01;
-    gridBagConstraints.weighty = 0.01;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-    jPanel6.add(jLabel16, gridBagConstraints);
 
     jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     jLabel17.setText("14,190.5 KHz");
+    jLabel17.setEnabled(false);
     jLabel17.setFocusable(false);
     jLabel17.setMaximumSize(null);
     jLabel17.setMinimumSize(new java.awt.Dimension(0, 0));
@@ -251,6 +233,7 @@ public class EnterQso extends javax.swing.JFrame
 
     jLabel18.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     jLabel18.setText("CW");
+    jLabel18.setEnabled(false);
     jLabel18.setFocusable(false);
     jLabel18.setMaximumSize(null);
     jLabel18.setMinimumSize(new java.awt.Dimension(0, 0));
@@ -263,7 +246,9 @@ public class EnterQso extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
     jPanel6.add(jLabel18, gridBagConstraints);
 
-    jLabel24.setText("VFO_A");
+    jLabel24.setText("Radio1 -->  VFO_A");
+    jLabel24.setToolTipText("");
+    jLabel24.setEnabled(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 0;
@@ -271,15 +256,6 @@ public class EnterQso extends javax.swing.JFrame
     gridBagConstraints.weightx = 0.01;
     gridBagConstraints.weighty = 0.01;
     jPanel6.add(jLabel24, gridBagConstraints);
-
-    jLabel25.setText("LZ1ABC");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 0.01;
-    gridBagConstraints.weighty = 0.01;
-    jPanel6.add(jLabel25, gridBagConstraints);
 
     jLabel26.setText(" ");
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -306,7 +282,7 @@ public class EnterQso extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
     jPanel7.add(jLabel19, gridBagConstraints);
 
-    jLabel20.setText("sntRST");
+    jLabel20.setText("rcvSerial");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 0.4;
@@ -314,7 +290,7 @@ public class EnterQso extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
     jPanel7.add(jLabel20, gridBagConstraints);
 
-    jLabel21.setText("sntSerial");
+    jLabel21.setText("rcvRST");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 0.4;
@@ -322,7 +298,8 @@ public class EnterQso extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
     jPanel7.add(jLabel21, gridBagConstraints);
 
-    jLabel22.setText("rcvSerial");
+    jLabel22.setText("sntSerial");
+    jLabel22.setToolTipText("");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 0.4;
@@ -330,7 +307,8 @@ public class EnterQso extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
     jPanel7.add(jLabel22, gridBagConstraints);
 
-    jLabel23.setText("rcvSerial");
+    jLabel23.setText("sntRST");
+    jLabel23.setToolTipText("");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 0.4;
@@ -338,7 +316,8 @@ public class EnterQso extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
     jPanel7.add(jLabel23, gridBagConstraints);
 
-    jTextField1.setText("jTextField1");
+    jTextField1.setForeground(new java.awt.Color(204, 0, 0));
+    jTextField1.setText("LZ3FN");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -349,7 +328,7 @@ public class EnterQso extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
     jPanel7.add(jTextField1, gridBagConstraints);
 
-    jTextField3.setText("jTextField3");
+    jTextField3.setText("199");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 1;
@@ -360,7 +339,8 @@ public class EnterQso extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
     jPanel7.add(jTextField3, gridBagConstraints);
 
-    jTextField4.setText("jTextField4");
+    jTextField4.setBackground(new java.awt.Color(204, 204, 204));
+    jTextField4.setText("599");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 1;
@@ -371,7 +351,15 @@ public class EnterQso extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
     jPanel7.add(jTextField4, gridBagConstraints);
 
-    jTextField2.setText("jTextField2");
+    jTextField2.setBackground(new java.awt.Color(204, 204, 204));
+    jTextField2.setText("1001");
+    jTextField2.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jTextField2ActionPerformed(evt);
+      }
+    });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 3;
     gridBagConstraints.gridy = 1;
@@ -382,7 +370,9 @@ public class EnterQso extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
     jPanel7.add(jTextField2, gridBagConstraints);
 
-    jTextField6.setText("jTextField6");
+    jTextField6.setBackground(new java.awt.Color(204, 204, 204));
+    jTextField6.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+    jTextField6.setText("599");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 4;
     gridBagConstraints.gridy = 1;
@@ -526,60 +516,8 @@ public class EnterQso extends javax.swing.JFrame
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 20);
+    gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 1);
     jPanel3.add(jButton8, gridBagConstraints);
-
-    jButton9.setText("f9");
-    jButton9.setFocusable(false);
-    jButton9.setMargin(new java.awt.Insets(1, 1, 1, 1));
-    jButton9.setMinimumSize(new java.awt.Dimension(0, 0));
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 8;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 1);
-    jPanel3.add(jButton9, gridBagConstraints);
-
-    jButton10.setText("f10");
-    jButton10.setFocusable(false);
-    jButton10.setMargin(new java.awt.Insets(1, 1, 1, 1));
-    jButton10.setMinimumSize(new java.awt.Dimension(0, 0));
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 9;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 1);
-    jPanel3.add(jButton10, gridBagConstraints);
-
-    jButton11.setText("wipe");
-    jButton11.setFocusable(false);
-    jButton11.setMargin(new java.awt.Insets(1, 1, 1, 1));
-    jButton11.setMinimumSize(new java.awt.Dimension(0, 0));
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 10;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 1);
-    jPanel3.add(jButton11, gridBagConstraints);
-
-    jButton12.setText("f12");
-    jButton12.setFocusable(false);
-    jButton12.setMargin(new java.awt.Insets(1, 1, 1, 1));
-    jButton12.setMinimumSize(new java.awt.Dimension(0, 0));
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 11;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 1);
-    jPanel3.add(jButton12, gridBagConstraints);
 
     jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     jLabel1.setText("F1");
@@ -642,7 +580,7 @@ public class EnterQso extends javax.swing.JFrame
     jPanel3.add(jLabel5, gridBagConstraints);
 
     jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabel6.setText("F5");
+    jLabel6.setText("F6");
     jLabel6.setEnabled(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 5;
@@ -674,56 +612,8 @@ public class EnterQso extends javax.swing.JFrame
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 20);
+    gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 1);
     jPanel3.add(jLabel8, gridBagConstraints);
-
-    jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabel9.setText("F9");
-    jLabel9.setEnabled(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 8;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 1);
-    jPanel3.add(jLabel9, gridBagConstraints);
-
-    jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabel10.setText("F10");
-    jLabel10.setEnabled(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 9;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 1);
-    jPanel3.add(jLabel10, gridBagConstraints);
-
-    jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabel11.setText("F11");
-    jLabel11.setEnabled(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 10;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 1);
-    jPanel3.add(jLabel11, gridBagConstraints);
-
-    jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabel12.setText("F12");
-    jLabel12.setEnabled(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 11;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(1, 1, 1, 1);
-    jPanel3.add(jLabel12, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -733,6 +623,14 @@ public class EnterQso extends javax.swing.JFrame
     gridBagConstraints.weighty = 0.1;
     jPanel1.add(jPanel3, gridBagConstraints);
 
+    jMenu1.setText("File");
+    jMenuBar1.add(jMenu1);
+
+    jMenu2.setText("Config");
+    jMenuBar1.add(jMenu2);
+
+    setJMenuBar(jMenuBar1);
+
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
@@ -741,7 +639,7 @@ public class EnterQso extends javax.swing.JFrame
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+      .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
     );
 
     pack();
@@ -751,6 +649,11 @@ public class EnterQso extends javax.swing.JFrame
   {//GEN-HEADEREND:event_jButton3ActionPerformed
     // TODO add your handling code here:
   }//GEN-LAST:event_jButton3ActionPerformed
+
+  private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jTextField2ActionPerformed
+  {//GEN-HEADEREND:event_jTextField2ActionPerformed
+    // TODO add your handling code here:
+  }//GEN-LAST:event_jTextField2ActionPerformed
 
   /**
    * @param args the command line arguments
@@ -800,9 +703,6 @@ public class EnterQso extends javax.swing.JFrame
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.ButtonGroup buttonGroup1;
   private javax.swing.JButton jButton1;
-  private javax.swing.JButton jButton10;
-  private javax.swing.JButton jButton11;
-  private javax.swing.JButton jButton12;
   private javax.swing.JButton jButton2;
   private javax.swing.JButton jButton3;
   private javax.swing.JButton jButton4;
@@ -810,18 +710,13 @@ public class EnterQso extends javax.swing.JFrame
   private javax.swing.JButton jButton6;
   private javax.swing.JButton jButton7;
   private javax.swing.JButton jButton8;
-  private javax.swing.JButton jButton9;
   private javax.swing.JComboBox jComboBox1;
   private javax.swing.JComboBox jComboBox2;
   private javax.swing.JInternalFrame jInternalFrame1;
   private javax.swing.JLabel jLabel1;
-  private javax.swing.JLabel jLabel10;
-  private javax.swing.JLabel jLabel11;
-  private javax.swing.JLabel jLabel12;
   private javax.swing.JLabel jLabel13;
   private javax.swing.JLabel jLabel14;
   private javax.swing.JLabel jLabel15;
-  private javax.swing.JLabel jLabel16;
   private javax.swing.JLabel jLabel17;
   private javax.swing.JLabel jLabel18;
   private javax.swing.JLabel jLabel19;
@@ -831,7 +726,6 @@ public class EnterQso extends javax.swing.JFrame
   private javax.swing.JLabel jLabel22;
   private javax.swing.JLabel jLabel23;
   private javax.swing.JLabel jLabel24;
-  private javax.swing.JLabel jLabel25;
   private javax.swing.JLabel jLabel26;
   private javax.swing.JLabel jLabel3;
   private javax.swing.JLabel jLabel4;
@@ -839,7 +733,9 @@ public class EnterQso extends javax.swing.JFrame
   private javax.swing.JLabel jLabel6;
   private javax.swing.JLabel jLabel7;
   private javax.swing.JLabel jLabel8;
-  private javax.swing.JLabel jLabel9;
+  private javax.swing.JMenu jMenu1;
+  private javax.swing.JMenu jMenu2;
+  private javax.swing.JMenuBar jMenuBar1;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel2;
   private javax.swing.JPanel jPanel3;

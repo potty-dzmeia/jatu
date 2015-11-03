@@ -5,14 +5,9 @@
  */
 package org.lz1aq.jatu;
 
-<<<<<<< HEAD
 import org.lz1aq.pyrig.I_Radio;
 import org.lz1aq.pyrig.I_Rig;
-=======
-import java.util.ArrayList;
-import org.lz1aq.pyrig_interfaces.I_Radio;
-import org.lz1aq.pyrig_interfaces.I_Rig;
->>>>>>> db4o_implementation
+import java.util.ArrayList;;
 import org.lz1aq.utils.Misc;
 
 
