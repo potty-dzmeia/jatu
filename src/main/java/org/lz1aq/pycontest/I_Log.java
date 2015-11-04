@@ -21,33 +21,15 @@ package org.lz1aq.pycontest;
 
 
 /**
- * A ProtoQso contains the following information:
- * - myCallsign
- * - hisCallsign
- * - frequency
- * - mode
- * - date
- * - time
- * 
- * This is the minimum information that a QSO should consist
- * 
+ *
+ * @author chavdar
  */
-public interface I_ProtoQso
+public interface I_Log
 {
-  public String getMyCallsign();
+  public I_Qso  get(int index);
   
-  
-  public String getHisCallsign();
-  
-  
-  public String getFrequency();
-  
-  
-  public String getMode();
-  
-  
-  public String getTime();
-  
-  
-  public String getDate();
+  public int getRowCount();
+  public int getColumnCount();
+  public String getValueAt(int row, int col);
+  public String getColumnName(int col);
 }

@@ -19,35 +19,25 @@
 // ***************************************************************************
 package org.lz1aq.pycontest;
 
+import org.lz1aq.log.QsoParameter;
 
 /**
- * A ProtoQso contains the following information:
- * - myCallsign
- * - hisCallsign
- * - frequency
- * - mode
- * - date
- * - time
- * 
- * This is the minimum information that a QSO should consist
- * 
+ *
+ * @author chavdar
  */
-public interface I_ProtoQso
+public interface I_Qso extends I_ProtoQso
 {
-  public String getMyCallsign();
+  public int getParamsCount();
   
   
-  public String getHisCallsign();
+  public int getExtraParamsCount();
   
   
-  public String getFrequency();
+  public String getParamName(int parameterIndex);
   
   
-  public String getMode();
+  public String getParamValue(int parameterIndex);
   
   
-  public String getTime();
-  
-  
-  public String getDate();
+  public String setParamValue(int parameterIndex, String value);
 }

@@ -21,7 +21,7 @@ package org.lz1aq.log;
 
 import java.util.ArrayList;
 import org.joda.time.DateTime;
-import org.lz1aq.pycontest.I_ProtoQso;
+import org.lz1aq.pycontest.I_Qso;
 import org.lz1aq.utils.TimeUtils;
 
 
@@ -30,7 +30,7 @@ import org.lz1aq.utils.TimeUtils;
  * The Qso class is describing a contact between two radio station by using 
  * QsoParameters (e.g. "date", "time", "frequency" and so on ...)
  */
-public class Qso implements I_ProtoQso
+public class Qso implements I_Qso
 {
   /**Used for accessing Date parameter - the Date parameter has the format yyyy-mm-dd */
   static private final int DATE_INDEX = 0;
@@ -114,6 +114,7 @@ public class Qso implements I_ProtoQso
   /**
    * @return The count of the total Qso parameters
    */
+  @Override
   public int getParamsCount()
   {
     return qsoParams.size();
@@ -122,6 +123,7 @@ public class Qso implements I_ProtoQso
    /**
    * @return The count of the additional Qso parameters
    */
+  @Override
   public int getExtraParamsCount()
   {
     return qsoParams.size()-FIRST_EXTRA_PARAM_INDEX;
@@ -138,7 +140,7 @@ public class Qso implements I_ProtoQso
   }
   
   /**
-   * @return Date in hhmm 24hour format)
+   * @return Date in hhmm 24hour format
    */
   @Override
   public String getTime()
@@ -151,9 +153,9 @@ public class Qso implements I_ProtoQso
    * @return Frequency on Hz
    */
   @Override
-  public float getFrequency()
+  public String getFrequency()
   {
-    return Float.parseFloat(qsoParams.get(FREQ_INDEX).value);
+    return qsoParams.get(FREQ_INDEX).value;
   }
   
 
@@ -179,8 +181,30 @@ public class Qso implements I_ProtoQso
   {
     return qsoParams.get(HISCALL_INDEX).value;
   }
+
+  
+  @Override
+  public String getParamName(int parameterIndex)
+  {
+     return qsoParams.get(parameterIndex).name;
+  }
+
+  @Override
+  public String getParamValue(int parameterIndex)
+  {
+     return qsoParams.get(parameterIndex).value;
+  }
+
+  @Override
+  public String setParamValue(int parameterIndex, String value)
+  {
+     return qsoParams.get(parameterIndex).value = value;
+  }
+  
+  
   
 
+  
   /**
    * For accessing qso parameters.
    * 

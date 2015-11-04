@@ -20,6 +20,8 @@
 package org.lz1aq.log;
 
 import java.util.ArrayList;
+import org.lz1aq.pycontest.I_Log;
+import org.lz1aq.pycontest.I_Qso;
 
 
 
@@ -32,7 +34,7 @@ import java.util.ArrayList;
  * - The number of rows is equal to the number of Qso objects contained in the Log.
  * 
  */
-public class Log
+public class Log implements I_Log
 {
   private final LogDatabase db;  // the interface to a db4o database, stand-alone or client/server. 
   private final ArrayList<Qso> qsoList;
@@ -64,6 +66,19 @@ public class Log
     db.add(qso);      // Add the qso to the database
     qsoList.add(qso); // Add the qso to RAM (i.e local list)
   }
+
+  
+  /**
+   * Method for accessing QSOs inside the log.
+   * 
+   * @param index - Qso index inside the log (0 is being the first QSO in the log)
+   * @return  Reference to the QSO object
+   */
+  @Override
+  public I_Qso get(int index)
+  {
+    return qsoList.get(index);
+  }
   
   
   /**
@@ -79,10 +94,11 @@ public class Log
   
   
   /**
-   * Row count is equivalent to the count of Qso object contained in the Log.
+   * Row count is equivalent to the count of QSO object contained in the Log.
    * 
-   * @return Returns the amount of Qso objects contained in the Log.
+   * @return Returns the amount of QSO objects contained in the Log.
    */
+  @Override
   public int getRowCount()
   {
     return qsoList.size();
@@ -102,6 +118,7 @@ public class Log
    * @return The number of columns inside the log. If log is empty the return 
    * value will be 0.
    */
+  @Override
   public int getColumnCount()
   {
     if(qsoList.isEmpty())
@@ -121,10 +138,11 @@ public class Log
    * @param col Column index (i.e. index of Qso param)
    * @return 
    */
+  @Override
   public String getValueAt(int row, int col)
   {
     Qso qso = qsoList.get(row);
-    return qso.getParam(col).value;
+    return qso.getParamValue(col);
   }
   
   
@@ -135,10 +153,11 @@ public class Log
    * @param col Column index of which we would like to get the name
    * @return Name of the column (i.e. name of the Qso param)
    */
+  @Override
   public String getColumnName(int col)
   {
     Qso qso = qsoList.get(0); // We will use the first Qso from the list as a prototype
-    return qso.getParam(col).name;
+    return qso.getParamName(col);
   }
    
   
@@ -154,7 +173,7 @@ public class Log
   public void setValueAt(String value, int row, int col)
   {
     Qso qso = qsoList.get(row); 
-    qso.getParam(col).value = value; // Update 
+    qso.setParamValue(col,value); // Update 
     db.modify(qso); // Update the database
   }
   

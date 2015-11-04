@@ -21,8 +21,7 @@ package org.lz1aq.log;
 
 
 /**
- * This class is used for describing a Qso parameter. This is a parameter which
- * has a name and a String value.
+ * This class is used for describing a Qso parameter.
  * For example: name=sntRST, value=599
  */
 public class QsoParameter
