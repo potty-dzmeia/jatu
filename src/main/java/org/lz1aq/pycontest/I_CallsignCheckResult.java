@@ -27,7 +27,7 @@ public interface I_CallsignCheckResult
 {
   public boolean  isDupe(I_Log log, I_ProtoQso protoQso);
   public int  getPoints(I_Log log, I_ProtoQso protoQso);
-  public int  isMultiplier(I_Log log, I_ProtoQso protoQso);
-  public int  getColor(I_Log log, I_ProtoQso protoQso);
-  
+  public boolean  isMultiplier(I_Log log, I_ProtoQso protoQso);
+  public int  getBandmapColor(I_Log log, I_ProtoQso protoQso);
+  public int  getEntryWindowColor(I_Log log, I_ProtoQso protoQso);
 }

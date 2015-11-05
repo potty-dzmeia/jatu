@@ -1,5 +1,5 @@
 import json
-from org.lz1aq.pyrig_interfaces import I_SerialSettings
+from org.lz1aq.pyrig import I_SerialSettings
 
 class SerialSettings(I_SerialSettings):
 

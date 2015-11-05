@@ -1,4 +1,4 @@
-from org.lz1aq.pyrig_interfaces import I_Rig
+from org.lz1aq.pyrig import I_Rig
 
 
 

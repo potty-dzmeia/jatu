@@ -19,7 +19,6 @@
 // ***************************************************************************
 package org.lz1aq.pycontest;
 
-import org.lz1aq.log.QsoParameter;
 
 /**
  *

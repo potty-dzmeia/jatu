@@ -22,13 +22,36 @@ package org.lz1aq.pycontest;
 
 public interface I_Contest
 {
-  public String getQsoExample();
+  
+  /**
+   * Used for acquiring all QSO types for the given contest. By QSO types we 
+   * mean QSOs with different set of parameters.
+   * 
+   * @return Object holding QSO definitions
+   */
+  public I_QsoTemplates getQsoTemplates();
   
   
+  /**
+   * Calculates overall result
+   * 
+   * @param log - Reference to the object holding all the QSOs
+   * @return - The calculated result
+   */
   public int  calculateResult(I_Log log);
+ 
   
-  
+  /**
+   * 
+   * @param log
+   * @param protoQso
+   * @return 
+   */
   public I_CallsignCheckResult checkCallsign(I_Log log, I_ProtoQso protoQso);
+  
+  
+  public void fillQsoParams(I_Qso qso);
+  
   
   /**
    * The function returns a string with all the modes that the contest supports

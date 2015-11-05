@@ -1,4 +1,4 @@
-from org.lz1aq.pyrig_interfaces import I_DecodedTransaction
+from org.lz1aq.pyrig import I_DecodedTransaction
 from radio import Radio
 import json
 import misc_utils
