@@ -48,25 +48,25 @@ public interface I_QsoTemplates
   
   
   /**
-   * Gets the number of send parameters for the selected QSO template
+   * Gets the number of sent parameters for the selected QSO template
    * 
    * @param templateIndex -  Index of template (0 is being the first QSO template)
    * @return - Count of send parameters.
    */
-  int getSndParamCount(int templateIndex);
+  int getSntParamCount(int templateIndex);
   
   /**
-   * Gets the name of a send parameter for the selected QSO template
+   * Gets the name of a sent parameter for the selected QSO template
    * 
    * @param templateIndex - Index of template (0 is being the first QSO template)
    * @param paramIndex - Index of the send parameter whose name we would like to read
    * @return 
    */
-  String getSndParamName(int templateIndex, int paramIndex);
+  String getSntParamName(int templateIndex, int paramIndex);
   
   
   /**
-   * Gets the number of receive parameters for the selected QSO template
+   * Gets the number of received parameters for the selected QSO template
    * 
    * @param templateIndex -  Index of template (0 is being the first QSO template)
    * @return - Count of send parameters.
@@ -75,7 +75,7 @@ public interface I_QsoTemplates
   
   
   /**
-   * Gets the name of a receive parameter for the selected QSO template
+   * Gets the name of a received parameter for the selected QSO template
    * 
    * @param templateIndex - Index of template (0 is being the first QSO template)
    * @param paramIndex - Index of the receive parameter whose name we would like to read

@@ -119,7 +119,7 @@ class Radio(I_Radio):
 
 
     # Possible radio modes
-    MODES ={'none',
+    MODES =['none',
             'am',        # AM -- Amplitude Modulation
             'cw',        # CW - CW "normal" sideband
             'usb',       # USB - Upper Side Band
@@ -140,7 +140,7 @@ class Radio(I_Radio):
             'sal',       # SAL - Synchronous AM lower sideband
             'sah',       # SAH - Synchronous AM upper (higher) sideband
             'dsb',      # DSB - Double sideband suppressed carrier
-    }
+            ]
 
     # Mapping of VFO letters to numbers
     VFO_NONE    = -1

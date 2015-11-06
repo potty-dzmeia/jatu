@@ -22,6 +22,10 @@ package org.lz1aq.pycontest;
 
 public interface I_Contest
 {
+  /**
+   * @return The name of the contest
+   */
+  public String getName();
   
   /**
    * Used for acquiring all QSO types for the given contest. By QSO types we 
@@ -50,15 +54,15 @@ public interface I_Contest
   public I_CallsignCheckResult checkCallsign(I_Log log, I_ProtoQso protoQso);
   
   
-  public void fillQsoParams(I_Qso qso);
+  public void fillQsoParams(int qsoTemplate, I_Qso qso);
   
   
   /**
    * The function returns a string with all the modes that the contest supports
-   * Example: "cw ssb lsb"
+   * Example: "cw usb lsb"
    * 
    * @return A string with the supported modes. Each mode is separated from 
-   * the next with space.
+   * the next with space. Could be in lower case or capital letters.
    */
   public String getAvailableModes();
   
@@ -67,8 +71,8 @@ public interface I_Contest
    * The function returns a string with all the bands that the contest supports.
    * Example: "3.5 7 14"
    * 
-   * @return A string with the supported bands in MHz. Each band is separated from the
-   *  next with space.
+   * @return A string with the supported bands in MHz. Each band is separated 
+   *  from the next one with space.
    */
   public String getAvailableBands();
 }
