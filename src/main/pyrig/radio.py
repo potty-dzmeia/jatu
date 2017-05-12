@@ -1,4 +1,4 @@
-from org.lz1aq.pyrig import I_Radio
+from org.lz1aq.py.rig import I_Radio
 import logging
 
 
@@ -105,6 +105,19 @@ class Radio(I_Radio):
         :rtype: EncodedTransaction
         """
         raise NotImplementedError("encode_SetFreq")
+
+    @classmethod
+    def encodeSendCW(cls, text):
+        """
+        Gets the command with which we can tell the radio to send morse code
+
+        :param text: The VFO for which we want the current mode
+        :type vfo: str
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
+        """
+
+        raise NotImplementedError("encodeSendCW")
 
 
     #Freq - frequency of the target VFO

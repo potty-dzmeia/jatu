@@ -19,15 +19,15 @@
 // ***************************************************************************
 package org.lz1aq.rsi;
 
-import org.lz1aq.pyrig.I_EncodedTransaction;
-import org.lz1aq.pyrig.I_SerialSettings;
-import org.lz1aq.pyrig.I_DecodedTransaction;
+import org.lz1aq.py.rig.I_EncodedTransaction;
+import org.lz1aq.py.rig.I_SerialSettings;
+import org.lz1aq.py.rig.I_DecodedTransaction;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import org.lz1aq.rsi.event.*;
 import org.lz1aq.utils.Misc;
 import org.lz1aq.utils.DynamicByteArray;
-import org.lz1aq.pyrig.I_Radio;
+import org.lz1aq.py.rig.I_Radio;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -211,6 +211,17 @@ public class Radio
   public void getMode(int vfo) throws Exception
   {
     this.queueTransactions(radioProtocolParser.encodeGetMode(vfo));
+  }
+  
+  /**
+   * Send morse code
+   * 
+   * @param text - text to be send as morse code
+   * @throws Exception 
+   */
+  public void sendCW(String text) throws Exception
+  {
+    this.queueTransactions(radioProtocolParser.encodeSendCW(text));
   }
   
   
@@ -397,13 +408,13 @@ public class Radio
   private class LocalRadioListener extends EmptyRadioListener
   {
     @Override
-    public void confirmationEvent(ConfirmationEvent e)
+    public void eventConfirmation(ConfirmationEvent e)
     {
       updateConfirmation(e.getConfirmation());
     }
     
     @Override
-    public void notsupportedEvent(NotsupportedEvent e)
+    public void eventNotsupported(NotsupportedEvent e)
     {
       logger.log(Level.WARNING, "The following transaction couldn't be decoded: " + e.getData());
     }

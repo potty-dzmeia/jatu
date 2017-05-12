@@ -23,14 +23,17 @@ package org.lz1aq.rsi.event;
 public class EmptyRadioListener implements RadioListener
 {
   @Override
-  public void notsupportedEvent(NotsupportedEvent e){}
+  public void eventNotsupported(NotsupportedEvent e){}
 
   @Override
-  public void confirmationEvent(ConfirmationEvent e){}
+  public void eventConfirmation(ConfirmationEvent e){}
 
   @Override
-  public void frequencyEvent(FrequencyEvent e){}
+  public void eventFrequency(FrequencyEvent e){}
 
   @Override
-  public void modeEvent(ModeEvent e){}
+  public void eventMode(ModeEvent e){}
+
+  @Override
+  public void eventSmeter(SmeterEvent e){}
 }

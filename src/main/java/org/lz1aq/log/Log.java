@@ -20,8 +20,8 @@
 package org.lz1aq.log;
 
 import java.util.ArrayList;
-import org.lz1aq.pycontest.I_Log;
-import org.lz1aq.pycontest.I_Qso;
+import org.lz1aq.py.contest.I_Log;
+import org.lz1aq.py.contest.I_Qso;
 
 
 

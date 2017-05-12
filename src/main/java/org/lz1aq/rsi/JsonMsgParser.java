@@ -40,6 +40,7 @@ public class JsonMsgParser
   public static final String CONFIRMATION_MSG   = "confirmation";
   public static final String FREQUENCY_MSG      = "frequency";
   public static final String MODE_MSG           = "mode";
+  public static final String SMETER_MSG         = "smeter";
   
   // A field wich can be found inside the FREQUENCY_MSG and MODE_MSG
   public static final String VFO_PAR            = "vfo";
@@ -79,7 +80,7 @@ public class JsonMsgParser
           ConfirmationEvent cfmEv = parseConfirmationMsg(jso);
           for (RadioListener listener : listeners)
           {
-            listener.confirmationEvent(cfmEv);
+            listener.eventConfirmation(cfmEv);
           }
           break;
 
@@ -89,17 +90,27 @@ public class JsonMsgParser
           FrequencyEvent freqEv = parseFrequencyMsg(jso.getJSONObject(command));
           for (RadioListener listener : listeners)
           {
-            listener.frequencyEvent(freqEv);
+            listener.eventFrequency(freqEv);
           }
           break;
 
         // -----------------------------
         case JsonMsgParser.MODE_MSG:
-          // -----------------------------
+        // -----------------------------
           ModeEvent modeEv = parseModeMsg(jso.getJSONObject(command));
           for (RadioListener listener : listeners)
           {
-            listener.modeEvent(modeEv);
+            listener.eventMode(modeEv);
+          }
+          break;
+        
+        // -----------------------------
+        case JsonMsgParser.SMETER_MSG:
+        // -----------------------------
+          SmeterEvent smeterEv = parseSmeterMsg(jso.getJSONObject(command));
+          for (RadioListener listener : listeners)
+          {
+            listener.eventSmeter(smeterEv);
           }
           break;
 
@@ -109,9 +120,10 @@ public class JsonMsgParser
           NotsupportedEvent unsupportedEv = parseNotsupportedMsg(jso);
           for (RadioListener listener : listeners)
           {
-            listener.notsupportedEvent(unsupportedEv);
+            listener.eventNotsupported(unsupportedEv);
           }
           break;
+            
 
         // -----------------------------
         default:
@@ -214,6 +226,37 @@ public class JsonMsgParser
     }
     
     return new ModeEvent(mode, parseVfoField(jso));
+  }
+  
+  
+  /**
+   * Parser an object containing Mode and some additional data (e.g. VFO)
+   * 
+   * @param jso - JSON object of the type:
+   *    {
+   *      "smeter": "30"
+   *    }
+   * @return event holding the parsed data
+   */
+  private static SmeterEvent parseSmeterMsg(JSONObject jso)
+  {
+    int smeter = 0; 
+    
+    if(jso.has(SMETER_MSG))
+    {  
+      try{
+        smeter = Integer.parseInt(jso.getString(SMETER_MSG));
+      }catch(Exception exc)
+      {
+          smeter = 0;
+      }
+    }
+    else
+    {
+      logger.severe("JSON object didn't contained " + SMETER_MSG + " key as expected");
+    }
+    
+    return new SmeterEvent(smeter);
   }
 
   

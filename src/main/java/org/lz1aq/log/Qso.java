@@ -21,7 +21,7 @@ package org.lz1aq.log;
 
 import java.util.ArrayList;
 import org.joda.time.DateTime;
-import org.lz1aq.pycontest.I_Qso;
+import org.lz1aq.py.contest.I_Qso;
 import org.lz1aq.utils.TimeUtils;
 
 
@@ -34,27 +34,27 @@ public class Qso implements I_Qso
 {
   /**Used for accessing Date parameter - the Date parameter has the format yyyy-mm-dd */
   static private final int DATE_INDEX = 0;
-  static private final String DATE_NAME = "date";
+  static private final String DATE_TXT = "date";
   
-  /** Used for accessing Time parameter. The Time parameter has the format hhmm (24hour format) */
+  /** Used for accessing Time parameter. The Time parameter has the format hhmmss (24hour format) */
   static private final int TIME_INDEX = 1;
-  static private final String TIME_NAME = "time";
+  static private final String TIME_TXT = "time";
   
   /** Used for accessing Frequency parameter - The Freq param is in Hz */
   static private final int FREQ_INDEX = 2;
-  static private final String FREQ_NAME = "frequency";
+  static private final String FREQ_TXT = "freq";
   
   /** Used for accessing Mode parameter - see class RadioModes for the expected values */
   static private final int MODE_INDEX = 3;
-  static private final String MODE_NAME = "mode";
+  static private final String MODE_TXT = "mode";
   
   /** Used for accessing MyCall parameter - the callsign of the user of this program */
   static private final int MYCALL_INDEX = 4;
-  static private final String MYCALL_NAME = "myCall";
+  static private final String MYCALL_TXT = "myCall";
   
   /** Used for accessing Time parameter - the callsign of the correspondent */
   static private final int HISCALL_INDEX = 5;
-  static private final String HISCALL_NAME = "hisCall";
+  static private final String HISCALL_TXT = "hisCall";
   
    /** Used for accessing Extra parameters */
   static private final int FIRST_EXTRA_PARAM_INDEX = 6;
@@ -72,12 +72,12 @@ public class Qso implements I_Qso
     qsoParams = new ArrayList<>();
     
     DateTime utc = TimeUtils.getUTC();
-    qsoParams.add(new QsoParameter(DATE_NAME, TimeUtils.toQsoDate(utc)));
-    qsoParams.add(new QsoParameter(TIME_NAME, TimeUtils.toQsoTime(utc)));
-    qsoParams.add(new QsoParameter(FREQ_NAME, Long.toString(freq)));
-    qsoParams.add(new QsoParameter(MODE_NAME, mode));
-    qsoParams.add(new QsoParameter(MYCALL_NAME, myCall));
-    qsoParams.add(new QsoParameter(HISCALL_NAME, hisCall));
+    qsoParams.add(new QsoParameter(DATE_TXT, TimeUtils.toQsoDate(utc)));
+    qsoParams.add(new QsoParameter(TIME_TXT, TimeUtils.toQsoTime(utc)));
+    qsoParams.add(new QsoParameter(FREQ_TXT, Long.toString(freq)));
+    qsoParams.add(new QsoParameter(MODE_TXT, mode));
+    qsoParams.add(new QsoParameter(MYCALL_TXT, myCall));
+    qsoParams.add(new QsoParameter(HISCALL_TXT, hisCall));
   }
   
   
@@ -86,12 +86,12 @@ public class Qso implements I_Qso
     qsoParams = new ArrayList<>();
     
     DateTime utc = TimeUtils.getUTC();
-    qsoParams.add(new QsoParameter(DATE_NAME, TimeUtils.toQsoDate(utc)));
-    qsoParams.add(new QsoParameter(TIME_NAME, TimeUtils.toQsoTime(utc)));
-    qsoParams.add(new QsoParameter(FREQ_NAME, Long.toString(freq)));
-    qsoParams.add(new QsoParameter(MODE_NAME, mode));
-    qsoParams.add(new QsoParameter(MYCALL_NAME, myCall));
-    qsoParams.add(new QsoParameter(HISCALL_NAME, hisCall));
+    qsoParams.add(new QsoParameter(DATE_TXT, TimeUtils.toQsoDate(utc)));
+    qsoParams.add(new QsoParameter(TIME_TXT, TimeUtils.toQsoTime(utc)));
+    qsoParams.add(new QsoParameter(FREQ_TXT, Long.toString(freq)));
+    qsoParams.add(new QsoParameter(MODE_TXT, mode));
+    qsoParams.add(new QsoParameter(MYCALL_TXT, myCall));
+    qsoParams.add(new QsoParameter(HISCALL_TXT, hisCall));
     
     qsoParams.addAll(extraQsoParams);
   }
@@ -114,7 +114,6 @@ public class Qso implements I_Qso
   /**
    * @return The count of the total Qso parameters
    */
-  @Override
   public int getParamsCount()
   {
     return qsoParams.size();
@@ -123,7 +122,6 @@ public class Qso implements I_Qso
    /**
    * @return The count of the additional Qso parameters
    */
-  @Override
   public int getExtraParamsCount()
   {
     return qsoParams.size()-FIRST_EXTRA_PARAM_INDEX;
@@ -183,19 +181,19 @@ public class Qso implements I_Qso
   }
 
   
-  @Override
+  
   public String getParamName(int parameterIndex)
   {
      return qsoParams.get(parameterIndex).name;
   }
 
-  @Override
+  
   public String getParamValue(int parameterIndex)
   {
      return qsoParams.get(parameterIndex).value;
   }
 
-  @Override
+  
   public String setParamValue(int parameterIndex, String value)
   {
      return qsoParams.get(parameterIndex).value = value;

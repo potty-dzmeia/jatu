@@ -1,5 +1,5 @@
 import json
-from org.lz1aq.pyrig import I_SerialSettings
+from org.lz1aq.py.rig import I_SerialSettings
 
 class SerialSettings(I_SerialSettings):
 
@@ -9,6 +9,10 @@ class SerialSettings(I_SerialSettings):
     HANDSHAKE_NONE, HANDSHAKE_XONXOFF, HANDSHAKE_CTSRTS = 'None', 'XonXoff', 'CtsRts'
     RTS_STATE_NONE, RTS_STATE_ON, RTS_STATE_OFF = 'None', 'On', 'Off'
     DTR_STATE_NONE, DTR_STATE_ON, DTR_STATE_OFF = 'None', 'On', 'Off'
+
+    B_300, B_1200, B_2400, B_4800, B_9600, B_14400, B_19200, B_28800, B_38400, B_57600, B_115200, B_230400 = \
+    300, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200, 230400
+
 
     def __init__(self):
         # underscore added because of a jython issue

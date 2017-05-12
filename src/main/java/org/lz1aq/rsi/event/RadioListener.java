@@ -33,27 +33,33 @@ public interface RadioListener extends EventListener
    * 
    * @param e - holds information about the event
    */
-  public void notsupportedEvent(NotsupportedEvent e);
+  public void eventNotsupported(NotsupportedEvent e);
   
   /**
    * Called when the radio sends us positive or negative confirmation
    * 
    * @param e - holds information about the event
    */
-  public void confirmationEvent(ConfirmationEvent e);
+  public void eventConfirmation(ConfirmationEvent e);
   
   /**
    * Called when the radio sends us the Frequency
    * 
    * @param e - holds information about the event
    */
-  public void frequencyEvent(FrequencyEvent e);
+  public void eventFrequency(FrequencyEvent e);
 
   /**
    * Called when the radio sends us the Mode (e.g. to CW)
    * 
    * @param e - holds information about the event
    */
-  public void modeEvent(ModeEvent e);
+  public void eventMode(ModeEvent e);
 
+  /**
+   * Called when the radio sends us the Smeter value
+   * 
+   * @param e - holds information about the event
+   */
+  public void eventSmeter(SmeterEvent e);
 }

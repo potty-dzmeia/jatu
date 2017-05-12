@@ -1,5 +1,5 @@
-from org.lz1aq.pycontest import I_Contest
-from org.lz1aq.pycontest import I_QsoTemplates
+from org.lz1aq.py.contest import I_Contest
+from org.lz1aq.py.contest import I_QsoTemplates
 import logging
 
 
@@ -16,12 +16,12 @@ class CqWwDx_Cw(I_Contest):
   MODES = "cw cwr"
   BANDS = "1.8 3.5 7 14 21 28"
 
-
   QSO_TEMPLATES = {"default":
                      {"snt": ["RST", "CQ-Zone"],
                       "rcv": ["RST", "CQ-Zone"]}
                   }
 
+  CONFIGURATION_PARAMS = {"CQ-Zone": ["1","2"]}
 
 
   #+--------------------------------------------------------------------------+

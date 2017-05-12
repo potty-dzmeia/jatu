@@ -1,4 +1,4 @@
-from org.lz1aq.pyrig import I_DecodedTransaction
+from org.lz1aq.py.rig import I_DecodedTransaction
 from radio import Radio
 import json
 import misc_utils
@@ -128,6 +128,24 @@ class DecodedTransaction(I_DecodedTransaction):
         sub["mode"] = mode
         sub["vfo"] = str(vfo)
         dest["mode"] = sub
+
+
+    @classmethod
+    def insertSmeter(cls, dest, smeter_value):
+        """
+        Inserts a decoded command coming from the radio into the supplied dictionary
+
+        :param mode: A string describing the working mode of the radio
+        :type mode: str
+        :param vfo: VFO that changed mode (optional). Possible values are "0", "1" and so on...
+        :type vfo: int
+        :param dest: The dict to which the following item will be added: "mode": {"mode": "cw", "vfo": "0"}
+        :type dest: dict
+        """
+
+        sub = dict()
+        sub["smeter"] = smeter_value
+        dest["smeter"] = sub
 
 
     @classmethod

@@ -5,8 +5,8 @@
  */
 package org.lz1aq.jatu;
 
-import org.lz1aq.pyrig.I_Radio;
-import org.lz1aq.pyrig.I_Rig;
+import org.lz1aq.py.rig.I_Radio;
+import org.lz1aq.py.rig.I_Rig;
 import java.util.ArrayList;;
 import org.lz1aq.utils.Misc;
 

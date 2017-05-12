@@ -1,4 +1,4 @@
-from org.lz1aq.pyrig import I_EncodedTransaction
+from org.lz1aq.py.rig import I_EncodedTransaction
 
 
 class EncodedTransaction(I_EncodedTransaction):
