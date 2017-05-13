@@ -30,16 +30,18 @@ import org.lz1aq.log.*;
  */
 public class TableTester extends javax.swing.JFrame
 {
-  Log log;
-  LogDatabase logdb;
+ 
   LogTableModel qsoTableModel;
   /**
    * Creates new form TableTester
    */
   public TableTester()
   {
-    logdb = new LogDatabase("log_test.db4o");
-    log = new Log(logdb);
+    ArrayList<QsoParameter> extraParams = new ArrayList<>();
+    extraParams.add(new QsoParameter("sntRST", "599"));
+    extraParams.add(new QsoParameter("rcvRST", "599"));
+    Log log = new Log(new LogDatabase("log_test.db4o"),
+                      new Qso(14190000, "cw", "lz1abc", "lz1aq", extraParams));
     qsoTableModel = new LogTableModel(log);
    
 
@@ -51,7 +53,6 @@ public class TableTester extends javax.swing.JFrame
       Qso qso = new Qso(14190000, "cw", "lz1abc", "lz1aq", extraQsoParams);
       log.add(qso);
     }
-    log.writeToDB();
     
     initComponents();
   }

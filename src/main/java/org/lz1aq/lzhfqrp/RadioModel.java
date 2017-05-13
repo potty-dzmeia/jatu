@@ -17,54 +17,48 @@
 // *   Free Software Foundation, Inc.,                                       
 // *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             
 // ***************************************************************************
-package org.lz1aq.log;
+package org.lz1aq.lzhfqrp;
 
-import com.db4o.Db4oEmbedded;
-import com.db4o.ObjectContainer;
-import com.db4o.config.EmbeddedConfiguration;
-import java.util.List;
+import org.lz1aq.utils.RadioVfos;
 
 /**
  *
- * @author chavdar
+ * @author potty
  */
-public class LogDatabase
+public class RadioModel
 {
-  private final ObjectContainer db;
-  
-  public LogDatabase(String dbFile)
-  {
-    EmbeddedConfiguration config = Db4oEmbedded.newConfiguration();
-    config.common().objectClass(Qso.class).cascadeOnUpdate(true);
-    db = Db4oEmbedded.openFile(config, dbFile);
-  }
-  
-  
-  List<Qso> getAll()
-  {
-    return db.query(Qso.class);
-  }
-
-  
-  void add(Qso qso)
-  {
-    db.store(qso);
-  }
-  
-
-  void remove(Qso qso)
-  {
-    db.delete(qso);
-  }
-  
-
-  void modify(Qso qso)
-  {
-    db.store(qso);
-  }
-  
-  void commit()
-  {
-    db.commit();
-  }
+    RadioVfos activeVfo;
+    int vfoAFreq;
+    int vfoBFreq;
+    
+    
+    
+    /**
+     * Gets frequency of the currently active VFO
+     * 
+     * @return 
+     */
+    int getFreq()
+    {
+        // send the IF command and get the frequency from there
+    }
+    
+    /**
+     * Sets the frequency of the currently active VFO to the desired value
+     * @param freq 
+     */
+    void setFreq(int freq)
+    {
+        if(activeVfo == RadioVfos.A)
+        {
+            vfoAFreq =  freq;
+        }
+        else
+        {
+            vfoBFreq = freq;
+        }  
+    }
+    
+    
+    
 }

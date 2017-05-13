@@ -81,7 +81,6 @@ public class LogTableModel extends AbstractTableModel
   public void addRow(Qso qso)
   {
     log.add(qso);
-    log.writeToDB();
     this.fireTableRowsInserted(log.getRowCount()-1, log.getRowCount()-1);
   }
   

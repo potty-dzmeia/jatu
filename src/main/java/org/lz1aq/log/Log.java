@@ -20,8 +20,6 @@
 package org.lz1aq.log;
 
 import java.util.ArrayList;
-import org.lz1aq.py.contest.I_Log;
-import org.lz1aq.py.contest.I_Qso;
 
 
 
@@ -34,21 +32,28 @@ import org.lz1aq.py.contest.I_Qso;
  * - The number of rows is equal to the number of Qso objects contained in the Log.
  * 
  */
-public class Log implements I_Log
+public class Log
 {
-  private final LogDatabase db;  // the interface to a db4o database, stand-alone or client/server. 
-  private final ArrayList<Qso> qsoList;
+  private static final int TIME_INTERVAL_BETWEEN_QSOS = 1800; // time interval between qso seconds
   
   
+  private final LogDatabase db;         // Interface to a db4o database, stand-alone or client/server. 
+  private final ArrayList<Qso> qsoList; // Log is also mirrored in RAM
+  private final Qso   exampleQso;
+  private int timeIntervalBetweenQso = TIME_INTERVAL_BETWEEN_QSOS;
   /**
    *
    * 
-   * @param db interface to a already opened database
+   * @param db interface to an already opened database
+   * @param exampleQso - here we must input an example Qso from which the log 
+   * will determine the column count and their names.
    */
-  public Log(LogDatabase db)
+  public Log(LogDatabase db, Qso exampleQso)
   {
     this.db = db;
     qsoList = new ArrayList<> (db.getAll()); // Load Qsos from the database
+    
+    this.exampleQso = exampleQso;
   }
   
   
@@ -65,6 +70,7 @@ public class Log implements I_Log
   {
     db.add(qso);      // Add the qso to the database
     qsoList.add(qso); // Add the qso to RAM (i.e local list)
+    db.commit();
   }
 
   
@@ -74,12 +80,11 @@ public class Log implements I_Log
    * @param index - Qso index inside the log (0 is being the first QSO in the log)
    * @return  Reference to the QSO object
    */
-  @Override
-  public I_Qso get(int index)
+  public Qso get(int index)
   {
     return qsoList.get(index);
   }
-  
+ 
   
   /**
    * Removes a QSO object from the log.
@@ -90,6 +95,7 @@ public class Log implements I_Log
   {
     db.remove(qsoList.get(index)); // Remove the qso from the RAM (i.e local list)
     qsoList.remove(index);         // Remove the qso from the database
+    db.commit();
   }
   
   
@@ -98,7 +104,6 @@ public class Log implements I_Log
    * 
    * @return Returns the amount of QSO objects contained in the Log.
    */
-  @Override
   public int getRowCount()
   {
     return qsoList.size();
@@ -118,17 +123,24 @@ public class Log implements I_Log
    * @return The number of columns inside the log. If log is empty the return 
    * value will be 0.
    */
-  @Override
   public int getColumnCount()
   {
-    if(qsoList.isEmpty())
-      return 0;
-    
-    Qso qso = qsoList.get(0); // Use the first Qso from the list as a prototype
-    return qso.getParamsCount();
+    return exampleQso.getParamsCount();
   }
   
-
+   /**
+   * Returns the column name of the log which is equivalent to a Qso parameter
+   * name.
+   * 
+   * @param col Column index of which we would like to get the name
+   * @return Name of the column (i.e. name of the Qso param)
+   */
+  public String getColumnName(int col)
+  {
+    return exampleQso.getParamName(col);
+  }
+  
+  
   /**
    * Returns the value from the specified cell.
    * 
@@ -138,26 +150,10 @@ public class Log implements I_Log
    * @param col Column index (i.e. index of Qso param)
    * @return 
    */
-  @Override
   public String getValueAt(int row, int col)
   {
     Qso qso = qsoList.get(row);
     return qso.getParamValue(col);
-  }
-  
-  
-  /**
-   * Returns the column name of the log which is equivalent to a Qso parameter
-   * name.
-   * 
-   * @param col Column index of which we would like to get the name
-   * @return Name of the column (i.e. name of the Qso param)
-   */
-  @Override
-  public String getColumnName(int col)
-  {
-    Qso qso = qsoList.get(0); // We will use the first Qso from the list as a prototype
-    return qso.getParamName(col);
   }
    
   
@@ -175,15 +171,70 @@ public class Log implements I_Log
     Qso qso = qsoList.get(row); 
     qso.setParamValue(col,value); // Update 
     db.modify(qso); // Update the database
+    db.commit();
   }
   
+  public int getQsoCount()
+  {
+      return qsoList.size();
+  }
+
   
   /**
-   * Commits all not committed changes to the database
+   * Returns the serial number that we must send for the next Qso
+   * 
+   * @return string of the type 010 020. First part is the serial number of the Qso.
+   * Second part is the first three figures of received report during previous Qso.
+   * Report for the  first Qso is 001 000.
    */
-  public void writeToDB()
+  public String getNextSentReport()
   {
-    db.commit();
+    // If the log is empty send "001000"
+    if(getRowCount() == 0)
+    {
+      return "001000";
+    }
+    // Else send serial number + first three digits of received report during previous Qso
+    else
+    {
+      String part1 = String.format("%03d", getRowCount()+1);
+      
+      Qso qso = qsoList.get(qsoList.size()-1);
+      String part2 = qso.getRcv().substring(0, 3);
+      
+      return part1+part2;
+    }
+  }
+  
+  /**
+   * Set the time interval between QSOs with the same station
+   * 
+   * @param timeInterval - time interval in seconds
+   */
+  public void setTimeInterval(int timeInterval)
+  {
+    this.timeIntervalBetweenQso = timeInterval;
+  }
+ 
+  
+  /**
+   * Returns the time left till the next possible contact
+   * @param callsign The callsign of the station
+   * @return time left in seconds
+   * @throws java.lang.Exception - if there is contact before with this station
+   */
+  public long getTimeLeft(String callsign) throws Exception
+  {
+    //find last Qso with this station
+    for(int i=qsoList.size()-1; i>=0; i--)
+    {
+      if(callsign.equalsIgnoreCase(qsoList.get(i).getHisCallsign()))
+      {
+        return qsoList.get(i).getElapsedTime();
+      }
+    }
+    
+    throw new Exception("no qso before");
   }
  
   
