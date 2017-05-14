@@ -35,7 +35,7 @@ import java.util.ArrayList;
 public class Log
 {
   private static final int TIME_INTERVAL_BETWEEN_QSOS = 1800; // time interval between qso seconds
-  
+  public  static final String DEFAULT_CALLSIGN_PREFIX = "LZ0";
   
   private final LogDatabase db;         // Interface to a db4o database, stand-alone or client/server. 
   private final ArrayList<Qso> qsoList; // Log is also mirrored in RAM
@@ -218,23 +218,74 @@ public class Log
  
   
   /**
-   * Returns the time left till the next possible contact
-   * @param callsign The callsign of the station
-   * @return time left in seconds
-   * @throws java.lang.Exception - if there is contact before with this station
+   * Return the last Qso that we had with this station
+   * @param callsign station callsign
+   * @return Qso object
    */
-  public long getTimeLeft(String callsign) throws Exception
+  public Qso getLastQso(String callsign)
   {
     //find last Qso with this station
-    for(int i=qsoList.size()-1; i>=0; i--)
+    for (int i = qsoList.size() - 1; i >= 0; i--)
     {
-      if(callsign.equalsIgnoreCase(qsoList.get(i).getHisCallsign()))
+      if (callsign.equalsIgnoreCase(qsoList.get(i).getHisCallsign()))
       {
-        return qsoList.get(i).getElapsedTime();
+        return qsoList.get(i);
       }
     }
     
-    throw new Exception("no qso before");
+    return null;
+  }
+  
+  
+  /**
+   * Returns time left till the next possible contact
+   * 
+   * @param qso
+   * @return
+   */
+  public long getSecondsLeft(Qso qso)
+  {
+    return TIME_INTERVAL_BETWEEN_QSOS-qso.getElapsedSeconds();
+  }
+  
+  /**
+   * Same as getSecondsLeft but returns the seconds left in the following format mm:ss
+   * 
+   * @param qso
+   * @return 
+   */
+  public String getTimeLeftFormatted(Qso qso)
+  {
+    long secondsleft = getSecondsLeft(qso);
+
+    long second = secondsleft % 60;
+    long minute = (secondsleft / 60) % 60;
+    String timeleft = String.format("%02d:%02d", minute, second);
+    
+    return timeleft;
+  }
+  
+  
+  /**
+   * Checks if it is OK to work the station
+   * 
+   * @param callsign
+   * @return true if the required time has not elapsed
+   */
+  public boolean isDupe(String callsign)
+  {
+    Qso qso = getLastQso(callsign);
+    
+    // If there is no previous contact with this station
+    if(qso == null)
+    {
+      return false;
+    }
+    
+    //Prvious contact was found...
+    long secondsLeft = getSecondsLeft(qso);
+    
+    return secondsLeft > 0;
   }
  
   

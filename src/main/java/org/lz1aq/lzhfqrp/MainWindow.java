@@ -24,6 +24,9 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
+import jssc.SerialPortList;
 import org.lz1aq.log.Log;
 import org.lz1aq.log.LogDatabase;
 import org.lz1aq.log.LogTableModel;
@@ -35,16 +38,19 @@ import org.lz1aq.log.Qso;
  */
 public class MainWindow extends javax.swing.JFrame
 {
-
+  static final String PROGRAM_VERSION = "1.0.0";
+  static final String PROGRAM_NAME    = "LZ Log";
+    
   Log log;
   LogTableModel qsoTableModel;
-  String myCallsign = "lz1abc";
-
+  private final ApplicationSettings  applicationSettings;
+  
   /**
    * Creates new form MainWindow
    */
   public MainWindow()
   {
+    
     // We need to supply an example QSO whwn creating/opening new
     try
     {
@@ -57,7 +63,11 @@ public class MainWindow extends javax.swing.JFrame
     {
       Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
     }
-
+    
+    // Load user settings from the properties file
+    this.applicationSettings = new ApplicationSettings();
+    
+    // 
     // Init GUI
     initComponents();
 
@@ -84,9 +94,20 @@ public class MainWindow extends javax.swing.JFrame
   {
     java.awt.GridBagConstraints gridBagConstraints;
 
-    buttonGroup1 = new javax.swing.ButtonGroup();
-    jInternalFrame1 = new javax.swing.JInternalFrame();
+    buttonGroupTypeOfWork = new javax.swing.ButtonGroup();
+    jDialogSettings = new javax.swing.JDialog();
     jPanel1 = new javax.swing.JPanel();
+    jPanel3 = new javax.swing.JPanel();
+    textfieldSettingsMyCallsign = new javax.swing.JTextField();
+    jPanel4 = new javax.swing.JPanel();
+    jComboBoxComPort = new javax.swing.JComboBox();
+    jLabel12 = new javax.swing.JLabel();
+    jPanel5 = new javax.swing.JPanel();
+    jButtonCancel = new javax.swing.JButton();
+    jButtonSave = new javax.swing.JButton();
+    jPanel6 = new javax.swing.JPanel();
+    checkboxSettingsQuickMode = new javax.swing.JCheckBox();
+    textfieldSettingsDefaultPrefix = new javax.swing.JTextField();
     jpanelEntry = new javax.swing.JPanel();
     jpanelCallsign = new javax.swing.JPanel();
     jtextfieldCallsign = new javax.swing.JTextField();
@@ -111,7 +132,7 @@ public class MainWindow extends javax.swing.JFrame
     jButton11 = new javax.swing.JButton();
     jButton12 = new javax.swing.JButton();
     jPanelStatusBar = new javax.swing.JPanel();
-    jlabelEntryStatus = new javax.swing.JLabel();
+    jlabelCallsignStatus = new javax.swing.JLabel();
     jpanelLog = new javax.swing.JPanel();
     jScrollPane1 = new javax.swing.JScrollPane();
     jtableLog = new javax.swing.JTable();
@@ -122,48 +143,203 @@ public class MainWindow extends javax.swing.JFrame
     jMenuBar1 = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     jMenu2 = new javax.swing.JMenu();
+    jMenuItem1 = new javax.swing.JMenuItem();
 
-    jInternalFrame1.setVisible(true);
-    jInternalFrame1.getContentPane().setLayout(new java.awt.GridBagLayout());
+    jDialogSettings.setTitle("Settings");
+    jDialogSettings.setAlwaysOnTop(true);
+    jDialogSettings.setModal(true);
+    jDialogSettings.setType(java.awt.Window.Type.UTILITY);
+    jDialogSettings.addComponentListener(new java.awt.event.ComponentAdapter()
+    {
+      public void componentShown(java.awt.event.ComponentEvent evt)
+      {
+        jDialogSettingsComponentShown(evt);
+      }
+    });
+    jDialogSettings.getContentPane().setLayout(new java.awt.GridBagLayout());
 
     jPanel1.setLayout(new java.awt.GridBagLayout());
+
+    jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("My callsign"));
+    jPanel3.setLayout(new java.awt.GridBagLayout());
+
+    textfieldSettingsMyCallsign.setFont(new java.awt.Font("Dialog", 0, 24)); // NOI18N
+    textfieldSettingsMyCallsign.setText("Your callsign here");
     gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    jInternalFrame1.getContentPane().add(jPanel1, gridBagConstraints);
+    gridBagConstraints.insets = new java.awt.Insets(20, 20, 20, 20);
+    jPanel3.add(textfieldSettingsMyCallsign, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+    jPanel1.add(jPanel3, gridBagConstraints);
+
+    jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("CommPort settings"));
+    jPanel4.setLayout(new java.awt.GridBagLayout());
+
+    jComboBoxComPort.setModel(getComportsComboboxModel());
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+    jPanel4.add(jComboBoxComPort, gridBagConstraints);
+
+    jLabel12.setText("CommPort");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+    jPanel4.add(jLabel12, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+    jPanel1.add(jPanel4, gridBagConstraints);
+
+    jPanel5.setLayout(new java.awt.GridBagLayout());
+
+    jButtonCancel.setText("Cancel");
+    jButtonCancel.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButtonCancelActionPerformed(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(5, 2, 5, 5);
+    jPanel5.add(jButtonCancel, gridBagConstraints);
+
+    jButtonSave.setText("Save");
+    jButtonSave.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButtonSaveActionPerformed(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 2);
+    jPanel5.add(jButtonSave, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+    jPanel1.add(jPanel5, gridBagConstraints);
+
+    jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Quick callsign mode"));
+    jPanel6.setLayout(new java.awt.GridBagLayout());
+
+    checkboxSettingsQuickMode.setText("Enable quick callsign entry");
+    checkboxSettingsQuickMode.setToolTipText("If enabled will allow to enter callsign by using only the sufix");
+    checkboxSettingsQuickMode.addChangeListener(new javax.swing.event.ChangeListener()
+    {
+      public void stateChanged(javax.swing.event.ChangeEvent evt)
+      {
+        checkboxSettingsQuickModeStateChanged(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 10, 5);
+    jPanel6.add(checkboxSettingsQuickMode, gridBagConstraints);
+
+    textfieldSettingsDefaultPrefix.setFont(new java.awt.Font("Dialog", 0, 24)); // NOI18N
+    textfieldSettingsDefaultPrefix.setText("LZ0");
+    textfieldSettingsDefaultPrefix.setToolTipText("The default prefix which will be added");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.3;
+    gridBagConstraints.weighty = 1.0;
+    jPanel6.add(textfieldSettingsDefaultPrefix, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 0.1;
+    gridBagConstraints.weighty = 0.1;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+    jPanel1.add(jPanel6, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    jDialogSettings.getContentPane().add(jPanel1, gridBagConstraints);
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+    addWindowListener(new java.awt.event.WindowAdapter()
+    {
+      public void windowOpened(java.awt.event.WindowEvent evt)
+      {
+        formWindowOpened(evt);
+      }
+      public void windowClosing(java.awt.event.WindowEvent evt)
+      {
+        formWindowClosing(evt);
+      }
+    });
     getContentPane().setLayout(new java.awt.GridBagLayout());
 
     jpanelEntry.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
     jpanelEntry.setLayout(new java.awt.GridBagLayout());
 
+    jpanelCallsign.setFocusCycleRoot(true);
     jpanelCallsign.setLayout(new java.awt.GridBagLayout());
 
     jtextfieldCallsign.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
     jtextfieldCallsign.setHorizontalAlignment(javax.swing.JTextField.CENTER);
     jtextfieldCallsign.setText("Callsign");
     jtextfieldCallsign.setBorder(javax.swing.BorderFactory.createTitledBorder("Callsign"));
-    jtextfieldCallsign.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
-        jtextfieldCallsignActionPerformed(evt);
-      }
-    });
     jtextfieldCallsign.addKeyListener(new java.awt.event.KeyAdapter()
     {
       public void keyTyped(java.awt.event.KeyEvent evt)
       {
         jtextfieldCallsignKeyTyped(evt);
       }
-      public void keyPressed(java.awt.event.KeyEvent evt)
+      public void keyReleased(java.awt.event.KeyEvent evt)
       {
-        jtextfieldCallsignKeyPressed(evt);
+        jtextfieldCallsignKeyReleased(evt);
       }
     });
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -188,6 +364,13 @@ public class MainWindow extends javax.swing.JFrame
     jtextfieldRcv.setHorizontalAlignment(javax.swing.JTextField.CENTER);
     jtextfieldRcv.setText("299 209");
     jtextfieldRcv.setBorder(javax.swing.BorderFactory.createTitledBorder("Rcv"));
+    jtextfieldRcv.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jtextfieldRcvActionPerformed(evt);
+      }
+    });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -204,6 +387,7 @@ public class MainWindow extends javax.swing.JFrame
 
     jpanelTypeOfWork.setLayout(new java.awt.GridBagLayout());
 
+    buttonGroupTypeOfWork.add(jRadioButton1);
     jRadioButton1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
     jRadioButton1.setText("CQ");
     jRadioButton1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -215,6 +399,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 1.0;
     jpanelTypeOfWork.add(jRadioButton1, gridBagConstraints);
 
+    buttonGroupTypeOfWork.add(jRadioButton2);
     jRadioButton2.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
     jRadioButton2.setText("S&P");
     jRadioButton2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -247,6 +432,7 @@ public class MainWindow extends javax.swing.JFrame
     jpanelFunctionKeys.setLayout(new java.awt.GridBagLayout());
 
     jButton1.setText("F1 CQ");
+    jButton1.setFocusable(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -255,6 +441,7 @@ public class MainWindow extends javax.swing.JFrame
     jpanelFunctionKeys.add(jButton1, gridBagConstraints);
 
     jButton2.setText("F2 Exch");
+    jButton2.setFocusable(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -263,6 +450,7 @@ public class MainWindow extends javax.swing.JFrame
     jpanelFunctionKeys.add(jButton2, gridBagConstraints);
 
     jButton3.setText("F3 Tu");
+    jButton3.setFocusable(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -271,6 +459,7 @@ public class MainWindow extends javax.swing.JFrame
     jpanelFunctionKeys.add(jButton3, gridBagConstraints);
 
     jButton4.setText("F4 MyCall");
+    jButton4.setFocusable(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -280,6 +469,7 @@ public class MainWindow extends javax.swing.JFrame
     jpanelFunctionKeys.add(jButton4, gridBagConstraints);
 
     jButton5.setText("F5 His Call");
+    jButton5.setFocusable(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -288,6 +478,7 @@ public class MainWindow extends javax.swing.JFrame
     jpanelFunctionKeys.add(jButton5, gridBagConstraints);
 
     jButton6.setText("F6 Agn");
+    jButton6.setFocusable(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -296,6 +487,7 @@ public class MainWindow extends javax.swing.JFrame
     jpanelFunctionKeys.add(jButton6, gridBagConstraints);
 
     jButton7.setText("F7 ?");
+    jButton7.setFocusable(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -304,6 +496,7 @@ public class MainWindow extends javax.swing.JFrame
     jpanelFunctionKeys.add(jButton7, gridBagConstraints);
 
     jButton8.setText("F8 Dupe");
+    jButton8.setFocusable(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -323,6 +516,7 @@ public class MainWindow extends javax.swing.JFrame
     jpanelAdditionalKeys.setLayout(new java.awt.GridBagLayout());
 
     jButton9.setText("F9 Store as CQ freq");
+    jButton9.setFocusable(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
@@ -332,6 +526,7 @@ public class MainWindow extends javax.swing.JFrame
 
     jButton10.setText("F10 To Bandmap");
     jButton10.setToolTipText("");
+    jButton10.setFocusable(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
@@ -340,6 +535,7 @@ public class MainWindow extends javax.swing.JFrame
     jpanelAdditionalKeys.add(jButton10, gridBagConstraints);
 
     jButton11.setText("F11 Spare");
+    jButton11.setFocusable(false);
     jButton11.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -350,6 +546,7 @@ public class MainWindow extends javax.swing.JFrame
     jpanelAdditionalKeys.add(jButton11, new java.awt.GridBagConstraints());
 
     jButton12.setText("F12 Wipe");
+    jButton12.setFocusable(false);
     jButton12.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -370,16 +567,16 @@ public class MainWindow extends javax.swing.JFrame
 
     jPanelStatusBar.setLayout(new java.awt.GridBagLayout());
 
-    jlabelEntryStatus.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-    jlabelEntryStatus.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-    jlabelEntryStatus.setText("status text here");
-    jlabelEntryStatus.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+    jlabelCallsignStatus.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+    jlabelCallsignStatus.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jlabelCallsignStatus.setText("status text here");
+    jlabelCallsignStatus.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    jPanelStatusBar.add(jlabelEntryStatus, gridBagConstraints);
+    jPanelStatusBar.add(jlabelCallsignStatus, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -459,21 +656,24 @@ public class MainWindow extends javax.swing.JFrame
     jMenu1.setText("File");
     jMenuBar1.add(jMenu1);
 
-    jMenu2.setText("Settings");
+    jMenu2.setText("Tools");
+
+    jMenuItem1.setText("Settings");
+    jMenuItem1.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuItem1ActionPerformed(evt);
+      }
+    });
+    jMenu2.add(jMenuItem1);
+
     jMenuBar1.add(jMenu2);
 
     setJMenuBar(jMenuBar1);
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
-
-    private void jtextfieldCallsignActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jtextfieldCallsignActionPerformed
-    {//GEN-HEADEREND:event_jtextfieldCallsignActionPerformed
-      if (addEntryToLog())
-      {
-        initEntryFields();
-      }
-    }//GEN-LAST:event_jtextfieldCallsignActionPerformed
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton11ActionPerformed
     {//GEN-HEADEREND:event_jButton11ActionPerformed
@@ -487,21 +687,34 @@ public class MainWindow extends javax.swing.JFrame
 
   private void jtextfieldCallsignKeyTyped(java.awt.event.KeyEvent evt)//GEN-FIRST:event_jtextfieldCallsignKeyTyped
   {//GEN-HEADEREND:event_jtextfieldCallsignKeyTyped
-    if(evt.getKeyChar() == KeyEvent.VK_SPACE)
+    switch(evt.getKeyChar())
     {
-      try
-      {
-        long secondsleft = log.getTimeLeft(jtextfieldCallsign.getText());
-        jlabelEntryStatus.setText(Long.toString(secondsleft));
-      }
-      catch (Exception ex)
-      {
-        jlabelEntryStatus.setText("New callsign");
-      }
-
-      evt.consume();
-      
+      case KeyEvent.VK_SPACE:
+        // If Dupe - clear the fields
+        if(log.isDupe(getCallsignFromTextField()))
+        {
+          initEntryFields();
+          evt.consume();
+        }
+        // If not DUPE - move to Rcv field
+        else
+        {
+          jtextfieldRcv.requestFocus();
+          evt.consume();
+        }
+        break;
+        
+        
+      case KeyEvent.VK_ENTER:
+        // Move to Rcv field
+        jtextfieldRcv.requestFocus();
+        evt.consume();
+        break;
     }
+   
+      
+   
+   
 //    switch(evt.getKeyCode())
 //    {
 //      case KeyEvent.VK_SPACE:
@@ -514,17 +727,84 @@ public class MainWindow extends javax.swing.JFrame
    
   }//GEN-LAST:event_jtextfieldCallsignKeyTyped
 
-  private void jtextfieldCallsignKeyPressed(java.awt.event.KeyEvent evt)//GEN-FIRST:event_jtextfieldCallsignKeyPressed
-  {//GEN-HEADEREND:event_jtextfieldCallsignKeyPressed
-     
-     
-     
-  }//GEN-LAST:event_jtextfieldCallsignKeyPressed
+  private void jtextfieldCallsignKeyReleased(java.awt.event.KeyEvent evt)//GEN-FIRST:event_jtextfieldCallsignKeyReleased
+  {//GEN-HEADEREND:event_jtextfieldCallsignKeyReleased
+    // On every key press update the callsign status
+    String status = getCallsignStatusText(getCallsignFromTextField());
+    jlabelCallsignStatus.setText(status);
+  }//GEN-LAST:event_jtextfieldCallsignKeyReleased
 
+  private void jtextfieldRcvActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jtextfieldRcvActionPerformed
+  {//GEN-HEADEREND:event_jtextfieldRcvActionPerformed
+    // If DUPE ask for confirmation to log
+    if(log.isDupe(getCallsignFromTextField()))
+    {
+      int response = JOptionPane.showConfirmDialog(null, "Do you want to log DUPE Qso?", "Confirm",
+              JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+      if (response == JOptionPane.NO_OPTION || response == JOptionPane.CLOSED_OPTION)
+      {
+        return; // do nothing
+      }
+    }
+    
+    // Log Qso
+    if(addEntryToLog())
+    {
+      initEntryFields();
+      // Move focus to Callsign field
+      jtextfieldCallsign.requestFocus();
+    }
+  }//GEN-LAST:event_jtextfieldRcvActionPerformed
+
+  private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButtonCancelActionPerformed
+  {//GEN-HEADEREND:event_jButtonCancelActionPerformed
+    jDialogSettings.setVisible(false);
+  }//GEN-LAST:event_jButtonCancelActionPerformed
+
+  private void jButtonSaveActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButtonSaveActionPerformed
+  {//GEN-HEADEREND:event_jButtonSaveActionPerformed
+    jDialogSettings.setVisible(false); // Hide the SettingsDialog
+    storeSettingsDialogParams();       // Read the state of the controls and save them
+
+    initMainWindow(false);
+  }//GEN-LAST:event_jButtonSaveActionPerformed
+
+  private void jDialogSettingsComponentShown(java.awt.event.ComponentEvent evt)//GEN-FIRST:event_jDialogSettingsComponentShown
+  {//GEN-HEADEREND:event_jDialogSettingsComponentShown
+    // Settings dialog is shown and we need to set the states of the controls
+    initSettingsDialog();
+  }//GEN-LAST:event_jDialogSettingsComponentShown
+
+  private void formWindowOpened(java.awt.event.WindowEvent evt)//GEN-FIRST:event_formWindowOpened
+  {//GEN-HEADEREND:event_formWindowOpened
+    initMainWindow(true);
+  }//GEN-LAST:event_formWindowOpened
+
+  private void formWindowClosing(java.awt.event.WindowEvent evt)//GEN-FIRST:event_formWindowClosing
+  {//GEN-HEADEREND:event_formWindowClosing
+    applicationSettings.SaveSettingsToDisk(); // Save all settings to disk
+  }//GEN-LAST:event_formWindowClosing
+
+  private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem1ActionPerformed
+  {//GEN-HEADEREND:event_jMenuItem1ActionPerformed
+     jDialogSettings.pack();
+    jDialogSettings.setVisible(true);
+  }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+  private void checkboxSettingsQuickModeStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_checkboxSettingsQuickModeStateChanged
+  {//GEN-HEADEREND:event_checkboxSettingsQuickModeStateChanged
+    if(checkboxSettingsQuickMode.isSelected())
+      textfieldSettingsDefaultPrefix.setEnabled(true);
+    else
+      textfieldSettingsDefaultPrefix.setEnabled(false);
+  }//GEN-LAST:event_checkboxSettingsQuickModeStateChanged
+  
+  
   /**
-   * Reads the info from the entry window and if all data is correct it saves it into the Log
+   * Reads the info from the entry window and if all data is valid it saves it into the Log
    *
-   * @return true if the QSO was successfully logged
+   * @return true - if the QSO was successfully logged
+   *         false - 
    */
   boolean addEntryToLog()
   {
@@ -533,11 +813,11 @@ public class MainWindow extends javax.swing.JFrame
     try
     {
       qso = new Qso(14190000, // TODO -> get freq
-              "cw", // TODO -> radio.getmode
-              myCallsign,
-              jtextfieldCallsign.getText(),
-              jtextfieldSnt.getText(),
-              jtextfieldRcv.getText());
+                    "cw", // TODO -> radio.getmode
+                    applicationSettings.getMyCallsign(),
+                    getCallsignFromTextField(),
+                    jtextfieldSnt.getText(),
+                    jtextfieldRcv.getText());
     }
     catch (Exception exc)
     {
@@ -549,6 +829,66 @@ public class MainWindow extends javax.swing.JFrame
     return true;
   }
 
+  
+  /**
+   * Gets the callsign from the jtextfieldCallsign.
+   * If the callsign was inserted in the short form (e.g. HH) this function will return the full
+   * form (i.e. LZ2HH)
+   * @return - the callsign in its full form (e.g. LZ6HH)
+   */
+  private String getCallsignFromTextField()
+  {
+    String callsign = jtextfieldCallsign.getText();
+    
+    if(applicationSettings.isQuickCallsignModeEnabled())
+    {
+      callsign = Log.DEFAULT_CALLSIGN_PREFIX+callsign;
+    }
+    
+    return callsign;
+  }
+  
+  
+  /**
+   * Prints info concerning the callsign:
+   * NEW - If no qso before
+   * OK - Qso before but the required time has elapsed
+   * DUPE time left... - Qso before and the required time has not elapsed
+   * @param callsign
+   * @return 
+   */
+  private String getCallsignStatusText(String callsign)
+  {
+    String statusText = "";
+
+    Qso qso = log.getLastQso(callsign);
+
+    // Unknown callsign - OK to work
+    if (qso == null)
+    {
+      statusText = "New";
+    }
+    else
+    {
+      // Required time has not elapsed
+      if (log.getSecondsLeft(qso) > 0)
+      {
+        // Print DUPE
+        statusText = statusText.concat("DUPE   ");
+
+        //Print the time left till next possible contact
+        statusText = statusText.concat("time left: " + log.getTimeLeftFormatted(qso));
+      }
+      else
+      {
+        statusText = "OK";
+      }
+    }
+    
+    return statusText;
+  }
+  
+  
   /**
    * Cleans/prepares the entry fields for the next QSO
    */
@@ -560,6 +900,80 @@ public class MainWindow extends javax.swing.JFrame
     jtextfieldSnt.setText(log.getNextSentReport());
     // Cean the Rcv field
     jtextfieldRcv.setText("");
+  }
+  
+  /**
+   * @return Returns a new DefaultComboBoxModel containing all available COM ports
+   */
+  private DefaultComboBoxModel getComportsComboboxModel()
+  {
+    String[] portNames = SerialPortList.getPortNames();
+    return new DefaultComboBoxModel(portNames);
+  }
+  
+  
+  /**
+   * Initialize the controls of the main windows
+   */
+  private void initMainWindow(boolean isStartup)
+  {
+//    // Read last used JFrame dimensions and restore it
+//    if (isStartup)
+//    {
+//      if (applicationSettings.getJFrameDimensions().isEmpty() == false)
+//      {
+//        this.setBounds(applicationSettings.getJFrameDimensions());
+//      }
+//
+//    }
+  }
+    
+    
+  /**
+   * User has opened the setting dialog and we need to load the state of the controls
+   */
+  private void initSettingsDialog()
+  {
+    // Comport selection
+    jComboBoxComPort.setSelectedItem(applicationSettings.getComPort());
+  
+    // my callsing texts
+    textfieldSettingsMyCallsign.setText(applicationSettings.getMyCallsign());
+
+    // Quick callsign mode 
+    checkboxSettingsQuickMode.setSelected(applicationSettings.isQuickCallsignModeEnabled());
+    
+    // Default prefix
+    textfieldSettingsDefaultPrefix.setText(applicationSettings.getDefaultPrefix());
+    
+    // Disable the "default prefix" text field if the "Quick callsign mode" is disabled
+    if(applicationSettings.isQuickCallsignModeEnabled() == false) 
+    {
+      textfieldSettingsDefaultPrefix.setEnabled(false);
+    }
+   
+  }
+    
+    
+  /**
+   * User has closed the setting dialog and we need to save the state of the controls
+   */
+  private void storeSettingsDialogParams()
+  {
+    // Commport
+    if (jComboBoxComPort.getSelectedItem() != null)
+    {
+      applicationSettings.setComPort(jComboBoxComPort.getSelectedItem().toString());
+    }
+    
+    // Callsign
+    applicationSettings.setMyCallsign(textfieldSettingsMyCallsign.getText());
+   
+    // Quick callsign mode
+    applicationSettings.setQuickCallsignMode(checkboxSettingsQuickMode.isSelected());
+    
+    // Default prefix
+    applicationSettings.setDefaultPrefix(textfieldSettingsDefaultPrefix.getText());
   }
 
   /**
@@ -612,7 +1026,8 @@ public class MainWindow extends javax.swing.JFrame
   }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.ButtonGroup buttonGroup1;
+  private javax.swing.ButtonGroup buttonGroupTypeOfWork;
+  private javax.swing.JCheckBox checkboxSettingsQuickMode;
   private javax.swing.JButton jButton1;
   private javax.swing.JButton jButton10;
   private javax.swing.JButton jButton11;
@@ -625,18 +1040,27 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JButton jButton7;
   private javax.swing.JButton jButton8;
   private javax.swing.JButton jButton9;
-  private javax.swing.JInternalFrame jInternalFrame1;
+  private javax.swing.JButton jButtonCancel;
+  private javax.swing.JButton jButtonSave;
+  private javax.swing.JComboBox jComboBoxComPort;
+  private javax.swing.JDialog jDialogSettings;
   private javax.swing.JLabel jLabel1;
+  private javax.swing.JLabel jLabel12;
   private javax.swing.JMenu jMenu1;
   private javax.swing.JMenu jMenu2;
   private javax.swing.JMenuBar jMenuBar1;
+  private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JPanel jPanel1;
+  private javax.swing.JPanel jPanel3;
+  private javax.swing.JPanel jPanel4;
+  private javax.swing.JPanel jPanel5;
+  private javax.swing.JPanel jPanel6;
   private javax.swing.JPanel jPanelStatusBar;
   private javax.swing.JRadioButton jRadioButton1;
   private javax.swing.JRadioButton jRadioButton2;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JScrollPane jScrollPane3;
-  private javax.swing.JLabel jlabelEntryStatus;
+  private javax.swing.JLabel jlabelCallsignStatus;
   private javax.swing.JPanel jpanelAdditionalKeys;
   private javax.swing.JPanel jpanelBandmap;
   private javax.swing.JPanel jpanelCallsign;
@@ -650,5 +1074,7 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JTextField jtextfieldCallsign;
   private javax.swing.JTextField jtextfieldRcv;
   private javax.swing.JTextField jtextfieldSnt;
+  private javax.swing.JTextField textfieldSettingsDefaultPrefix;
+  private javax.swing.JTextField textfieldSettingsMyCallsign;
   // End of variables declaration//GEN-END:variables
 }

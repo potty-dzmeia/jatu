@@ -296,7 +296,7 @@ public class Qso
 
   
   
-  public long getElapsedTime()
+  public long getElapsedSeconds()
   { 
     return (TimeUtils.getUTC().getMillis()-utc.getMillis())/1000;
   }

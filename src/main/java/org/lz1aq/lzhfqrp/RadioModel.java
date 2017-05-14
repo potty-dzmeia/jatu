@@ -27,38 +27,38 @@ import org.lz1aq.utils.RadioVfos;
  */
 public class RadioModel
 {
-    RadioVfos activeVfo;
-    int vfoAFreq;
-    int vfoBFreq;
-    
-    
-    
-    /**
-     * Gets frequency of the currently active VFO
-     * 
-     * @return 
-     */
-    int getFreq()
-    {
-        // send the IF command and get the frequency from there
-    }
-    
-    /**
-     * Sets the frequency of the currently active VFO to the desired value
-     * @param freq 
-     */
-    void setFreq(int freq)
-    {
-        if(activeVfo == RadioVfos.A)
-        {
-            vfoAFreq =  freq;
-        }
-        else
-        {
-            vfoBFreq = freq;
-        }  
-    }
-    
-    
+//    RadioVfos activeVfo;
+//    int vfoAFreq;
+//    int vfoBFreq;
+//    
+//    
+//    
+//    /**
+//     * Gets frequency of the currently active VFO
+//     * 
+//     * @return 
+//     */
+//    int getFreq()
+//    {
+//        // send the IF command and get the frequency from there
+//    }
+//    
+//    /**
+//     * Sets the frequency of the currently active VFO to the desired value
+//     * @param freq 
+//     */
+//    void setFreq(int freq)
+//    {
+//        if(activeVfo == RadioVfos.A)
+//        {
+//            vfoAFreq =  freq;
+//        }
+//        else
+//        {
+//            vfoBFreq = freq;
+//        }  
+//    }
+//    
+//    
     
 }

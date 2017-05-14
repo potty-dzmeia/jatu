@@ -36,98 +36,98 @@ import org.lz1aq.utils.RadioVfos;
  */
 public class RadioController
 {
-    int vfoFreq = 14000000;
-
-    public RadioController()
-    {
-        
-    }
-    
-    void connect(String filename, String commPort)
-    {
-        
-    }
-    int getFrequency()
-    {
-        return freq;
-    }
-   
-    
-    void setFrequency(int freq)
-    {
-        
-    }
-    
-    
-    /**
-   * Handlers for events coming from the radio
-   */
-  private class LocalRadioListener implements RadioListener
-  {
-    @Override
-    public void eventNotsupported(NotsupportedEvent e){} // not interested
-
-    @Override
-    public void eventConfirmation(ConfirmationEvent e){} // not interested
-
-    @Override
-    public void eventFrequency(final FrequencyEvent e)
-    {
-      /* Create and display the form */
-      java.awt.EventQueue.invokeLater(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          if(e.getVfo() == RadioVfos.A)
-            frequencyATextfield.setText(Misc.formatFrequency(e.getFrequency()));
-          else if(e.getVfo() == RadioVfos.B)
-            frequencyBTextfield.setText(Misc.formatFrequency(e.getFrequency()));
-          else
-          {
-            frequencyATextfield.setText(Misc.formatFrequency(e.getFrequency()));
-            logger.warning("Frequency event from unknown VFO!");
-          }
-            
-        }
-      });
-    }
-
-    @Override
-    public void eventMode(final ModeEvent e)
-    {
-       /* Create and display the form */
-      java.awt.EventQueue.invokeLater(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          if(e.getVfo() == RadioVfos.A)
-            modeATextfield.setText(e.getMode().toString());
-          else if(e.getVfo() == RadioVfos.B)
-            modeBTextfield.setText(e.getMode().toString());
-          else
-          {
-            modeATextfield.setText(e.getMode().toString());
-            logger.warning("Mode event from unknown VFO!");
-          }
-          
-        }
-      });
-    }
-    
-    @Override
-    public void eventSmeter(final SmeterEvent e)
-    {
-      /* Create and display the form */
-      java.awt.EventQueue.invokeLater(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          meterProgressBar.setValue(e.getValue());
-        }
-      });
-    }
-  }
+//    int vfoFreq = 14000000;
+//
+//    public RadioController()
+//    {
+//        
+//    }
+//    
+//    void connect(String filename, String commPort)
+//    {
+//        
+//    }
+//    int getFrequency()
+//    {
+//        return freq;
+//    }
+//   
+//    
+//    void setFrequency(int freq)
+//    {
+//        
+//    }
+//    
+//    
+//    /**
+//   * Handlers for events coming from the radio
+//   */
+//  private class LocalRadioListener implements RadioListener
+//  {
+//    @Override
+//    public void eventNotsupported(NotsupportedEvent e){} // not interested
+//
+//    @Override
+//    public void eventConfirmation(ConfirmationEvent e){} // not interested
+//
+//    @Override
+//    public void eventFrequency(final FrequencyEvent e)
+//    {
+//      /* Create and display the form */
+//      java.awt.EventQueue.invokeLater(new Runnable()
+//      {
+//        @Override
+//        public void run()
+//        {
+//          if(e.getVfo() == RadioVfos.A)
+//            frequencyATextfield.setText(Misc.formatFrequency(e.getFrequency()));
+//          else if(e.getVfo() == RadioVfos.B)
+//            frequencyBTextfield.setText(Misc.formatFrequency(e.getFrequency()));
+//          else
+//          {
+//            frequencyATextfield.setText(Misc.formatFrequency(e.getFrequency()));
+//            logger.warning("Frequency event from unknown VFO!");
+//          }
+//            
+//        }
+//      });
+//    }
+//
+//    @Override
+//    public void eventMode(final ModeEvent e)
+//    {
+//       /* Create and display the form */
+//      java.awt.EventQueue.invokeLater(new Runnable()
+//      {
+//        @Override
+//        public void run()
+//        {
+//          if(e.getVfo() == RadioVfos.A)
+//            modeATextfield.setText(e.getMode().toString());
+//          else if(e.getVfo() == RadioVfos.B)
+//            modeBTextfield.setText(e.getMode().toString());
+//          else
+//          {
+//            modeATextfield.setText(e.getMode().toString());
+//            logger.warning("Mode event from unknown VFO!");
+//          }
+//          
+//        }
+//      });
+//    }
+//    
+//    @Override
+//    public void eventSmeter(final SmeterEvent e)
+//    {
+//      /* Create and display the form */
+//      java.awt.EventQueue.invokeLater(new Runnable()
+//      {
+//        @Override
+//        public void run()
+//        {
+//          meterProgressBar.setValue(e.getValue());
+//        }
+//      });
+//    }
+//  }
 }
