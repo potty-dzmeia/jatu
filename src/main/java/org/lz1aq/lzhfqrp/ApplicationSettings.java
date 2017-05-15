@@ -40,7 +40,8 @@ public final class ApplicationSettings
     static final String PROPERTY_COMPORT              = "comPort";
     static final String PROPERTY_MY_CALL_SIGN         = "myCallSign";
     static final String PROPERTY_QUICK_CALLSIGN_MODE  = "quickCallsignMode";  
-    static final String PROPERTY_DEFAULT_PREFIX       = "LZ0";
+    static final String PROPERTY_DEFAULT_PREFIX       = "defaultPrefix";
+    static final String PROPERTY_QSO_REPEAT_PERIOD_SEC = "qsoRepeatPeriod";
     static final String PROPERTY_MAIN_WINDOW_X        = "x";
     static final String PROPERTY_MAIN_WINDOW_Y        = "y";
     static final String PROPERTY_MAIN_WINDOW_WIDTH    = "w";
@@ -50,6 +51,7 @@ public final class ApplicationSettings
     private String             myCallsign;
     private boolean            isQuickCallsignModeEnabled;
     private String             defaultPrefix;
+    private String             qsoRepeatPeriod;
     private Rectangle          jFrameDimensions; // JFrame settings: position and size
     
     private final Properties   prop;
@@ -128,6 +130,24 @@ public final class ApplicationSettings
       this.defaultPrefix = prefix;
     }
     
+    /**
+     * Get the allowed repeat period for Qso in seconds
+     * @return 
+     */
+    public int getQsoRepeatPeriod()
+    {
+      return Integer.parseInt(this.qsoRepeatPeriod);
+    }
+  
+    /**
+     * Set the allowed repeat period for Qso in seconds
+     * @param periodInSeconds 
+     */
+    public void setQsoRepeatPeriod(int periodInSeconds)
+    {
+      this.qsoRepeatPeriod = Integer.toString(periodInSeconds);
+    }
+    
     
     /**
      * Stores the array of values into properties which are named using
@@ -163,6 +183,7 @@ public final class ApplicationSettings
         prop.setProperty(PROPERTY_MY_CALL_SIGN, myCallsign);
         prop.setProperty(PROPERTY_QUICK_CALLSIGN_MODE, Boolean.toString(isQuickCallsignModeEnabled));
         prop.setProperty(PROPERTY_DEFAULT_PREFIX, defaultPrefix);
+        prop.setProperty(PROPERTY_QSO_REPEAT_PERIOD_SEC, qsoRepeatPeriod);
         
         // Now save the JFrame dimensions:
         prop.setProperty(PROPERTY_MAIN_WINDOW_X, Integer.toString(jFrameDimensions.x));
@@ -211,6 +232,11 @@ public final class ApplicationSettings
             if(defaultPrefix == null)
               throwMissingPropertyException(PROPERTY_DEFAULT_PREFIX);
             
+            // Repeat period for Qso
+            qsoRepeatPeriod = prop.getProperty(PROPERTY_QSO_REPEAT_PERIOD_SEC);
+             if(qsoRepeatPeriod == null)
+              throwMissingPropertyException(PROPERTY_QSO_REPEAT_PERIOD_SEC);
+            
             // Read the JFrame dimensions:
             int x = Integer.parseInt(prop.getProperty(PROPERTY_MAIN_WINDOW_X));
             int y = Integer.parseInt(prop.getProperty(PROPERTY_MAIN_WINDOW_Y));
@@ -247,6 +273,7 @@ public final class ApplicationSettings
         myCallsign = "LZ1ABC";
         isQuickCallsignModeEnabled = false;     
         defaultPrefix = "LZ0";
+        qsoRepeatPeriod = "30";
         
         // We have minimum size so we don't have to worry about the values:
         jFrameDimensions.height = 0;

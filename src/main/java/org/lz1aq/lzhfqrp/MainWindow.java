@@ -26,6 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.DocumentFilter;
 import jssc.SerialPortList;
 import org.lz1aq.log.Log;
 import org.lz1aq.log.LogDatabase;
@@ -45,17 +47,23 @@ public class MainWindow extends javax.swing.JFrame
   LogTableModel qsoTableModel;
   private final ApplicationSettings  applicationSettings;
   
+  DocumentFilter filter = new UppercaseDocumentFilter();
+  
   /**
    * Creates new form MainWindow
    */
   public MainWindow()
   {
+   
     
-    // We need to supply an example QSO whwn creating/opening new
+    // Load user settings from the properties file
+    this.applicationSettings = new ApplicationSettings();
+    
+     
+    // Init the Log/database 
     try
     {
-      Qso example;
-      example = new Qso(14190000, "cw", "lz1abc", "lz0fs", "200 091", "200 091");
+      Qso example = new Qso(14190000, "cw", "lz1abc", "lz0fs", "200 091", "200 091"); // We need to supply an example QSO whwn creating/opening new
       log = new Log(new LogDatabase("log_test.db4o"), example);
       qsoTableModel = new LogTableModel(log);
     }
@@ -64,15 +72,17 @@ public class MainWindow extends javax.swing.JFrame
       Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
     }
     
-    // Load user settings from the properties file
-    this.applicationSettings = new ApplicationSettings();
     
-    // 
     // Init GUI
     initComponents();
 
-    initEntryFields(); // Prepare the entry fields to have the necessary data
+    // Prepare the entry fields to have the necessary data
+    initEntryFields();
 
+    // Callsign text field should show capital letters only
+    ((AbstractDocument) jtextfieldCallsign.getDocument()).setDocumentFilter(filter);
+    
+    
     // Needed so that jTable to scroll automatically upon entering a new Qso
     jtableLog.addComponentListener(new ComponentAdapter()
     {
@@ -108,6 +118,21 @@ public class MainWindow extends javax.swing.JFrame
     jPanel6 = new javax.swing.JPanel();
     checkboxSettingsQuickMode = new javax.swing.JCheckBox();
     textfieldSettingsDefaultPrefix = new javax.swing.JTextField();
+    jPanel2 = new javax.swing.JPanel();
+    jtextfieldQsoRepeatPeriod = new javax.swing.JTextField();
+    jLabel2 = new javax.swing.JLabel();
+    jpanelLog = new javax.swing.JPanel();
+    jpanelCompleteLog = new javax.swing.JPanel();
+    jScrollPane1 = new javax.swing.JScrollPane();
+    jtableLog = new javax.swing.JTable();
+    jbuttonDeleteEntry = new javax.swing.JButton();
+    jpanelSearchLog = new javax.swing.JPanel();
+    jScrollPane3 = new javax.swing.JScrollPane();
+    jtableSearch = new javax.swing.JTable();
+    jpanelTimeRemaining = new javax.swing.JPanel();
+    jpanelIncomingQso = new javax.swing.JPanel();
+    jButton14 = new javax.swing.JButton();
+    jSplitPane1 = new javax.swing.JSplitPane();
     jpanelEntry = new javax.swing.JPanel();
     jpanelCallsign = new javax.swing.JPanel();
     jtextfieldCallsign = new javax.swing.JTextField();
@@ -126,20 +151,15 @@ public class MainWindow extends javax.swing.JFrame
     jButton6 = new javax.swing.JButton();
     jButton7 = new javax.swing.JButton();
     jButton8 = new javax.swing.JButton();
-    jpanelAdditionalKeys = new javax.swing.JPanel();
     jButton9 = new javax.swing.JButton();
     jButton10 = new javax.swing.JButton();
     jButton11 = new javax.swing.JButton();
     jButton12 = new javax.swing.JButton();
+    jpanelAdditionalKeys = new javax.swing.JPanel();
     jPanelStatusBar = new javax.swing.JPanel();
     jlabelCallsignStatus = new javax.swing.JLabel();
-    jpanelLog = new javax.swing.JPanel();
-    jScrollPane1 = new javax.swing.JScrollPane();
-    jtableLog = new javax.swing.JTable();
-    jScrollPane3 = new javax.swing.JScrollPane();
-    jtableSearch = new javax.swing.JTable();
-    jpanelTimeRemaining = new javax.swing.JPanel();
     jpanelBandmap = new javax.swing.JPanel();
+    jButton13 = new javax.swing.JButton();
     jMenuBar1 = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     jMenu2 = new javax.swing.JMenu();
@@ -252,7 +272,7 @@ public class MainWindow extends javax.swing.JFrame
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 4;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
@@ -280,7 +300,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 10, 5);
     jPanel6.add(checkboxSettingsQuickMode, gridBagConstraints);
 
-    textfieldSettingsDefaultPrefix.setFont(new java.awt.Font("Dialog", 0, 24)); // NOI18N
+    textfieldSettingsDefaultPrefix.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
     textfieldSettingsDefaultPrefix.setText("LZ0");
     textfieldSettingsDefaultPrefix.setToolTipText("The default prefix which will be added");
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -300,6 +320,41 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 0.1;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
     jPanel1.add(jPanel6, gridBagConstraints);
+
+    jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Qso repeat period"));
+    jPanel2.setToolTipText("");
+    jPanel2.setLayout(new java.awt.GridBagLayout());
+
+    jtextfieldQsoRepeatPeriod.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+    jtextfieldQsoRepeatPeriod.setText("30");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 0.3;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+    jPanel2.add(jtextfieldQsoRepeatPeriod, gridBagConstraints);
+
+    jLabel2.setText("Period in seconds:");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+    jPanel2.add(jLabel2, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.1;
+    gridBagConstraints.weighty = 0.1;
+    jPanel1.add(jPanel2, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -321,11 +376,125 @@ public class MainWindow extends javax.swing.JFrame
     });
     getContentPane().setLayout(new java.awt.GridBagLayout());
 
+    jpanelLog.setLayout(new java.awt.GridBagLayout());
+
+    jpanelCompleteLog.setBorder(javax.swing.BorderFactory.createTitledBorder("Log"));
+    jpanelCompleteLog.setLayout(new java.awt.GridBagLayout());
+
+    jScrollPane1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+    jtableLog.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+    jtableLog.setModel(qsoTableModel);
+    jtableLog.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+    jScrollPane1.setViewportView(jtableLog);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    jpanelCompleteLog.add(jScrollPane1, gridBagConstraints);
+
+    jbuttonDeleteEntry.setToolTipText("Deletes Qso from the Log.");
+    jbuttonDeleteEntry.setLabel("Delete entry");
+    jbuttonDeleteEntry.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jbuttonDeleteEntryActionPerformed(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 0.1;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+    jpanelCompleteLog.add(jbuttonDeleteEntry, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    jpanelLog.add(jpanelCompleteLog, gridBagConstraints);
+
+    jpanelSearchLog.setLayout(new java.awt.GridBagLayout());
+
+    jScrollPane3.setBorder(javax.swing.BorderFactory.createTitledBorder("Search results"));
+    jScrollPane3.setToolTipText("");
+
+    jtableSearch.setModel(new javax.swing.table.DefaultTableModel(
+      new Object [][]
+      {
+        {null, null, null, null},
+        {null, null, null, null},
+        {null, null, null, null},
+        {null, null, null, null}
+      },
+      new String []
+      {
+        "Title 1", "Title 2", "Title 3", "Title 4"
+      }
+    ));
+    jScrollPane3.setViewportView(jtableSearch);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.3;
+    gridBagConstraints.weighty = 0.3;
+    jpanelSearchLog.add(jScrollPane3, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 0.2;
+    gridBagConstraints.weighty = 0.2;
+    jpanelLog.add(jpanelSearchLog, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    getContentPane().add(jpanelLog, gridBagConstraints);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    getContentPane().add(jpanelTimeRemaining, gridBagConstraints);
+
+    jpanelIncomingQso.setBorder(javax.swing.BorderFactory.createTitledBorder("Incoming Qso"));
+    jpanelIncomingQso.setLayout(new java.awt.GridBagLayout());
+
+    jButton14.setText("jButton14");
+    jpanelIncomingQso.add(jButton14, new java.awt.GridBagConstraints());
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    getContentPane().add(jpanelIncomingQso, gridBagConstraints);
+
+    jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
     jpanelEntry.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
     jpanelEntry.setLayout(new java.awt.GridBagLayout());
 
     jpanelCallsign.setFocusCycleRoot(true);
-    jpanelCallsign.setLayout(new java.awt.GridBagLayout());
+    jpanelCallsign.setLayout(new java.awt.GridLayout());
 
     jtextfieldCallsign.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
     jtextfieldCallsign.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -342,28 +511,19 @@ public class MainWindow extends javax.swing.JFrame
         jtextfieldCallsignKeyReleased(evt);
       }
     });
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelCallsign.add(jtextfieldCallsign, gridBagConstraints);
+    jpanelCallsign.add(jtextfieldCallsign);
 
     jtextfieldSnt.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
     jtextfieldSnt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
     jtextfieldSnt.setText("020 043");
     jtextfieldSnt.setBorder(javax.swing.BorderFactory.createTitledBorder("Snt"));
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelCallsign.add(jtextfieldSnt, gridBagConstraints);
+    jpanelCallsign.add(jtextfieldSnt);
 
     jtextfieldRcv.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
     jtextfieldRcv.setHorizontalAlignment(javax.swing.JTextField.CENTER);
     jtextfieldRcv.setText("299 209");
     jtextfieldRcv.setBorder(javax.swing.BorderFactory.createTitledBorder("Rcv"));
+    jtextfieldRcv.setMinimumSize(new java.awt.Dimension(210, 58));
     jtextfieldRcv.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -371,12 +531,7 @@ public class MainWindow extends javax.swing.JFrame
         jtextfieldRcvActionPerformed(evt);
       }
     });
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelCallsign.add(jtextfieldRcv, gridBagConstraints);
+    jpanelCallsign.add(jtextfieldRcv);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -429,80 +584,82 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 1.0;
     jpanelEntry.add(jpanelTypeOfWork, gridBagConstraints);
 
-    jpanelFunctionKeys.setLayout(new java.awt.GridBagLayout());
+    jpanelFunctionKeys.setLayout(new java.awt.GridLayout(3, 0));
 
     jButton1.setText("F1 CQ");
     jButton1.setFocusable(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelFunctionKeys.add(jButton1, gridBagConstraints);
+    jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jpanelFunctionKeys.add(jButton1);
 
     jButton2.setText("F2 Exch");
     jButton2.setFocusable(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelFunctionKeys.add(jButton2, gridBagConstraints);
+    jButton2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jpanelFunctionKeys.add(jButton2);
 
     jButton3.setText("F3 Tu");
     jButton3.setFocusable(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelFunctionKeys.add(jButton3, gridBagConstraints);
+    jButton3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jpanelFunctionKeys.add(jButton3);
 
     jButton4.setText("F4 MyCall");
     jButton4.setFocusable(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 15);
-    jpanelFunctionKeys.add(jButton4, gridBagConstraints);
+    jButton4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jpanelFunctionKeys.add(jButton4);
 
     jButton5.setText("F5 His Call");
     jButton5.setFocusable(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelFunctionKeys.add(jButton5, gridBagConstraints);
+    jButton5.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jpanelFunctionKeys.add(jButton5);
 
     jButton6.setText("F6 Agn");
     jButton6.setFocusable(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelFunctionKeys.add(jButton6, gridBagConstraints);
+    jButton6.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jpanelFunctionKeys.add(jButton6);
 
     jButton7.setText("F7 ?");
     jButton7.setFocusable(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelFunctionKeys.add(jButton7, gridBagConstraints);
+    jButton7.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jpanelFunctionKeys.add(jButton7);
 
     jButton8.setText("F8 Dupe");
     jButton8.setFocusable(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelFunctionKeys.add(jButton8, gridBagConstraints);
+    jButton8.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jpanelFunctionKeys.add(jButton8);
+
+    jButton9.setText("F9 Spare");
+    jButton9.setFocusable(false);
+    jButton9.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jpanelFunctionKeys.add(jButton9);
+
+    jButton10.setText("F10 Spare");
+    jButton10.setToolTipText("");
+    jButton10.setFocusable(false);
+    jButton10.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jpanelFunctionKeys.add(jButton10);
+
+    jButton11.setText("F11 Spot");
+    jButton11.setFocusable(false);
+    jButton11.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jButton11.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton11ActionPerformed(evt);
+      }
+    });
+    jpanelFunctionKeys.add(jButton11);
+
+    jButton12.setText("F12 Wipe");
+    jButton12.setFocusable(false);
+    jButton12.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jButton12.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton12ActionPerformed(evt);
+      }
+    });
+    jpanelFunctionKeys.add(jButton12);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -514,48 +671,6 @@ public class MainWindow extends javax.swing.JFrame
     jpanelEntry.add(jpanelFunctionKeys, gridBagConstraints);
 
     jpanelAdditionalKeys.setLayout(new java.awt.GridBagLayout());
-
-    jButton9.setText("F9 Store as CQ freq");
-    jButton9.setFocusable(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-    jpanelAdditionalKeys.add(jButton9, gridBagConstraints);
-
-    jButton10.setText("F10 To Bandmap");
-    jButton10.setToolTipText("");
-    jButton10.setFocusable(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-    jpanelAdditionalKeys.add(jButton10, gridBagConstraints);
-
-    jButton11.setText("F11 Spare");
-    jButton11.setFocusable(false);
-    jButton11.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
-        jButton11ActionPerformed(evt);
-      }
-    });
-    jpanelAdditionalKeys.add(jButton11, new java.awt.GridBagConstraints());
-
-    jButton12.setText("F12 Wipe");
-    jButton12.setFocusable(false);
-    jButton12.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
-        jButton12ActionPerformed(evt);
-      }
-    });
-    jpanelAdditionalKeys.add(jButton12, new java.awt.GridBagConstraints());
-
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 4;
@@ -587,19 +702,15 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 1.0;
     jpanelEntry.add(jPanelStatusBar, gridBagConstraints);
 
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 0.1;
-    gridBagConstraints.weighty = 0.1;
-    getContentPane().add(jpanelEntry, gridBagConstraints);
+    jSplitPane1.setLeftComponent(jpanelEntry);
 
-    jpanelLog.setLayout(new java.awt.GridBagLayout());
+    jpanelBandmap.setBorder(javax.swing.BorderFactory.createTitledBorder("Bandmap"));
+    jpanelBandmap.setLayout(new java.awt.GridBagLayout());
 
-    jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Log"));
+    jButton13.setText("jButton13");
+    jpanelBandmap.add(jButton13, new java.awt.GridBagConstraints());
 
-    jtableLog.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-    jtableLog.setModel(qsoTableModel);
-    jScrollPane1.setViewportView(jtableLog);
+    jSplitPane1.setRightComponent(jpanelBandmap);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -608,50 +719,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    jpanelLog.add(jScrollPane1, gridBagConstraints);
-
-    jScrollPane3.setBorder(javax.swing.BorderFactory.createTitledBorder("Search results"));
-    jScrollPane3.setToolTipText("");
-
-    jtableSearch.setModel(new javax.swing.table.DefaultTableModel(
-      new Object [][]
-      {
-        {null, null, null, null},
-        {null, null, null, null},
-        {null, null, null, null},
-        {null, null, null, null}
-      },
-      new String []
-      {
-        "Title 1", "Title 2", "Title 3", "Title 4"
-      }
-    ));
-    jScrollPane3.setViewportView(jtableSearch);
-
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 0.3;
-    gridBagConstraints.weighty = 0.3;
-    jpanelLog.add(jScrollPane3, gridBagConstraints);
-
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    getContentPane().add(jpanelLog, gridBagConstraints);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 2;
-    getContentPane().add(jpanelTimeRemaining, gridBagConstraints);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 3;
-    getContentPane().add(jpanelBandmap, gridBagConstraints);
+    getContentPane().add(jSplitPane1, gridBagConstraints);
 
     jMenu1.setText("File");
     jMenuBar1.add(jMenu1);
@@ -691,7 +759,7 @@ public class MainWindow extends javax.swing.JFrame
     {
       case KeyEvent.VK_SPACE:
         // If Dupe - clear the fields
-        if(log.isDupe(getCallsignFromTextField()))
+        if(log.isDupe(getCallsignFromTextField(), applicationSettings.getQsoRepeatPeriod()))
         {
           initEntryFields();
           evt.consume();
@@ -711,20 +779,6 @@ public class MainWindow extends javax.swing.JFrame
         evt.consume();
         break;
     }
-   
-      
-   
-   
-//    switch(evt.getKeyCode())
-//    {
-//      case KeyEvent.VK_SPACE:
-//        {
-//          
-//          return;
-//        }
-//     
-//    }// switch
-   
   }//GEN-LAST:event_jtextfieldCallsignKeyTyped
 
   private void jtextfieldCallsignKeyReleased(java.awt.event.KeyEvent evt)//GEN-FIRST:event_jtextfieldCallsignKeyReleased
@@ -737,7 +791,7 @@ public class MainWindow extends javax.swing.JFrame
   private void jtextfieldRcvActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jtextfieldRcvActionPerformed
   {//GEN-HEADEREND:event_jtextfieldRcvActionPerformed
     // If DUPE ask for confirmation to log
-    if(log.isDupe(getCallsignFromTextField()))
+    if(log.isDupe(getCallsignFromTextField(), applicationSettings.getQsoRepeatPeriod()))
     {
       int response = JOptionPane.showConfirmDialog(null, "Do you want to log DUPE Qso?", "Confirm",
               JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -763,6 +817,24 @@ public class MainWindow extends javax.swing.JFrame
 
   private void jButtonSaveActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButtonSaveActionPerformed
   {//GEN-HEADEREND:event_jButtonSaveActionPerformed
+    // Validate myCallsign
+    if(!Qso.isValidCallsign(textfieldSettingsMyCallsign.getText()))
+    {
+      JOptionPane.showMessageDialog(null, "Invalid callsign!");
+      return;
+    }
+    
+    // Validate repeat period
+    try
+    {
+      Integer.parseInt(jtextfieldQsoRepeatPeriod.getText());
+    }catch(Exception exc)
+    {
+      JOptionPane.showMessageDialog(null, "Invalid repeat Qso period! Must be a number.");
+      return;
+    }
+    
+    
     jDialogSettings.setVisible(false); // Hide the SettingsDialog
     storeSettingsDialogParams();       // Read the state of the controls and save them
 
@@ -787,7 +859,7 @@ public class MainWindow extends javax.swing.JFrame
 
   private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem1ActionPerformed
   {//GEN-HEADEREND:event_jMenuItem1ActionPerformed
-     jDialogSettings.pack();
+    jDialogSettings.pack();
     jDialogSettings.setVisible(true);
   }//GEN-LAST:event_jMenuItem1ActionPerformed
 
@@ -798,6 +870,29 @@ public class MainWindow extends javax.swing.JFrame
     else
       textfieldSettingsDefaultPrefix.setEnabled(false);
   }//GEN-LAST:event_checkboxSettingsQuickModeStateChanged
+
+  private void jbuttonDeleteEntryActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbuttonDeleteEntryActionPerformed
+  {//GEN-HEADEREND:event_jbuttonDeleteEntryActionPerformed
+    // Ask for confirmation
+    int response = JOptionPane.showConfirmDialog(null, "Delete the selected Qso entry?", "Confirm",
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    if (response == JOptionPane.NO_OPTION || response == JOptionPane.CLOSED_OPTION)
+    {
+      return; // do nothing
+    }
+        
+    // Get the selected row
+    int selection = jtableLog.getSelectedRow(); 
+    if(selection >= 0)
+    {
+      selection = jtableLog.convertRowIndexToModel(selection);
+      qsoTableModel.removeRow(selection);
+    }
+    else
+    {
+      JOptionPane.showMessageDialog(null, "Pease select entry!");
+    }
+  }//GEN-LAST:event_jbuttonDeleteEntryActionPerformed
   
   
   /**
@@ -871,13 +966,13 @@ public class MainWindow extends javax.swing.JFrame
     else
     {
       // Required time has not elapsed
-      if (log.getSecondsLeft(qso) > 0)
+      if (log.getSecondsLeft(qso, applicationSettings.getQsoRepeatPeriod()) > 0)
       {
         // Print DUPE
         statusText = statusText.concat("DUPE   ");
 
         //Print the time left till next possible contact
-        statusText = statusText.concat("time left: " + log.getTimeLeftFormatted(qso));
+        statusText = statusText.concat("time left " + log.getTimeLeftFormatted(qso, applicationSettings.getQsoRepeatPeriod()));
       }
       else
       {
@@ -900,8 +995,11 @@ public class MainWindow extends javax.swing.JFrame
     jtextfieldSnt.setText(log.getNextSentReport());
     // Cean the Rcv field
     jtextfieldRcv.setText("");
+    // Clean the callsign status
+    jlabelCallsignStatus.setText("New");
   }
   
+
   /**
    * @return Returns a new DefaultComboBoxModel containing all available COM ports
    */
@@ -945,12 +1043,14 @@ public class MainWindow extends javax.swing.JFrame
     
     // Default prefix
     textfieldSettingsDefaultPrefix.setText(applicationSettings.getDefaultPrefix());
-    
-    // Disable the "default prefix" text field if the "Quick callsign mode" is disabled
+   
     if(applicationSettings.isQuickCallsignModeEnabled() == false) 
     {
-      textfieldSettingsDefaultPrefix.setEnabled(false);
+      textfieldSettingsDefaultPrefix.setEnabled(false); // Disable the "default prefix" text field if the "Quick callsign mode" is disabled
     }
+    
+    // Repeat period in seconds
+    jtextfieldQsoRepeatPeriod.setText(Integer.toString(applicationSettings.getQsoRepeatPeriod()));
    
   }
     
@@ -974,6 +1074,9 @@ public class MainWindow extends javax.swing.JFrame
     
     // Default prefix
     applicationSettings.setDefaultPrefix(textfieldSettingsDefaultPrefix.getText());
+    
+    // Qso repeat period
+    applicationSettings.setQsoRepeatPeriod(Integer.parseInt(jtextfieldQsoRepeatPeriod.getText()));
   }
 
   /**
@@ -1032,6 +1135,8 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JButton jButton10;
   private javax.swing.JButton jButton11;
   private javax.swing.JButton jButton12;
+  private javax.swing.JButton jButton13;
+  private javax.swing.JButton jButton14;
   private javax.swing.JButton jButton2;
   private javax.swing.JButton jButton3;
   private javax.swing.JButton jButton4;
@@ -1046,11 +1151,13 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JDialog jDialogSettings;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel12;
+  private javax.swing.JLabel jLabel2;
   private javax.swing.JMenu jMenu1;
   private javax.swing.JMenu jMenu2;
   private javax.swing.JMenuBar jMenuBar1;
   private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JPanel jPanel1;
+  private javax.swing.JPanel jPanel2;
   private javax.swing.JPanel jPanel3;
   private javax.swing.JPanel jPanel4;
   private javax.swing.JPanel jPanel5;
@@ -1060,18 +1167,24 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JRadioButton jRadioButton2;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JScrollPane jScrollPane3;
+  private javax.swing.JSplitPane jSplitPane1;
+  private javax.swing.JButton jbuttonDeleteEntry;
   private javax.swing.JLabel jlabelCallsignStatus;
   private javax.swing.JPanel jpanelAdditionalKeys;
   private javax.swing.JPanel jpanelBandmap;
   private javax.swing.JPanel jpanelCallsign;
+  private javax.swing.JPanel jpanelCompleteLog;
   private javax.swing.JPanel jpanelEntry;
   private javax.swing.JPanel jpanelFunctionKeys;
+  private javax.swing.JPanel jpanelIncomingQso;
   private javax.swing.JPanel jpanelLog;
+  private javax.swing.JPanel jpanelSearchLog;
   private javax.swing.JPanel jpanelTimeRemaining;
   private javax.swing.JPanel jpanelTypeOfWork;
   private javax.swing.JTable jtableLog;
   private javax.swing.JTable jtableSearch;
   private javax.swing.JTextField jtextfieldCallsign;
+  private javax.swing.JTextField jtextfieldQsoRepeatPeriod;
   private javax.swing.JTextField jtextfieldRcv;
   private javax.swing.JTextField jtextfieldSnt;
   private javax.swing.JTextField textfieldSettingsDefaultPrefix;

@@ -78,6 +78,12 @@ public class LogTableModel extends AbstractTableModel
     log.setValueAt((String)value, row, toLogColumn(col));
   }
   
+  public void removeRow(int i)
+  {
+    log.remove(i);
+    this.fireTableRowsInserted(log.getRowCount()-1, log.getRowCount()-1);
+  }
+  
   public void addRow(Qso qso)
   {
     log.add(qso);
@@ -134,4 +140,15 @@ public class LogTableModel extends AbstractTableModel
     
     throw new ArrayIndexOutOfBoundsException("Invalid index for tableColumn!");
   }
+  
+  
+//  int getSelectedRow()
+//  {
+//    int[] selection = table.getSelectedRows();
+//    for (int i = 0; i < selection.length; i++)
+//    {
+//      selection[i] = table.convertRowIndexToModel(selection[i]);
+//    }
+//   
+//  }
 }

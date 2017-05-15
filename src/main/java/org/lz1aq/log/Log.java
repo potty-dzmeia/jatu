@@ -34,13 +34,13 @@ import java.util.ArrayList;
  */
 public class Log
 {
-  private static final int TIME_INTERVAL_BETWEEN_QSOS = 1800; // time interval between qso seconds
   public  static final String DEFAULT_CALLSIGN_PREFIX = "LZ0";
   
   private final LogDatabase db;         // Interface to a db4o database, stand-alone or client/server. 
   private final ArrayList<Qso> qsoList; // Log is also mirrored in RAM
   private final Qso   exampleQso;
-  private int timeIntervalBetweenQso = TIME_INTERVAL_BETWEEN_QSOS;
+  
+  
   /**
    *
    * 
@@ -205,17 +205,8 @@ public class Log
       return part1+part2;
     }
   }
-  
-  /**
-   * Set the time interval between QSOs with the same station
-   * 
-   * @param timeInterval - time interval in seconds
-   */
-  public void setTimeInterval(int timeInterval)
-  {
-    this.timeIntervalBetweenQso = timeInterval;
-  }
  
+  
   
   /**
    * Return the last Qso that we had with this station
@@ -241,22 +232,24 @@ public class Log
    * Returns time left till the next possible contact
    * 
    * @param qso
+   * @param allowedQsoRepeatPeriod - the repeat period for another qso with the same station (in seconds)
    * @return
    */
-  public long getSecondsLeft(Qso qso)
+  public long getSecondsLeft(Qso qso, int allowedQsoRepeatPeriod)
   {
-    return TIME_INTERVAL_BETWEEN_QSOS-qso.getElapsedSeconds();
+    return allowedQsoRepeatPeriod-qso.getElapsedSeconds();
   }
   
   /**
    * Same as getSecondsLeft but returns the seconds left in the following format mm:ss
    * 
    * @param qso
+   * @param allowedQsoRepeatPeriod  - the repeat period for another qso with the same station (in seconds)
    * @return 
    */
-  public String getTimeLeftFormatted(Qso qso)
+  public String getTimeLeftFormatted(Qso qso, int allowedQsoRepeatPeriod)
   {
-    long secondsleft = getSecondsLeft(qso);
+    long secondsleft = getSecondsLeft(qso, allowedQsoRepeatPeriod);
 
     long second = secondsleft % 60;
     long minute = (secondsleft / 60) % 60;
@@ -270,9 +263,10 @@ public class Log
    * Checks if it is OK to work the station
    * 
    * @param callsign
+   * @param allowedQsoRepeatPeriod - the repeat period for another qso with the same station (in seconds)
    * @return true if the required time has not elapsed
    */
-  public boolean isDupe(String callsign)
+  public boolean isDupe(String callsign, int allowedQsoRepeatPeriod)
   {
     Qso qso = getLastQso(callsign);
     
@@ -283,7 +277,7 @@ public class Log
     }
     
     //Prvious contact was found...
-    long secondsLeft = getSecondsLeft(qso);
+    long secondsLeft = getSecondsLeft(qso, allowedQsoRepeatPeriod);
     
     return secondsLeft > 0;
   }

@@ -87,7 +87,7 @@ public class Qso
   /**
    * The minimum valid length for a callsign
    */
-  static private final int CALLSIGN_MIN_LEN = 4;
+  static private final int CALLSIGN_MIN_LEN = 3;
   
   
   /**
@@ -156,9 +156,11 @@ public class Qso
     qsoParams.add(new QsoParameter(TIME_TXT, TimeUtils.toQsoTime(utc)));
     qsoParams.add(new QsoParameter(FREQ_TXT, Long.toString(freq)));
     qsoParams.add(new QsoParameter(MODE_TXT, mode));
-    qsoParams.add(new QsoParameter(MYCALL_TXT, myCall));
-    qsoParams.add(new QsoParameter(HISCALL_TXT, hisCall));
+    qsoParams.add(new QsoParameter(MYCALL_TXT, myCall.toUpperCase()));
+    qsoParams.add(new QsoParameter(HISCALL_TXT, hisCall.toUpperCase()));
+    snt = snt.replaceAll("\\s", "");
     qsoParams.add(new QsoParameter(SNT_TXT, snt));
+    rcv = rcv.replaceAll("\\s", "");
     qsoParams.add(new QsoParameter(RCV_TXT, rcv));
 
   }
@@ -336,7 +338,7 @@ public class Qso
     if(!isValidCallsign(myCall))
       throw new Exception("Your callsign is invalid");
     
-    if(!isValidCallsign(myCall))
+    if(!isValidCallsign(hisCall))
       throw new Exception("His callsign is invalid");
     
     if(!isValidSerial(snt))
@@ -389,14 +391,16 @@ public class Qso
   }
 
   /**
-   * Checks
+   * Checks if the call sign has at least a number a letter and is 3 digits long
    *
    * @param call
    * @return
    */
-  private boolean isValidCallsign(String call)
+  public static boolean isValidCallsign(String call)
   {
-    return call.length() >= CALLSIGN_MIN_LEN;
+    return call.matches(".*\\d+.*")                                 && 
+           (call.matches(".*[a-z].*") || call.matches(".*[A-Z].*")) &&
+           call.length() >= CALLSIGN_MIN_LEN;
   }
 
   
