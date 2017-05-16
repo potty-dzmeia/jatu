@@ -225,6 +225,17 @@ public class Radio
   }
   
   
+  /**
+   * Interrupts the sending of morse code which was initiated by the SendCW() command
+   * @throws Exception 
+   */
+  public void interruptSendCW() throws Exception
+  {
+    this.queueTransactions(radioProtocolParser.interruptSendCW());
+  }
+  
+  
+  
   public void addEventListener(RadioListener listener) throws Exception
   {
     this.eventListeners.add(listener);

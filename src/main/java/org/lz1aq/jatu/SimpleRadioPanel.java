@@ -34,6 +34,7 @@ import jssc.SerialPortList;
 import org.lz1aq.rsi.Radio;
 import org.lz1aq.rsi.event.RadioListener;
 import org.apache.commons.lang3.StringUtils;
+import org.lz1aq.rsi.event.ActiveVfoEvent;
 import org.lz1aq.rsi.event.ConfirmationEvent;
 import org.lz1aq.rsi.event.FrequencyEvent;
 import org.lz1aq.rsi.event.ModeEvent;
@@ -207,6 +208,12 @@ public class SimpleRadioPanel extends javax.swing.JFrame
           meterProgressBar.setValue(e.getValue());
         }
       });
+    }
+
+    @Override
+    public void eventActiveVfo(ActiveVfoEvent e)
+    {
+      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
   }
   

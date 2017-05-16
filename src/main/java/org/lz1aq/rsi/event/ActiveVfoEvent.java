@@ -19,24 +19,25 @@
 // ***************************************************************************
 package org.lz1aq.rsi.event;
 
+import org.lz1aq.utils.RadioModes;
+import org.lz1aq.utils.RadioVfos;
 
-public class EmptyRadioListener implements RadioListener
+/**
+ *
+ * @author potty
+ */
+public class ActiveVfoEvent
 {
-  @Override
-  public void eventNotsupported(NotsupportedEvent e){}
+  private final RadioVfos vfo;    // Which VFO has become active
 
-  @Override
-  public void eventConfirmation(ConfirmationEvent e){}
+  public ActiveVfoEvent(RadioVfos vfo)
+  {
+    this.vfo = vfo;
+  }
 
-  @Override
-  public void eventFrequency(FrequencyEvent e){}
-
-  @Override
-  public void eventMode(ModeEvent e){}
-
-  @Override
-  public void eventSmeter(SmeterEvent e){}
-
-  @Override
-  public void eventActiveVfo(ActiveVfoEvent e){}
+  public RadioVfos getVfo()
+  {
+    return this.vfo;
+  }
+  
 }

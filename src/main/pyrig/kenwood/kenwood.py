@@ -207,9 +207,15 @@ class Kenwood(Radio):
 
         result = "KY {0};".format('{: <24}'.format(text))
 
-        logger.debug("returns: {0}".format(result))
+        #logger.debug("returns: {0}".format(result))
         return list([EncodedTransaction(result)])
 
+
+    @classmethod
+    def encodeInterruptSendCW(cls):
+        result = "KY0;"
+
+        return list([EncodedTransaction(result)])
 
 
     #+--------------------------------------------------------------------------+
@@ -265,15 +271,15 @@ class Kenwood(Radio):
                 result_dic = getattr(fn, '__func__')(cls, trans) # call the responsible parser
                 break
 
-        logger.debug(result_dic.__str__())
+        #logger.debug(result_dic.__str__())
 
         if result_dic is None:
             result_dic = dict()
             DecodedTransaction.insertNotSupported(result_dic, trans)
 
         result_json = DecodedTransaction.toJson(result_dic)
-        logger.debug(result_json.__str__())
-        logger.debug("parsed result: {0}".format(result_json))
+        #logger.debug(result_json.__str__())
+        #logger.debug("parsed result: {0}".format(result_json))
         return result_json
 
 
@@ -306,6 +312,25 @@ class Kenwood(Radio):
         result = dict()
         DecodedTransaction.insertFreq(result, command[2:-1].lstrip('0'), vfo=Radio.VFO_B)
         return result
+
+    @classmethod
+    def __parse_active_vfo(cls, command):
+        """
+        Extracts active VFO from the command
+
+        :param command: String of the type "FR1;"
+        :type command: str
+        :return: The dict with the parsed data
+        :rtype: dict
+        """
+        result = dict()
+        if command[2] == '1':
+            DecodedTransaction.insertActiveVfo(result, vfo=Radio.VFO_A)
+        else:
+            DecodedTransaction.insertActiveVfo(result, vfo=Radio.VFO_B)
+
+        return result
+
 
 
     @classmethod
@@ -389,7 +414,6 @@ class Kenwood(Radio):
         smeter = command[2:-1]
         # DecodedTransaction.insertSmeter(result, command[2:-1].lstrip('0'))
         DecodedTransaction.insertSmeter(result, smeter.lstrip('0'))
-        logger.debug("-------> {0}".format(smeter.lstrip('0')))
         return result
 
     #+--------------------------------------------------------------------------+
@@ -440,6 +464,7 @@ class Kenwood(Radio):
     # Commands coming from the Elecraft that we can understand(parse)
     parsers = { "FA": __parse_frequency_vfo_a,       # VFO A frequency
                 "FB": __parse_frequency_vfo_b,       # VFO B frequency
+                "FR": __parse_active_vfo,            # active Vfo
                 "MD": __parse_mode,                  # Operating mode
                 "IF": __parse_info,                  # IF (Transceiver Information; GET only)
                 "SM": __parse_smeter}                # S-meter values

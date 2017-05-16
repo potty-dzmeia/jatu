@@ -97,4 +97,11 @@ public interface I_Radio extends I_Rig
    * @return array of Transactions which are to be sent to the radio.
    */
   public I_EncodedTransaction[] encodeSendCW(String text);
+  
+  
+  /**
+   * Interrupt the previous command sendCW
+   * @return - array of Transactions which are to be sent to the radio.
+   */
+  public I_EncodedTransaction[] interruptSendCW();
 }

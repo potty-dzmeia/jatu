@@ -55,6 +55,15 @@ public interface RadioListener extends EventListener
    * @param e - holds information about the event
    */
   public void eventMode(ModeEvent e);
+  
+  
+  /**
+   * Called when the radio changes the active VFO (e.g. from VfoA to VfoB)
+   * 
+   * @param e - holds information about the event
+   */
+  public void eventActiveVfo(ActiveVfoEvent e);
+  
 
   /**
    * Called when the radio sends us the Smeter value

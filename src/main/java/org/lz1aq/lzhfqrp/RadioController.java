@@ -19,6 +19,18 @@
 // ***************************************************************************
 package org.lz1aq.lzhfqrp;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JFileChooser;
+import jssc.SerialPortException;
+import org.apache.commons.lang3.StringUtils;
+import org.lz1aq.jatu.JythonObjectFactory;
+import org.lz1aq.jatu.SimpleRadioPanel;
+import org.lz1aq.py.rig.I_Radio;
+import org.lz1aq.py.rig.I_SerialSettings;
+import org.lz1aq.rsi.Radio;
+import org.lz1aq.rsi.event.ActiveVfoEvent;
 import org.lz1aq.rsi.event.ConfirmationEvent;
 import org.lz1aq.rsi.event.FrequencyEvent;
 import org.lz1aq.rsi.event.ModeEvent;
@@ -26,6 +38,7 @@ import org.lz1aq.rsi.event.NotsupportedEvent;
 import org.lz1aq.rsi.event.RadioListener;
 import org.lz1aq.rsi.event.SmeterEvent;
 import org.lz1aq.utils.Misc;
+import org.lz1aq.utils.RadioModes;
 import org.lz1aq.utils.RadioVfos;
 
 /**
@@ -36,98 +49,263 @@ import org.lz1aq.utils.RadioVfos;
  */
 public class RadioController
 {
-//    int vfoFreq = 14000000;
-//
-//    public RadioController()
-//    {
-//        
-//    }
-//    
-//    void connect(String filename, String commPort)
-//    {
-//        
-//    }
-//    int getFrequency()
-//    {
-//        return freq;
-//    }
-//   
-//    
-//    void setFrequency(int freq)
-//    {
-//        
-//    }
-//    
-//    
-//    /**
-//   * Handlers for events coming from the radio
-//   */
-//  private class LocalRadioListener implements RadioListener
-//  {
-//    @Override
-//    public void eventNotsupported(NotsupportedEvent e){} // not interested
-//
-//    @Override
-//    public void eventConfirmation(ConfirmationEvent e){} // not interested
-//
-//    @Override
-//    public void eventFrequency(final FrequencyEvent e)
-//    {
-//      /* Create and display the form */
-//      java.awt.EventQueue.invokeLater(new Runnable()
-//      {
-//        @Override
-//        public void run()
-//        {
-//          if(e.getVfo() == RadioVfos.A)
-//            frequencyATextfield.setText(Misc.formatFrequency(e.getFrequency()));
-//          else if(e.getVfo() == RadioVfos.B)
-//            frequencyBTextfield.setText(Misc.formatFrequency(e.getFrequency()));
-//          else
-//          {
-//            frequencyATextfield.setText(Misc.formatFrequency(e.getFrequency()));
-//            logger.warning("Frequency event from unknown VFO!");
-//          }
-//            
-//        }
-//      });
-//    }
-//
-//    @Override
-//    public void eventMode(final ModeEvent e)
-//    {
-//       /* Create and display the form */
-//      java.awt.EventQueue.invokeLater(new Runnable()
-//      {
-//        @Override
-//        public void run()
-//        {
-//          if(e.getVfo() == RadioVfos.A)
-//            modeATextfield.setText(e.getMode().toString());
-//          else if(e.getVfo() == RadioVfos.B)
-//            modeBTextfield.setText(e.getMode().toString());
-//          else
-//          {
-//            modeATextfield.setText(e.getMode().toString());
-//            logger.warning("Mode event from unknown VFO!");
-//          }
-//          
-//        }
-//      });
-//    }
-//    
-//    @Override
-//    public void eventSmeter(final SmeterEvent e)
-//    {
-//      /* Create and display the form */
-//      java.awt.EventQueue.invokeLater(new Runnable()
-//      {
-//        @Override
-//        public void run()
-//        {
-//          meterProgressBar.setValue(e.getValue());
-//        }
-//      });
-//    }
-//  }
+  private boolean isConnected = false;
+  private int freqVfoA = 14000000;
+  private int freqVfoB = 14000000; 
+  private RadioModes modeVfoA = RadioModes.AM;
+  private RadioModes modeVfoB = RadioModes.AM;
+  private RadioVfos activeVfo = RadioVfos.A;
+
+  private Radio         radio;;
+  private I_Radio       radioParser;  
+  
+  private static final Logger logger = Logger.getLogger(Radio.class.getName());
+  
+  
+  /**
+   * Before being able to use this class you need to call the following methods:
+   * 1. loadProtocolParser()
+   * 2. connect()
+   */
+  public RadioController()
+  {
+    
+  }
+  
+  
+  /**
+   *  
+   * @param filenameOfPythonFile
+   * @return 
+   */
+  public boolean loadProtocolParser(String filenameOfPythonFile)
+  {
+    try
+    {
+      // Create radioParser object from the python Class
+      String moduleName = StringUtils.removeEnd(filenameOfPythonFile, ".py");
+
+      String className = StringUtils.capitalize(moduleName); // The name of the Class withing the module(file) should be with the same name but with capital letter
+
+      // Create radioParser object from the python Class
+      JythonObjectFactory f2 = new JythonObjectFactory(I_Radio.class, moduleName, className);
+      radioParser = (I_Radio) f2.createObject(); 
+      return true;
+      
+    }catch(Exception exc)
+    {
+      Logger.getLogger(RadioController.class.getName()).log(Level.SEVERE, null, exc);
+      return false;
+    }
+  }
+  
+  
+  public boolean connect(String commport)
+  {
+    if(radioParser == null)
+      return false;
+    
+    
+    try
+    {
+      //Create the radio object using the selected Com port
+      radio = new Radio(radioParser, commport);
+      radio.addEventListener(new RadioController.LocalRadioListener());
+      radio.connect(); // Let's not forget to call connect(). Calling disconnects() later will close the Com Port
+      isConnected = true;
+    }
+    catch(Exception exc)
+    {
+      Logger.getLogger(RadioController.class.getName()).log(Level.SEVERE, null, exc);
+      return false;
+    }
+    
+    return true;
+  }
+  
+  
+  public void disconnect()
+  {
+    try
+    {
+      radio.disconnect();
+    }
+    catch (SerialPortException ex)
+    {
+      Logger.getLogger(RadioController.class.getName()).log(Level.SEVERE, null, ex);
+    }
+  }
+  
+  
+  public boolean isConnected()
+  {
+    return isConnected;
+  }
+  
+  
+  /**
+   * Read the frequency from the VFO that is currently in use
+   * 
+   * @return 
+   */
+  public int getFrequency()
+  {
+    if(activeVfo == RadioVfos.A)
+      return freqVfoA;
+    else
+      return freqVfoB;
+  }
+  
+  /**
+   *  Set the frequency of the currently active VFO
+   * @param freq
+   */
+  public void setFrequency(long freq)
+  {
+    try
+    {
+      if(activeVfo == RadioVfos.A)
+      {
+        radio.setFrequency(freq, RadioVfos.A.getCode());
+      }
+      else
+      {
+        radio.setFrequency(freq, RadioVfos.B.getCode());
+      }
+    }catch (Exception ex) 
+    {
+      Logger.getLogger(RadioController.class.getName()).log(Level.SEVERE, null, ex);
+    }
+  }
+  
+  
+  public RadioModes getMode()
+  {
+    if(activeVfo == RadioVfos.A)
+      return modeVfoA;
+    else
+      return modeVfoB;
+  }
+  
+  
+  public void sendMorse(String text)
+  {
+    try
+    {
+      radio.sendCW(text);
+    }
+    catch (Exception ex)
+    {
+      Logger.getLogger(RadioController.class.getName()).log(Level.SEVERE, null, ex);
+    }
+  }
+  
+  public void interruptMorseSending()
+  {
+    try
+    {
+      radio.interruptSendCW();
+    }
+    catch (Exception ex)
+    {
+      Logger.getLogger(RadioController.class.getName()).log(Level.SEVERE, null, ex);
+    }
+  }
+  
+  public RadioVfos getActiveVfo()
+  {
+    return RadioVfos.A;
+  }
+  
+  
+  
+  public String getInfo()
+  {
+    I_SerialSettings serialSettings = radioParser.getSerialPortSettings();
+    
+    String info = "manufacturer: " + radioParser.getManufacturer() + "\n" + 
+                  "\n" +
+                  "model: " + radioParser.getModel() +
+                  "\n"+
+                  "serial port settings: " + serialSettings.toString()+
+                  "\n";
+   return info;
+  }
+  
+    
+  /**
+   * Handlers for events coming from the radio
+   */
+  private class LocalRadioListener implements RadioListener
+  {
+    @Override
+    public void eventNotsupported(NotsupportedEvent e)
+    {
+    // not interested
+    }
+
+    @Override
+    public void eventConfirmation(ConfirmationEvent e)
+    {
+    // not interested
+    }
+
+    @Override
+    public void eventFrequency(final FrequencyEvent e)
+    {
+      /* Create and display the form */
+      java.awt.EventQueue.invokeLater(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          if(e.getVfo() == RadioVfos.A)
+            freqVfoA = Integer.parseInt(e.getFrequency()); //Misc.formatFrequency(e.getFrequency());
+          else if(e.getVfo() == RadioVfos.B)
+            freqVfoB = Integer.parseInt(e.getFrequency());
+          else
+          {
+            logger.warning("Frequency event from unknown VFO!");
+          }
+            
+        }
+      });
+    }
+
+    @Override
+    public void eventMode(final ModeEvent e)
+    {
+       /* Create and display the form */
+      java.awt.EventQueue.invokeLater(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          if(e.getVfo() == RadioVfos.A)
+            modeVfoA = e.getMode();
+          else if(e.getVfo() == RadioVfos.B)
+            modeVfoB = e.getMode();
+          else
+          {
+            logger.warning("Mode event from unknown VFO!");
+          }
+          
+        }
+      });
+    }
+
+    @Override
+    public void eventSmeter(SmeterEvent e)
+    {
+      // Not interested
+    }
+
+    @Override
+    public void eventActiveVfo(ActiveVfoEvent e)
+    {
+      activeVfo = e.getVfo();
+    }
+    
+    
+  }
 }

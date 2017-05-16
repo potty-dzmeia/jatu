@@ -41,6 +41,7 @@ public class JsonMsgParser
   public static final String FREQUENCY_MSG      = "frequency";
   public static final String MODE_MSG           = "mode";
   public static final String SMETER_MSG         = "smeter";
+  public static final String ACTIVE_VFO         = "active_vfo";
   
   // A field wich can be found inside the FREQUENCY_MSG and MODE_MSG
   public static final String VFO_PAR            = "vfo";
@@ -104,6 +105,16 @@ public class JsonMsgParser
           }
           break;
         
+        // -----------------------------
+        case JsonMsgParser.ACTIVE_VFO:
+        // -----------------------------
+          ActiveVfoEvent activeVfoEv = parseActiveVfoMsg(jso.getJSONObject(command));
+          for (RadioListener listener : listeners)
+          {
+            listener.eventActiveVfo(activeVfoEv);
+          }
+          break;
+          
         // -----------------------------
         case JsonMsgParser.SMETER_MSG:
         // -----------------------------
@@ -229,6 +240,13 @@ public class JsonMsgParser
   }
   
   
+  
+  private static ActiveVfoEvent parseActiveVfoMsg(JSONObject jso)
+  {
+    return new ActiveVfoEvent(parseVfoField(jso));
+  }       
+          
+          
   /**
    * Parser an object containing Mode and some additional data (e.g. VFO)
    * 
