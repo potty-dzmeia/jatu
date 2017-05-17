@@ -195,8 +195,8 @@ public class MainWindow extends javax.swing.JFrame
     jpanelRadio = new javax.swing.JPanel();
     jpanelVfoA = new javax.swing.JPanel();
     jtogglebuttonConnectToRadio = new javax.swing.JToggleButton();
-    jtextfieldFrequencyVfoA = new javax.swing.JTextField();
-    jtextfieldModeVfoA = new javax.swing.JTextField();
+    jtextfieldFrequency = new javax.swing.JTextField();
+    jtextfieldMode = new javax.swing.JTextField();
     jMenuBar1 = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     jMenu2 = new javax.swing.JMenu();
@@ -812,33 +812,33 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(5, 20, 5, 20);
     jpanelVfoA.add(jtogglebuttonConnectToRadio, gridBagConstraints);
 
-    jtextfieldFrequencyVfoA.setEditable(false);
-    jtextfieldFrequencyVfoA.setBackground(new java.awt.Color(0, 0, 0));
-    jtextfieldFrequencyVfoA.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-    jtextfieldFrequencyVfoA.setForeground(new java.awt.Color(255, 255, 255));
-    jtextfieldFrequencyVfoA.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-    jtextfieldFrequencyVfoA.setText("frequency");
+    jtextfieldFrequency.setEditable(false);
+    jtextfieldFrequency.setBackground(new java.awt.Color(0, 0, 0));
+    jtextfieldFrequency.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+    jtextfieldFrequency.setForeground(new java.awt.Color(255, 255, 255));
+    jtextfieldFrequency.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+    jtextfieldFrequency.setText("frequency");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    jpanelVfoA.add(jtextfieldFrequencyVfoA, gridBagConstraints);
+    jpanelVfoA.add(jtextfieldFrequency, gridBagConstraints);
 
-    jtextfieldModeVfoA.setEditable(false);
-    jtextfieldModeVfoA.setBackground(new java.awt.Color(0, 0, 0));
-    jtextfieldModeVfoA.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-    jtextfieldModeVfoA.setForeground(new java.awt.Color(255, 255, 255));
-    jtextfieldModeVfoA.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-    jtextfieldModeVfoA.setText("mode");
+    jtextfieldMode.setEditable(false);
+    jtextfieldMode.setBackground(new java.awt.Color(0, 0, 0));
+    jtextfieldMode.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+    jtextfieldMode.setForeground(new java.awt.Color(255, 255, 255));
+    jtextfieldMode.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+    jtextfieldMode.setText("mode");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 0.2;
     gridBagConstraints.weighty = 1.0;
-    jpanelVfoA.add(jtextfieldModeVfoA, gridBagConstraints);
+    jpanelVfoA.add(jtextfieldMode, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -1071,7 +1071,7 @@ public class MainWindow extends javax.swing.JFrame
   
   private boolean connectToRadio()
   {
-    boolean result = radioController.connect(applicationSettings.getComPort());
+    boolean result = radioController.connect(applicationSettings.getComPort(), new LocalRadioControllerListener());
     if (!result)
     {
       JOptionPane.showMessageDialog(null, "Coud not connect to radio!", "Serial connection error...", JOptionPane.ERROR_MESSAGE);
@@ -1378,7 +1378,7 @@ public class MainWindow extends javax.swing.JFrame
         @Override
         public void run()
         {
-          // TO DO
+          jtextfieldFrequency.setText(radioController.getActiveVfo().toString()+" " +Integer.toString(radioController.getFrequency()));
         }
       });
      
@@ -1393,7 +1393,22 @@ public class MainWindow extends javax.swing.JFrame
         @Override
         public void run()
         {
-          // TO DO
+          jtextfieldMode.setText(radioController.getMode().toString());
+        }
+      });
+    }
+
+    @Override
+    public void vfo()
+    {
+      /* Create and display the form */
+      java.awt.EventQueue.invokeLater(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          jtextfieldMode.setText(radioController.getMode().toString());
+          jtextfieldFrequency.setText(radioController.getActiveVfo().toString()+" " +Integer.toString(radioController.getFrequency()));
         }
       });
     }
@@ -1511,8 +1526,8 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JTable jtableLog;
   private javax.swing.JTable jtableSearch;
   private javax.swing.JTextField jtextfieldCallsign;
-  private javax.swing.JTextField jtextfieldFrequencyVfoA;
-  private javax.swing.JTextField jtextfieldModeVfoA;
+  private javax.swing.JTextField jtextfieldFrequency;
+  private javax.swing.JTextField jtextfieldMode;
   private javax.swing.JTextField jtextfieldQsoRepeatPeriod;
   private javax.swing.JTextField jtextfieldRcv;
   private javax.swing.JTextField jtextfieldSnt;

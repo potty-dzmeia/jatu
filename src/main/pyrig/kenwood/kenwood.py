@@ -153,7 +153,7 @@ class Kenwood(Radio):
     @classmethod
     def encodeGetFreq(cls, vfo):
         """
-        Gets the command with which we can tell the radio send us the current frequency
+        Gets the command with which we can tell the radio to send us the current frequency
 
         :param vfo: For which VFO we want the mode
         :type vfo: int
@@ -161,6 +161,20 @@ class Kenwood(Radio):
         :rtype: EncodedTransaction
         """
         result = "F%c;"%(cls.__vfo_number_to_letter(vfo))
+        logger.debug("returns: {0}".format(result))
+        return list([EncodedTransaction(result)])
+
+
+    @classmethod
+    def encodeGetMode(cls, vfo):
+        """
+        Gets the command with which we can tell the radio to send us the Mode for the certain VFO
+        :param vfo: For which VFO we want to get the mode (Kenwood does not support this)
+        :type vfo: int
+        :return:
+        :rtype: EncodedTransaction
+        """
+        result = "MD;"
         logger.debug("returns: {0}".format(result))
         return list([EncodedTransaction(result)])
 
@@ -213,8 +227,20 @@ class Kenwood(Radio):
 
     @classmethod
     def encodeInterruptSendCW(cls):
+        """
+        Gets the command with which we can tell the radio to stop sending morse code
+        :return:
+        """
         result = "KY0;"
+        return list([EncodedTransaction(result)])
 
+    @classmethod
+    def encodeGetActiveVfo(cls):
+        """
+        Gets the command with which we can tell the radio to send us the active VFO
+        :return:
+        """
+        result = "FR;"
         return list([EncodedTransaction(result)])
 
 
@@ -288,7 +314,7 @@ class Kenwood(Radio):
         """
         Extracts the Frequency value from the command
 
-        :param command: String starting of the type "FA00007000000;"
+        :param command: String of the type "FA00007000000;"
         :type command: str
         :return: The dict with the parsed data
         :rtype: dict
@@ -304,7 +330,7 @@ class Kenwood(Radio):
         """
         Extracts the Frequency value from the command
 
-        :param command: String starting of the type "FB00007000000;"
+        :param command: String of the type "FB00007000000;"
         :type command: str
         :return: The dict with the parsed data
         :rtype: dict
@@ -324,7 +350,7 @@ class Kenwood(Radio):
         :rtype: dict
         """
         result = dict()
-        if command[2] == '1':
+        if command[2] == '0':
             DecodedTransaction.insertActiveVfo(result, vfo=Radio.VFO_A)
         else:
             DecodedTransaction.insertActiveVfo(result, vfo=Radio.VFO_B)
@@ -338,24 +364,24 @@ class Kenwood(Radio):
         """
         Extracts the Mode value from the command
 
-        :param command: String starting of the type "MD1;" or "MD$1;"
+        :param command: String of the type "MD1;"
         :type command: str
         :return: The dict with the parsed data
         :rtype: dict
         """
 
         result = dict()
-        #
-        # m = cls.__mode_from_byte_to_string(int(command[3]))
-        # DecodedTransaction.insertMode(result, m, vfo=Radio.VFO_NONE)
-        #
-        # return result
-        if command[2] != '$':
-            m = cls.__mode_from_byte_to_string(int(command[2]))
-            DecodedTransaction.insertMode(result, m, vfo=Radio.VFO_A)
-        else:
-            m = cls.__mode_from_byte_to_string(int(command[3]))
-            DecodedTransaction.insertMode(result, m, vfo=Radio.VFO_B)
+
+        m = cls.__mode_from_byte_to_string(int(command[2]))
+        DecodedTransaction.insertMode(result, m, vfo=Radio.VFO_NONE)
+
+        return result
+        # if command[2] != '$':
+        #     m = cls.__mode_from_byte_to_string(int(command[2]))
+        #     DecodedTransaction.insertMode(result, m, vfo=Radio.VFO_A)
+        # else:
+        #     m = cls.__mode_from_byte_to_string(int(command[3]))
+        #     DecodedTransaction.insertMode(result, m, vfo=Radio.VFO_B)
 
         return result
 

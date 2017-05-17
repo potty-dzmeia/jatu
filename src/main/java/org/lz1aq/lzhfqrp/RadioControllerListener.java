@@ -29,4 +29,5 @@ public interface RadioControllerListener extends EventListener
 {
   public void frequency();
   public void mode();
+  public void vfo();
 }

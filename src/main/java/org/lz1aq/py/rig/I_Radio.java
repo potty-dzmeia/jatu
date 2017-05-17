@@ -91,6 +91,12 @@ public interface I_Radio extends I_Rig
   
   
   /**
+   * Gets the command with which we can the the radio to send us the currently active VFO
+   * @return - Array of transaction which are to be sent to the radio
+   */
+  public I_EncodedTransaction[] encodeGetActiveVfo();
+  
+  /**
    * Gets the command(s) with which we can tell the radio to send morse code
    *
    * @param text - the text that we would like to transmit as morse code  

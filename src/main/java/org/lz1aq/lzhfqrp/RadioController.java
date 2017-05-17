@@ -49,11 +49,11 @@ public class RadioController
   private boolean isConnected = false;
   private int freqVfoA = 14000000;
   private int freqVfoB = 14000000; 
-  private RadioModes modeVfoA = RadioModes.AM;
-  private RadioModes modeVfoB = RadioModes.AM;
-  private RadioVfos activeVfo = RadioVfos.A;
+  private RadioModes modeVfoA = RadioModes.NONE;
+  private RadioModes modeVfoB = RadioModes.NONE;
+  private RadioVfos activeVfo = RadioVfos.NONE;
   private final CopyOnWriteArrayList<RadioControllerListener>  eventListeners;
-  private Radio         radio;;
+  private Radio         radio;
   private I_Radio       radioParser;  
   
   private static final Logger logger = Logger.getLogger(Radio.class.getName());
@@ -109,13 +109,14 @@ public class RadioController
       radio = new Radio(radioParser, commport);
       radio.addEventListener(new RadioController.LocalRadioListener());
       radio.connect(); // Let's not forget to call connect(). Calling disconnects() later will close the Com Port
+      eventListeners.add(listener);
       isConnected = true;
       
-      radio.getFrequency(freqVfoA);
-      radio.getMode(freqVfoA);
-      radio.getFrequency(freqVfoB);
-      radio.getMode(freqVfoB);
-      //radio.getActiveVfo()
+      radio.getFrequency(RadioVfos.A.getCode());
+      radio.getMode(RadioVfos.A.getCode());
+      radio.getFrequency(RadioVfos.B.getCode());
+      radio.getMode(RadioVfos.B.getCode());
+      radio.getActiveVfo();
     }
     catch(Exception exc)
     {
@@ -164,6 +165,10 @@ public class RadioController
       return freqVfoB;
   }
   
+  public RadioVfos getActiveVfo()
+  {
+    return activeVfo;
+  }
   /**
    *  Set the frequency of the currently active VFO
    * @param freq
@@ -292,16 +297,25 @@ public class RadioController
     @Override
     public void eventMode(final ModeEvent e)
     {
-       if (e.getVfo() == RadioVfos.A)
+      if (e.getVfo() == RadioVfos.A)
       {
         modeVfoA = e.getMode();
-      } else if (e.getVfo() == RadioVfos.B)
+      } 
+      else if (e.getVfo() == RadioVfos.B)
       {
         modeVfoB = e.getMode();
-      } else
+      } 
+      // No information for the VFO - we need to deduce which Vfo mode was changed
+      else if(e.getVfo() == RadioVfos.NONE)
       {
-        logger.warning("Mode event from unknown VFO!");
-        return;
+        if(activeVfo == RadioVfos.A)
+          modeVfoA = e.getMode();
+        else
+          modeVfoB = e.getMode();
+      }
+      else
+      {
+        logger.warning("Unknown VFO number was received!");
       }
 
       // Notify any listeners
@@ -323,6 +337,12 @@ public class RadioController
     public void eventActiveVfo(ActiveVfoEvent e)
     {
       activeVfo = e.getVfo();
+      
+       // Notify any listeners
+      for (RadioControllerListener listener : eventListeners)
+      {
+        listener.vfo();
+      }
     }
   }
 }

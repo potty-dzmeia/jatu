@@ -213,6 +213,12 @@ public class Radio
     this.queueTransactions(radioProtocolParser.encodeGetMode(vfo));
   }
   
+  
+  public void getActiveVfo() throws Exception
+  {
+    this.queueTransactions(radioProtocolParser.encodeGetActiveVfo());
+  }
+  
   /**
    * Send morse code
    * 

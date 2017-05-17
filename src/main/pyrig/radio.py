@@ -119,6 +119,9 @@ class Radio(I_Radio):
 
         raise NotImplementedError("encodeSendCW")
 
+    @classmethod
+    def encodeGetActiveVfo(cls):
+        raise NotImplementedError("encodeGetActiveVfo")
 
     #Freq - frequency of the target VFO
     #rig_set_mode(RIG *rig, vfo_t vfo, rmode_t mode, pbwidth_t width)
