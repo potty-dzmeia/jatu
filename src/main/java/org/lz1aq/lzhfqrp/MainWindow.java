@@ -33,13 +33,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.DocumentFilter;
 import jssc.SerialPortList;
-import org.apache.commons.lang3.StringUtils;
-import org.lz1aq.jatu.JythonObjectFactory;
 import org.lz1aq.log.Log;
 import org.lz1aq.log.LogDatabase;
 import org.lz1aq.log.LogTableModel;
 import org.lz1aq.log.Qso;
-import org.lz1aq.py.rig.I_Radio;
+import org.lz1aq.rsi.Radio;
+import org.lz1aq.utils.RadioModes;
+import org.lz1aq.utils.RadioVfos;
 
 /**
  *
@@ -51,14 +51,16 @@ public class MainWindow extends javax.swing.JFrame
   static final String PROGRAM_NAME    = "LZ Log";
     
   
-  private Log log;
-  private LogTableModel qsoTableModel;
-  private final ApplicationSettings  applicationSettings;
-  private RadioController radioController;
-  
+  private Log                         log;
+  private LogTableModel               qsoTableModel;
+  private final ApplicationSettings   applicationSettings;
+  private RadioController             radioController;
+  private LocalRadioControllerListener radioListener;
           
-  private DocumentFilter filter = new UppercaseDocumentFilter();
-  private JFileChooser  chooser;
+  private DocumentFilter              filter = new UppercaseDocumentFilter();
+  private JFileChooser                chooser;
+  
+  private static final Logger logger = Logger.getLogger(Radio.class.getName());
   /**
    * Creates new form MainWindow
    */
@@ -68,13 +70,13 @@ public class MainWindow extends javax.swing.JFrame
     // Init the Log/database 
     try
     {
-      Qso example = new Qso(14190000, "cw", "lz1abc", "lz0fs", "200 091", "200 091"); // We need to supply an example QSO whwn creating/opening new
+      Qso example = new Qso(14190000, "cw", "lz1abc", "lz0fs", "200 091", "200 091", "cq"); // We need to supply an example QSO whwn creating/opening new
       log = new Log(new LogDatabase("log_test.db4o"), example);
       qsoTableModel = new LogTableModel(log);
     }
     catch (Exception ex)
     {
-      Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+      logger.log(Level.SEVERE, "Couldn't open the log database!", ex);
     }
     
     
@@ -109,7 +111,7 @@ public class MainWindow extends javax.swing.JFrame
   
   private DefaultComboBoxModel getBandsComboboxModel()
   {
-    return new DefaultComboBoxModel(new String[] { "1.8", "3.5", "7", "10", "14", "18", "21", "24", "28" });
+    return new DefaultComboBoxModel(new String[] { "1.8", "3.5", "7", "14", "21", "28" });
   }
   
   
@@ -166,8 +168,8 @@ public class MainWindow extends javax.swing.JFrame
     jtextfieldSnt = new javax.swing.JTextField();
     jtextfieldRcv = new javax.swing.JTextField();
     jpanelTypeOfWork = new javax.swing.JPanel();
-    jRadioButton1 = new javax.swing.JRadioButton();
-    jRadioButton2 = new javax.swing.JRadioButton();
+    jradiobuttonCQ = new javax.swing.JRadioButton();
+    jradiobuttonSP = new javax.swing.JRadioButton();
     jLabel1 = new javax.swing.JLabel();
     jcomboboxMode = new javax.swing.JComboBox();
     jcomboboxBand = new javax.swing.JComboBox();
@@ -192,14 +194,9 @@ public class MainWindow extends javax.swing.JFrame
     jTable1 = new javax.swing.JTable();
     jpanelRadio = new javax.swing.JPanel();
     jpanelVfoA = new javax.swing.JPanel();
-    jradiobuttonVfoA = new javax.swing.JRadioButton();
+    jtogglebuttonConnectToRadio = new javax.swing.JToggleButton();
     jtextfieldFrequencyVfoA = new javax.swing.JTextField();
     jtextfieldModeVfoA = new javax.swing.JTextField();
-    jpanelVfoB = new javax.swing.JPanel();
-    jradiobuttonVfoB = new javax.swing.JRadioButton();
-    jtextfieldFrequencyVfoB = new javax.swing.JTextField();
-    jtextfieldModeVfoB = new javax.swing.JTextField();
-    jtogglebuttonConnectToRadio = new javax.swing.JToggleButton();
     jMenuBar1 = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     jMenu2 = new javax.swing.JMenu();
@@ -414,7 +411,7 @@ public class MainWindow extends javax.swing.JFrame
         formWindowClosing(evt);
       }
     });
-    getContentPane().setLayout(new java.awt.GridLayout());
+    getContentPane().setLayout(new java.awt.GridLayout(1, 0));
 
     jsplitRighPanel.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
@@ -506,7 +503,7 @@ public class MainWindow extends javax.swing.JFrame
     jsplitRighPanel.setRightComponent(jpanelLog);
 
     jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Bandmap"));
-    jPanel8.setLayout(new java.awt.GridLayout());
+    jPanel8.setLayout(new java.awt.GridLayout(1, 0));
 
     jTable3.setModel(new javax.swing.table.DefaultTableModel(
       new Object [][]
@@ -583,22 +580,22 @@ public class MainWindow extends javax.swing.JFrame
 
     jpanelTypeOfWork.setLayout(new java.awt.GridBagLayout());
 
-    buttonGroupTypeOfWork.add(jRadioButton1);
-    jRadioButton1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-    jRadioButton1.setText("CQ");
-    jRadioButton1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    buttonGroupTypeOfWork.add(jradiobuttonCQ);
+    jradiobuttonCQ.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+    jradiobuttonCQ.setText("CQ");
+    jradiobuttonCQ.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 0.1;
     gridBagConstraints.weighty = 1.0;
-    jpanelTypeOfWork.add(jRadioButton1, gridBagConstraints);
+    jpanelTypeOfWork.add(jradiobuttonCQ, gridBagConstraints);
 
-    buttonGroupTypeOfWork.add(jRadioButton2);
-    jRadioButton2.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-    jRadioButton2.setText("S&P");
-    jRadioButton2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    buttonGroupTypeOfWork.add(jradiobuttonSP);
+    jradiobuttonSP.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+    jradiobuttonSP.setText("S&P");
+    jradiobuttonSP.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
@@ -606,7 +603,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 0.1;
     gridBagConstraints.weighty = 1.0;
-    jpanelTypeOfWork.add(jRadioButton2, gridBagConstraints);
+    jpanelTypeOfWork.add(jradiobuttonSP, gridBagConstraints);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 0;
@@ -797,83 +794,6 @@ public class MainWindow extends javax.swing.JFrame
     jpanelVfoA.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
     jpanelVfoA.setLayout(new java.awt.GridBagLayout());
 
-    jradiobuttonVfoA.setText("VFO A");
-    jradiobuttonVfoA.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 0.1;
-    gridBagConstraints.weighty = 0.1;
-    jpanelVfoA.add(jradiobuttonVfoA, gridBagConstraints);
-
-    jtextfieldFrequencyVfoA.setBackground(new java.awt.Color(0, 0, 0));
-    jtextfieldFrequencyVfoA.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-    jtextfieldFrequencyVfoA.setForeground(new java.awt.Color(255, 255, 255));
-    jtextfieldFrequencyVfoA.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-    jtextfieldFrequencyVfoA.setText("frequency");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelVfoA.add(jtextfieldFrequencyVfoA, gridBagConstraints);
-
-    jtextfieldModeVfoA.setBackground(new java.awt.Color(0, 0, 0));
-    jtextfieldModeVfoA.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-    jtextfieldModeVfoA.setForeground(new java.awt.Color(255, 255, 255));
-    jtextfieldModeVfoA.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-    jtextfieldModeVfoA.setText("mode");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 0.2;
-    gridBagConstraints.weighty = 1.0;
-    jpanelVfoA.add(jtextfieldModeVfoA, gridBagConstraints);
-
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelRadio.add(jpanelVfoA, gridBagConstraints);
-
-    jpanelVfoB.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-    jpanelVfoB.setLayout(new java.awt.GridBagLayout());
-
-    jradiobuttonVfoB.setText("VFO B");
-    jradiobuttonVfoB.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 0.1;
-    gridBagConstraints.weighty = 0.1;
-    jpanelVfoB.add(jradiobuttonVfoB, gridBagConstraints);
-
-    jtextfieldFrequencyVfoB.setBackground(new java.awt.Color(0, 0, 0));
-    jtextfieldFrequencyVfoB.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-    jtextfieldFrequencyVfoB.setForeground(new java.awt.Color(255, 255, 255));
-    jtextfieldFrequencyVfoB.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-    jtextfieldFrequencyVfoB.setText("frequency");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelVfoB.add(jtextfieldFrequencyVfoB, gridBagConstraints);
-
-    jtextfieldModeVfoB.setBackground(new java.awt.Color(0, 0, 0));
-    jtextfieldModeVfoB.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-    jtextfieldModeVfoB.setForeground(new java.awt.Color(255, 255, 255));
-    jtextfieldModeVfoB.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-    jtextfieldModeVfoB.setText("mode");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 0.2;
-    gridBagConstraints.weighty = 1.0;
-    jpanelVfoB.add(jtextfieldModeVfoB, gridBagConstraints);
-
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelRadio.add(jpanelVfoB, gridBagConstraints);
-
     jtogglebuttonConnectToRadio.setText("Connect/Disconnect");
     jtogglebuttonConnectToRadio.addActionListener(new java.awt.event.ActionListener()
     {
@@ -884,12 +804,47 @@ public class MainWindow extends javax.swing.JFrame
     });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.2;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(5, 20, 5, 20);
+    jpanelVfoA.add(jtogglebuttonConnectToRadio, gridBagConstraints);
+
+    jtextfieldFrequencyVfoA.setEditable(false);
+    jtextfieldFrequencyVfoA.setBackground(new java.awt.Color(0, 0, 0));
+    jtextfieldFrequencyVfoA.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+    jtextfieldFrequencyVfoA.setForeground(new java.awt.Color(255, 255, 255));
+    jtextfieldFrequencyVfoA.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+    jtextfieldFrequencyVfoA.setText("frequency");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(5, 20, 5, 20);
-    jpanelRadio.add(jtogglebuttonConnectToRadio, gridBagConstraints);
+    jpanelVfoA.add(jtextfieldFrequencyVfoA, gridBagConstraints);
+
+    jtextfieldModeVfoA.setEditable(false);
+    jtextfieldModeVfoA.setBackground(new java.awt.Color(0, 0, 0));
+    jtextfieldModeVfoA.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+    jtextfieldModeVfoA.setForeground(new java.awt.Color(255, 255, 255));
+    jtextfieldModeVfoA.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+    jtextfieldModeVfoA.setText("mode");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 0.2;
+    gridBagConstraints.weighty = 1.0;
+    jpanelVfoA.add(jtextfieldModeVfoA, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    jpanelRadio.add(jpanelVfoA, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -1094,14 +1049,14 @@ public class MainWindow extends javax.swing.JFrame
       }
 
       // Now establish connection with the radio
-      result = radioController.connect(applicationSettings.getComPort());
-      if (!result)
+      result = connectToRadio();
+      if(!result)
       {
         jtogglebuttonConnectToRadio.setSelected(false);
       }
     }
-     // Disconnect
-      // ----------
+    // Disconnect
+    // --------------------
     else
     {
       if (radioController != null)
@@ -1114,37 +1069,53 @@ public class MainWindow extends javax.swing.JFrame
   }//GEN-LAST:event_jtogglebuttonConnectToRadioActionPerformed
   
   
+  private boolean connectToRadio()
+  {
+    boolean result = radioController.connect(applicationSettings.getComPort());
+    if (!result)
+    {
+      JOptionPane.showMessageDialog(null, "Coud not connect to radio!", "Serial connection error...", JOptionPane.ERROR_MESSAGE);
+    }
+    
+    return result;
+  }
+  
+  
   /**
    * Opens a file chooser which lets the user select the appropriate radio protocol parser.
-   * @return 
+   * @return true - if the loading was successful
    */
   private boolean loadRadioProtocolParser()
   {
-    // Configure the FileChooser
-    this.chooser = new JFileChooser();
-    chooser.setFileFilter(new FileNameExtensionFilter("Python files", "py"));
-    chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-    
-    int returnVal = chooser.showOpenDialog(this.getParent());
-    if(returnVal == JFileChooser.APPROVE_OPTION) 
+    try
     {
-      boolean result = radioController.loadProtocolParser(chooser.getSelectedFile().getName());
-      
-      if(result == false)
-      {
-        JOptionPane.showMessageDialog(null, "Error when trying to load the radio protocol parser file!");
+      // Configure the FileChooser
+      chooser = new JFileChooser();
+      chooser.setFileFilter(new FileNameExtensionFilter("Python files", "py"));
+      chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+
+      int returnVal = chooser.showOpenDialog(this.getParent());
+      if (returnVal != JFileChooser.APPROVE_OPTION)
         return false;
-      }  
-      else
-      {
-        JOptionPane.showMessageDialog(null, radioController.getInfo());
-        return true;
-      }
-      //this.initModesCombobox();  
+    }catch(Exception exc)
+    {
+        logger.log(Level.SEVERE, "Coudln't start file chooser", exc);
+        return false;
     }
-    
-    return false;
+   
+    boolean result = radioController.loadProtocolParser(chooser.getSelectedFile().getName());
+    if (result == false)
+    {
+      JOptionPane.showMessageDialog(null, "Error when trying to load the radio protocol parser file!", "Error", JOptionPane.ERROR_MESSAGE);
+      return false;
+    }
+     
+    // Show the serial settings that we are going to use when connecting to this radio
+    JOptionPane.showMessageDialog(null, radioController.getInfo());
+    return true;
   }
+  
+  
   /**
    * Reads the info from the entry window and if all data is valid it saves it into the Log
    *
@@ -1153,16 +1124,20 @@ public class MainWindow extends javax.swing.JFrame
    */
   boolean addEntryToLog()
   {
+    
+    String mode;
     Qso qso;
 
     try
     {
-      qso = new Qso(14190000, // TODO -> get freq
-                    "cw", // TODO -> radio.getmode
+     
+      qso = new Qso(getFreq(),
+                    getMode(),     
                     applicationSettings.getMyCallsign(),
                     getCallsignFromTextField(),
                     jtextfieldSnt.getText(),
-                    jtextfieldRcv.getText());
+                    jtextfieldRcv.getText(),
+                    getTypeOfWork());
     }
     catch (Exception exc)
     {
@@ -1174,6 +1149,68 @@ public class MainWindow extends javax.swing.JFrame
     return true;
   }
 
+  
+  /**
+   * Determines if the current Type of work is SP or CQ
+   * @return 
+   */
+  private String getTypeOfWork()
+  {
+    if(jradiobuttonSP.isSelected())
+      return "SP";
+    else
+      return "CQ";
+  }
+  
+  
+  /**
+   * Determines the current working mode. Takes into account if the connected
+   * to the radio or not.
+   * @return - String describing the mode (e.g. "cw", "ssb")
+   */
+  private String getMode()
+  {
+    // If radio is connected get the frequency from there
+    if(radioController.isConnected())
+    {
+      RadioModes mode;
+      mode = radioController.getMode();
+      return mode.toString();
+    }
+    // If no radio is connected - read the mode from the combobox model
+    else
+    {
+      String temp = jcomboboxMode.getSelectedItem().toString();
+      return temp;
+    }
+  }
+  
+  
+  /**
+   * Determines the current working frequency. Takes into account if the connected
+   * to the radio or not.
+   * @return - frequency in Hz
+   */
+  private long getFreq()
+  {
+    int freq;
+    
+    // If radio is connected get the frequency from there
+    if(radioController.isConnected())
+    {
+      freq = radioController.getFrequency();
+    }
+    // If no radio is connected - read the freq from the dropdown box
+    else
+    {
+      String temp = jcomboboxBand.getSelectedItem().toString();
+      // convert to Hz
+      freq = Math.round(Float.parseFloat(temp)*1000000);
+    }
+    
+    return freq;
+  }
+  
   
   /**
    * Gets the callsign from the jtextfieldCallsign.
@@ -1329,6 +1366,39 @@ public class MainWindow extends javax.swing.JFrame
     applicationSettings.setQsoRepeatPeriod(Integer.parseInt(jtextfieldQsoRepeatPeriod.getText()));
   }
 
+  class LocalRadioControllerListener implements RadioControllerListener
+  {
+
+    @Override
+    public void frequency()
+    {
+      /* Create and display the form */
+      java.awt.EventQueue.invokeLater(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          // TO DO
+        }
+      });
+     
+    }
+
+    @Override
+    public void mode()
+    {
+      /* Create and display the form */
+      java.awt.EventQueue.invokeLater(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          // TO DO
+        }
+      });
+    }
+    
+  }
   /**
    * @param args the command line arguments
    */
@@ -1412,8 +1482,6 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JPanel jPanel6;
   private javax.swing.JPanel jPanel8;
   private javax.swing.JPanel jPanelStatusBar;
-  private javax.swing.JRadioButton jRadioButton1;
-  private javax.swing.JRadioButton jRadioButton2;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JScrollPane jScrollPane3;
@@ -1436,18 +1504,15 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JPanel jpanelSearchLog;
   private javax.swing.JPanel jpanelTypeOfWork;
   private javax.swing.JPanel jpanelVfoA;
-  private javax.swing.JPanel jpanelVfoB;
-  private javax.swing.JRadioButton jradiobuttonVfoA;
-  private javax.swing.JRadioButton jradiobuttonVfoB;
+  private javax.swing.JRadioButton jradiobuttonCQ;
+  private javax.swing.JRadioButton jradiobuttonSP;
   private javax.swing.JSplitPane jsplitLeftPanel;
   private javax.swing.JSplitPane jsplitRighPanel;
   private javax.swing.JTable jtableLog;
   private javax.swing.JTable jtableSearch;
   private javax.swing.JTextField jtextfieldCallsign;
   private javax.swing.JTextField jtextfieldFrequencyVfoA;
-  private javax.swing.JTextField jtextfieldFrequencyVfoB;
   private javax.swing.JTextField jtextfieldModeVfoA;
-  private javax.swing.JTextField jtextfieldModeVfoB;
   private javax.swing.JTextField jtextfieldQsoRepeatPeriod;
   private javax.swing.JTextField jtextfieldRcv;
   private javax.swing.JTextField jtextfieldSnt;

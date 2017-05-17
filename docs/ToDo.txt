@@ -1,13 +1,20 @@
  
 -[EntryWindow] callsigns:
-  RED - dupe
-  BLUE - OK
-  GREEN - multi
+  RED - must be work
+  black - not ready to be worked
  
-- [EntryWindow] When EntryWindow is very small hide the F-buttons starting from the left (i.e. first hide F9-F12)
-- [EntryWindow] Option to hide the F-buttons
+
 - [EntryWindow] Tab - goes through all entries; Space - goes throught non-default entries
-- [EntryWindow] enter send msg mode
+- determine how to send the serial number (e.g. 0 to be ----- or -)
 - [LogWindow2] to be able to show only certain qsos (e.g. callsign filter) and edit them fast. For example like n1mm in a sub-table below the main log.
-- [EntryWindow] Size of the fonts should be proportional to entry fields size and window size.
-- [LogWindow2] To show callsigns which were worked on the current S&P frequency
+
+
+- "Incoming Qso" to show the first 10 incoming calls
+- "INcoming Qso" to keep a not worked station for max 5 minutes
+- Bandmap to show last two frequencies of a certain station
+- Implement keyer
+- Space should not delete DUPE qso from entry window (important if time is about to elapse)
+- update SNT if a Qso is deleted from the Log!
+- Function keys to be the same as N1MM
+- CQ or SP is determined if F1 is pressed and then if frequency is changed by 500Hz
+- 

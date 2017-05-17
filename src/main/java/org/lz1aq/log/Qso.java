@@ -78,12 +78,20 @@ public class Qso
    */
   static private final int RCV_INDEX = 7;
   static private final String RCV_TXT = "rcv";
+  
+  /**
+   * For type of work (CQ or SP)
+   */
+  static private final int TYPE_INDEX = 8;
+  static private final String TYPE_TXT = "type";
 
   /**
    * Used for accessing Extra parameters
    */
-  static private final int FIRST_EXTRA_PARAM_INDEX = 8;
+  static private final int FIRST_EXTRA_PARAM_INDEX = 9;
 
+  
+  
   /**
    * The minimum valid length for a callsign
    */
@@ -124,7 +132,7 @@ public class Qso
     qsoParams.add(new QsoParameter(MODE_TXT, mode));
     qsoParams.add(new QsoParameter(MYCALL_TXT, myCall));
     qsoParams.add(new QsoParameter(HISCALL_TXT, hisCall));
-  }
+    qsoParams.add(new QsoParameter(HISCALL_TXT, hisCall));  }
 
   
   /**
@@ -136,13 +144,14 @@ public class Qso
    * @param hisCall
    * @param snt
    * @param rcv
+   * @param type - specifies the type of work CQ or S&P
    * @throws java.lang.Exception In case the input data contains invalid fields
    */
-  public Qso(long freq, String mode, String myCall, String hisCall, String snt, String rcv) throws Exception
+  public Qso(long freq, String mode, String myCall, String hisCall, String snt, String rcv, String type) throws Exception
   {
     try
     {
-      isValidEntry(freq, mode, myCall, hisCall, snt, rcv);
+      isValidEntry(freq, mode, myCall, hisCall, snt, rcv, type);
     }catch(Exception exc)
     {
       throw exc;
@@ -158,10 +167,11 @@ public class Qso
     qsoParams.add(new QsoParameter(MODE_TXT, mode));
     qsoParams.add(new QsoParameter(MYCALL_TXT, myCall.toUpperCase()));
     qsoParams.add(new QsoParameter(HISCALL_TXT, hisCall.toUpperCase()));
-    snt = snt.replaceAll("\\s", "");
+    snt = snt.replaceAll("\\s", ""); // Remove any empty spaces
     qsoParams.add(new QsoParameter(SNT_TXT, snt));
-    rcv = rcv.replaceAll("\\s", "");
+    rcv = rcv.replaceAll("\\s", ""); // Remove any empty spaces
     qsoParams.add(new QsoParameter(RCV_TXT, rcv));
+    qsoParams.add(new QsoParameter(TYPE_TXT, type.toUpperCase()));
 
   }
 
@@ -265,6 +275,16 @@ public class Qso
   }
   
   
+  /**
+   *  The Type of work during which the QSO was made (CQ or SP)
+   * @return 
+   */
+  public String getType()
+  {
+    return qsoParams.get(TYPE_INDEX).value;
+  }
+  
+  
   public String getParamName(int parameterIndex)
   {
     return qsoParams.get(parameterIndex).name;
@@ -330,7 +350,7 @@ public class Qso
    * @return
    * @throws Exception exception describing the issue
    */
-  private void isValidEntry(long freq, String mode, String myCall, String hisCall, String snt, String rcv) throws Exception
+  private void isValidEntry(long freq, String mode, String myCall, String hisCall, String snt, String rcv, String type) throws Exception
   {
     if(!isValidFrequency(freq))
       throw new Exception("Invalid frequency");
@@ -346,6 +366,9 @@ public class Qso
     
     if(!isValidSerial(rcv))
       throw new Exception("Rcv field is invalid");
+    
+    if(!isValidType(type))
+      throw new Exception("Type field is invalid. Must be CQ or SP");
   }
 
   
@@ -358,7 +381,7 @@ public class Qso
    */
   private boolean isValidFrequency(long freq)
   {
-    return !(freq < 3500000 || freq > 29000000);
+    return !(freq < 1800000 || freq > 29000000);
   }
 
   /**
@@ -403,5 +426,14 @@ public class Qso
            call.length() >= CALLSIGN_MIN_LEN;
   }
 
-  
+  /** 
+   * Checks it the type is SP or CQ
+   * 
+   * @param type
+   * @return - true if the type has been recognized
+   */
+  public static boolean isValidType(String type)
+  {
+    return type.toUpperCase().equals("CQ") || type.toUpperCase().equals("SP");
+  }
 }
