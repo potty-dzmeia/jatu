@@ -19,6 +19,8 @@
 // ***************************************************************************
 package org.lz1aq.lzhfqrp;
 
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
@@ -49,16 +51,17 @@ public class MainWindow extends javax.swing.JFrame
 {
   static final String PROGRAM_VERSION = "1.0.0";
   static final String PROGRAM_NAME    = "LZ Log";
-    
-  
+          
   private Log                         log;
   private LogTableModel               qsoTableModel;
   private final ApplicationSettings   applicationSettings;
-  private RadioController             radioController;
+  private final RadioController       radioController;
   private LocalRadioControllerListener radioListener;
           
   private DocumentFilter              filter = new UppercaseDocumentFilter();
-  private JFileChooser                chooser;
+  private final JFileChooser          chooser;
+  
+  
   
   private static final Logger logger = Logger.getLogger(Radio.class.getName());
   /**
@@ -88,6 +91,9 @@ public class MainWindow extends javax.swing.JFrame
     // Load user settings from the properties file
     this.applicationSettings = new ApplicationSettings();
     
+    //This is used for catching global key presses (i.e. needed for F1-F12 presses)
+    KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+    manager.addKeyEventDispatcher(new MyDispatcher());
     
 
     // Prepare the entry fields to have the necessary data
@@ -96,7 +102,11 @@ public class MainWindow extends javax.swing.JFrame
     // Callsign text field should show capital letters only
     ((AbstractDocument) jtextfieldCallsign.getDocument()).setDocumentFilter(filter);
     
-    
+    // Configure the FileChooser
+      chooser = new JFileChooser();
+      chooser.setFileFilter(new FileNameExtensionFilter("Python files", "py"));
+      chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+
     // Needed so that jTable to scroll automatically upon entering a new Qso
     jtableLog.addComponentListener(new ComponentAdapter()
     {
@@ -134,20 +144,35 @@ public class MainWindow extends javax.swing.JFrame
     buttonGroupTypeOfWork = new javax.swing.ButtonGroup();
     jDialogSettings = new javax.swing.JDialog();
     jPanel1 = new javax.swing.JPanel();
-    jPanel3 = new javax.swing.JPanel();
-    textfieldSettingsMyCallsign = new javax.swing.JTextField();
     jPanel4 = new javax.swing.JPanel();
     jComboBoxComPort = new javax.swing.JComboBox();
     jLabel12 = new javax.swing.JLabel();
-    jPanel5 = new javax.swing.JPanel();
-    jButtonCancel = new javax.swing.JButton();
-    jButtonSave = new javax.swing.JButton();
+    jPanel3 = new javax.swing.JPanel();
+    textfieldSettingsMyCallsign = new javax.swing.JTextField();
+    jPanel7 = new javax.swing.JPanel();
+    jLabel3 = new javax.swing.JLabel();
+    jtextfieldf1 = new javax.swing.JTextField();
+    jLabel9 = new javax.swing.JLabel();
+    jtextfieldf3 = new javax.swing.JTextField();
+    jLabel4 = new javax.swing.JLabel();
+    jtextfieldf6 = new javax.swing.JTextField();
+    jLabel5 = new javax.swing.JLabel();
+    jtextfieldf7 = new javax.swing.JTextField();
+    jLabel8 = new javax.swing.JLabel();
+    jtextfieldf8 = new javax.swing.JTextField();
+    jLabel6 = new javax.swing.JLabel();
+    jtextfieldf9 = new javax.swing.JTextField();
+    jLabel7 = new javax.swing.JLabel();
+    jtextfieldf10 = new javax.swing.JTextField();
     jPanel6 = new javax.swing.JPanel();
     checkboxSettingsQuickMode = new javax.swing.JCheckBox();
     textfieldSettingsDefaultPrefix = new javax.swing.JTextField();
     jPanel2 = new javax.swing.JPanel();
     jtextfieldQsoRepeatPeriod = new javax.swing.JTextField();
     jLabel2 = new javax.swing.JLabel();
+    jPanel5 = new javax.swing.JPanel();
+    jButtonCancel = new javax.swing.JButton();
+    jButtonSave = new javax.swing.JButton();
     jSplitPane2 = new javax.swing.JSplitPane();
     jsplitRighPanel = new javax.swing.JSplitPane();
     jpanelLog = new javax.swing.JPanel();
@@ -217,28 +242,6 @@ public class MainWindow extends javax.swing.JFrame
 
     jPanel1.setLayout(new java.awt.GridBagLayout());
 
-    jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("My callsign"));
-    jPanel3.setLayout(new java.awt.GridBagLayout());
-
-    textfieldSettingsMyCallsign.setFont(new java.awt.Font("Dialog", 0, 24)); // NOI18N
-    textfieldSettingsMyCallsign.setText("Your callsign here");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(20, 20, 20, 20);
-    jPanel3.add(textfieldSettingsMyCallsign, gridBagConstraints);
-
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-    jPanel1.add(jPanel3, gridBagConstraints);
-
     jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("CommPort settings"));
     jPanel4.setLayout(new java.awt.GridBagLayout());
 
@@ -270,6 +273,165 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
     jPanel1.add(jPanel4, gridBagConstraints);
+
+    jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("My callsign"));
+    jPanel3.setLayout(new java.awt.GridBagLayout());
+
+    textfieldSettingsMyCallsign.setFont(new java.awt.Font("Dialog", 0, 24)); // NOI18N
+    textfieldSettingsMyCallsign.setText("Your callsign here");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(20, 20, 20, 20);
+    jPanel3.add(textfieldSettingsMyCallsign, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+    jPanel1.add(jPanel3, gridBagConstraints);
+
+    jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Function keys"));
+    jPanel7.setLayout(new java.awt.GridLayout(0, 2));
+
+    jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jLabel3.setText("F1 Cq");
+    jPanel7.add(jLabel3);
+
+    jtextfieldf1.setText("jTextField1");
+    jPanel7.add(jtextfieldf1);
+
+    jLabel9.setText("F3 Tu");
+    jPanel7.add(jLabel9);
+
+    jtextfieldf3.setText("jTextField2");
+    jPanel7.add(jtextfieldf3);
+
+    jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jLabel4.setText("F6 Agn");
+    jPanel7.add(jLabel4);
+
+    jtextfieldf6.setText("jTextField3");
+    jPanel7.add(jtextfieldf6);
+
+    jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jLabel5.setText("F7 ?");
+    jPanel7.add(jLabel5);
+
+    jtextfieldf7.setText("jTextField4");
+    jPanel7.add(jtextfieldf7);
+
+    jLabel8.setText("F8 Dupe");
+    jPanel7.add(jLabel8);
+
+    jtextfieldf8.setText("jTextField5");
+    jPanel7.add(jtextfieldf8);
+
+    jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jLabel6.setText("F9 Spare");
+    jPanel7.add(jLabel6);
+
+    jtextfieldf9.setText("jTextField6");
+    jPanel7.add(jtextfieldf9);
+
+    jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jLabel7.setText("F10 Spare");
+    jPanel7.add(jLabel7);
+
+    jtextfieldf10.setText("jTextField7");
+    jPanel7.add(jtextfieldf10);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+    jPanel1.add(jPanel7, gridBagConstraints);
+
+    jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Quick callsign mode"));
+    jPanel6.setLayout(new java.awt.GridBagLayout());
+
+    checkboxSettingsQuickMode.setText("Enable quick callsign entry");
+    checkboxSettingsQuickMode.setToolTipText("If enabled will allow to enter callsign by using only the sufix");
+    checkboxSettingsQuickMode.addChangeListener(new javax.swing.event.ChangeListener()
+    {
+      public void stateChanged(javax.swing.event.ChangeEvent evt)
+      {
+        checkboxSettingsQuickModeStateChanged(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 10, 5);
+    jPanel6.add(checkboxSettingsQuickMode, gridBagConstraints);
+
+    textfieldSettingsDefaultPrefix.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+    textfieldSettingsDefaultPrefix.setText("LZ0");
+    textfieldSettingsDefaultPrefix.setToolTipText("The default prefix which will be added");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.3;
+    gridBagConstraints.weighty = 1.0;
+    jPanel6.add(textfieldSettingsDefaultPrefix, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 0.1;
+    gridBagConstraints.weighty = 0.1;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+    jPanel1.add(jPanel6, gridBagConstraints);
+
+    jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Qso repeat period"));
+    jPanel2.setToolTipText("");
+    jPanel2.setLayout(new java.awt.GridBagLayout());
+
+    jtextfieldQsoRepeatPeriod.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+    jtextfieldQsoRepeatPeriod.setText("30");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 0.3;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+    jPanel2.add(jtextfieldQsoRepeatPeriod, gridBagConstraints);
+
+    jLabel2.setText("Period in seconds:");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+    jPanel2.add(jLabel2, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 4;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.1;
+    gridBagConstraints.weighty = 0.1;
+    jPanel1.add(jPanel2, gridBagConstraints);
 
     jPanel5.setLayout(new java.awt.GridBagLayout());
 
@@ -309,89 +471,12 @@ public class MainWindow extends javax.swing.JFrame
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 4;
+    gridBagConstraints.gridy = 5;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
     jPanel1.add(jPanel5, gridBagConstraints);
-
-    jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Quick callsign mode"));
-    jPanel6.setLayout(new java.awt.GridBagLayout());
-
-    checkboxSettingsQuickMode.setText("Enable quick callsign entry");
-    checkboxSettingsQuickMode.setToolTipText("If enabled will allow to enter callsign by using only the sufix");
-    checkboxSettingsQuickMode.addChangeListener(new javax.swing.event.ChangeListener()
-    {
-      public void stateChanged(javax.swing.event.ChangeEvent evt)
-      {
-        checkboxSettingsQuickModeStateChanged(evt);
-      }
-    });
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 10, 5);
-    jPanel6.add(checkboxSettingsQuickMode, gridBagConstraints);
-
-    textfieldSettingsDefaultPrefix.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-    textfieldSettingsDefaultPrefix.setText("LZ0");
-    textfieldSettingsDefaultPrefix.setToolTipText("The default prefix which will be added");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 0.3;
-    gridBagConstraints.weighty = 1.0;
-    jPanel6.add(textfieldSettingsDefaultPrefix, gridBagConstraints);
-
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 2;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 0.1;
-    gridBagConstraints.weighty = 0.1;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-    jPanel1.add(jPanel6, gridBagConstraints);
-
-    jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Qso repeat period"));
-    jPanel2.setToolTipText("");
-    jPanel2.setLayout(new java.awt.GridBagLayout());
-
-    jtextfieldQsoRepeatPeriod.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-    jtextfieldQsoRepeatPeriod.setText("30");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 0.3;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-    jPanel2.add(jtextfieldQsoRepeatPeriod, gridBagConstraints);
-
-    jLabel2.setText("Period in seconds:");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-    jPanel2.add(jLabel2, gridBagConstraints);
-
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 3;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 0.1;
-    gridBagConstraints.weighty = 0.1;
-    jPanel1.add(jPanel2, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -594,6 +679,7 @@ public class MainWindow extends javax.swing.JFrame
 
     buttonGroupTypeOfWork.add(jradiobuttonSP);
     jradiobuttonSP.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+    jradiobuttonSP.setSelected(true);
     jradiobuttonSP.setText("S&P");
     jradiobuttonSP.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -647,52 +733,122 @@ public class MainWindow extends javax.swing.JFrame
     jButton1.setText("F1 CQ");
     jButton1.setFocusable(false);
     jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jButton1.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton1ActionPerformed(evt);
+      }
+    });
     jpanelFunctionKeys.add(jButton1);
 
     jButton2.setText("F2 Exch");
     jButton2.setFocusable(false);
     jButton2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jButton2.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton2ActionPerformed(evt);
+      }
+    });
     jpanelFunctionKeys.add(jButton2);
 
     jButton3.setText("F3 Tu");
     jButton3.setFocusable(false);
     jButton3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jButton3.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton3ActionPerformed(evt);
+      }
+    });
     jpanelFunctionKeys.add(jButton3);
 
     jButton4.setText("F4 MyCall");
     jButton4.setFocusable(false);
     jButton4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jButton4.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton4ActionPerformed(evt);
+      }
+    });
     jpanelFunctionKeys.add(jButton4);
 
     jButton5.setText("F5 His Call");
     jButton5.setFocusable(false);
     jButton5.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jButton5.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton5ActionPerformed(evt);
+      }
+    });
     jpanelFunctionKeys.add(jButton5);
 
     jButton6.setText("F6 Agn");
     jButton6.setFocusable(false);
     jButton6.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jButton6.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton6ActionPerformed(evt);
+      }
+    });
     jpanelFunctionKeys.add(jButton6);
 
     jButton7.setText("F7 ?");
     jButton7.setFocusable(false);
     jButton7.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jButton7.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton7ActionPerformed(evt);
+      }
+    });
     jpanelFunctionKeys.add(jButton7);
 
     jButton8.setText("F8 Dupe");
     jButton8.setFocusable(false);
     jButton8.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jButton8.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton8ActionPerformed(evt);
+      }
+    });
     jpanelFunctionKeys.add(jButton8);
 
     jButton9.setText("F9 Spare");
     jButton9.setFocusable(false);
     jButton9.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jButton9.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton9ActionPerformed(evt);
+      }
+    });
     jpanelFunctionKeys.add(jButton9);
 
     jButton10.setText("F10 Spare");
     jButton10.setToolTipText("");
     jButton10.setFocusable(false);
     jButton10.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    jButton10.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton10ActionPerformed(evt);
+      }
+    });
     jpanelFunctionKeys.add(jButton10);
 
     jButton11.setText("F11 Spot");
@@ -945,12 +1101,12 @@ public class MainWindow extends javax.swing.JFrame
 
   private void jButton12ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton12ActionPerformed
   {//GEN-HEADEREND:event_jButton12ActionPerformed
-    // TODO add your handling code here:
+    pressedF12();
   }//GEN-LAST:event_jButton12ActionPerformed
 
   private void jButton11ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton11ActionPerformed
   {//GEN-HEADEREND:event_jButton11ActionPerformed
-    // TODO add your handling code here:
+    pressedF11();
   }//GEN-LAST:event_jButton11ActionPerformed
 
   private void jtextfieldRcvActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jtextfieldRcvActionPerformed
@@ -1062,11 +1218,63 @@ public class MainWindow extends javax.swing.JFrame
       if (radioController != null)
       {
         radioController.disconnect();
-        radioController = null;
+        // If we are disconnecting from the radio we need to enable the Frequency and the Mode comboboxes
+        jcomboboxBand.setEnabled(true);
+        jcomboboxMode.setEnabled(true);
       }
 
     }
   }//GEN-LAST:event_jtogglebuttonConnectToRadioActionPerformed
+
+  private void jButton3ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton3ActionPerformed
+  {//GEN-HEADEREND:event_jButton3ActionPerformed
+    pressedF3();
+  }//GEN-LAST:event_jButton3ActionPerformed
+
+  private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton1ActionPerformed
+  {//GEN-HEADEREND:event_jButton1ActionPerformed
+    pressedF1();
+  }//GEN-LAST:event_jButton1ActionPerformed
+
+  private void jButton2ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton2ActionPerformed
+  {//GEN-HEADEREND:event_jButton2ActionPerformed
+    pressedF2();
+  }//GEN-LAST:event_jButton2ActionPerformed
+
+  private void jButton4ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton4ActionPerformed
+  {//GEN-HEADEREND:event_jButton4ActionPerformed
+    pressedF4();
+  }//GEN-LAST:event_jButton4ActionPerformed
+
+  private void jButton5ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton5ActionPerformed
+  {//GEN-HEADEREND:event_jButton5ActionPerformed
+    pressedF5();
+  }//GEN-LAST:event_jButton5ActionPerformed
+
+  private void jButton6ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton6ActionPerformed
+  {//GEN-HEADEREND:event_jButton6ActionPerformed
+    pressedF6();
+  }//GEN-LAST:event_jButton6ActionPerformed
+
+  private void jButton7ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton7ActionPerformed
+  {//GEN-HEADEREND:event_jButton7ActionPerformed
+    pressedF7();
+  }//GEN-LAST:event_jButton7ActionPerformed
+
+  private void jButton8ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton8ActionPerformed
+  {//GEN-HEADEREND:event_jButton8ActionPerformed
+    pressedF8();
+  }//GEN-LAST:event_jButton8ActionPerformed
+
+  private void jButton9ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton9ActionPerformed
+  {//GEN-HEADEREND:event_jButton9ActionPerformed
+    pressedF9();
+  }//GEN-LAST:event_jButton9ActionPerformed
+
+  private void jButton10ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton10ActionPerformed
+  {//GEN-HEADEREND:event_jButton10ActionPerformed
+    pressedF10();
+  }//GEN-LAST:event_jButton10ActionPerformed
   
   
   private boolean connectToRadio()
@@ -1077,6 +1285,9 @@ public class MainWindow extends javax.swing.JFrame
       JOptionPane.showMessageDialog(null, "Coud not connect to radio!", "Serial connection error...", JOptionPane.ERROR_MESSAGE);
     }
     
+    // If we are connected to the radio we need to disable the Frequency and the Mode comboboxes
+    jcomboboxBand.setEnabled(false);
+    jcomboboxMode.setEnabled(false);
     return result;
   }
   
@@ -1089,11 +1300,6 @@ public class MainWindow extends javax.swing.JFrame
   {
     try
     {
-      // Configure the FileChooser
-      chooser = new JFileChooser();
-      chooser.setFileFilter(new FileNameExtensionFilter("Python files", "py"));
-      chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-
       int returnVal = chooser.showOpenDialog(this.getParent());
       if (returnVal != JFileChooser.APPROVE_OPTION)
         return false;
@@ -1328,6 +1534,15 @@ public class MainWindow extends javax.swing.JFrame
     // Quick callsign mode 
     checkboxSettingsQuickMode.setSelected(applicationSettings.isQuickCallsignModeEnabled());
     
+    // Set the text for the function keys
+    jtextfieldf1.setText(applicationSettings.getFunctionKeyText(0));
+    jtextfieldf3.setText(applicationSettings.getFunctionKeyText(2));
+    jtextfieldf6.setText(applicationSettings.getFunctionKeyText(5));
+    jtextfieldf7.setText(applicationSettings.getFunctionKeyText(6));
+    jtextfieldf8.setText(applicationSettings.getFunctionKeyText(7));
+    jtextfieldf9.setText(applicationSettings.getFunctionKeyText(8));
+    jtextfieldf10.setText(applicationSettings.getFunctionKeyText(9));
+    
     // Default prefix
     textfieldSettingsDefaultPrefix.setText(applicationSettings.getDefaultPrefix());
    
@@ -1355,6 +1570,16 @@ public class MainWindow extends javax.swing.JFrame
     
     // Callsign
     applicationSettings.setMyCallsign(textfieldSettingsMyCallsign.getText());
+    
+    // Function keys texts
+    applicationSettings.setFunctionKeyText(0, jtextfieldf1.getText());
+    applicationSettings.setFunctionKeyText(2, jtextfieldf3.getText());
+    applicationSettings.setFunctionKeyText(5, jtextfieldf6.getText());
+    applicationSettings.setFunctionKeyText(6, jtextfieldf7.getText());
+    applicationSettings.setFunctionKeyText(7, jtextfieldf8.getText());
+    applicationSettings.setFunctionKeyText(8, jtextfieldf9.getText());
+    applicationSettings.setFunctionKeyText(9, jtextfieldf10.getText());
+    
    
     // Quick callsign mode
     applicationSettings.setQuickCallsignMode(checkboxSettingsQuickMode.isSelected());
@@ -1366,6 +1591,70 @@ public class MainWindow extends javax.swing.JFrame
     applicationSettings.setQsoRepeatPeriod(Integer.parseInt(jtextfieldQsoRepeatPeriod.getText()));
   }
 
+  
+  private void pressedF1()
+  {
+    String text = applicationSettings.getFunctionKeyText(0); // Get the text for the F1 key
+    text = text.replaceAll("\\{mycall\\}", applicationSettings.getMyCallsign()); // Substitute {mycall} with my callsign
+    radioController.sendMorse(text); // Send to radio
+  }
+  
+  private void pressedF2()
+  {
+    radioController.sendMorse(jtextfieldSnt.getText());
+  }
+  
+  private void pressedF3()
+  {
+    radioController.sendMorse(applicationSettings.getFunctionKeyText(2));
+  }
+  
+  private void pressedF4()
+  {
+    radioController.sendMorse(applicationSettings.getMyCallsign());
+  }
+  
+  private void pressedF5()
+  {
+    radioController.sendMorse(getCallsignFromTextField());
+  }
+  
+  private void pressedF6()
+  {
+    radioController.sendMorse(applicationSettings.getFunctionKeyText(5));
+  }
+  
+  private void pressedF7()
+  {
+    radioController.sendMorse(applicationSettings.getFunctionKeyText(6));
+  }
+  
+  private void pressedF8()
+  {
+    radioController.sendMorse(applicationSettings.getFunctionKeyText(7));
+  }
+  
+  private void pressedF9()
+  {
+    radioController.sendMorse(applicationSettings.getFunctionKeyText(8));
+  }
+  
+  private void pressedF10()
+  {
+    radioController.sendMorse(applicationSettings.getFunctionKeyText(9));
+  }
+  
+  private void pressedF11()
+  {
+    // TODO  add to bandmap
+  }
+  
+  private void pressedF12()
+  {
+    initEntryFields();
+  }
+  
+  
   class LocalRadioControllerListener implements RadioControllerListener
   {
 
@@ -1463,6 +1752,71 @@ public class MainWindow extends javax.swing.JFrame
     });
   }
 
+  private class MyDispatcher implements KeyEventDispatcher
+  {
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent evt)
+    {
+      if (evt.getID() != KeyEvent.KEY_RELEASED) 
+        return false;
+      
+      // Function keys events
+      switch (evt.getKeyCode())
+      {
+        case KeyEvent.VK_F1:
+          pressedF1();
+          evt.consume();
+          break;
+        case KeyEvent.VK_F2:
+          pressedF2();
+          evt.consume();
+          break;
+        case KeyEvent.VK_F3:
+          pressedF3();
+          evt.consume();
+          break;
+        case KeyEvent.VK_F4:
+          pressedF4();
+          evt.consume();
+          break;
+        case KeyEvent.VK_F5:
+          pressedF5();
+          evt.consume();
+          break;
+        case KeyEvent.VK_F6:
+          pressedF6();
+          evt.consume();
+          break;
+        case KeyEvent.VK_F7:
+          pressedF7();
+          evt.consume();
+          break;
+        case KeyEvent.VK_F8:
+          pressedF8();
+          evt.consume();
+          break;
+        case KeyEvent.VK_F9:
+          pressedF9();
+          evt.consume();
+          break;
+        case KeyEvent.VK_F10:
+          pressedF10();
+          evt.consume();
+          break;
+        case KeyEvent.VK_F11:
+          pressedF11();
+          evt.consume();
+          break;
+        case KeyEvent.VK_F12:
+          pressedF12();
+          evt.consume();
+          break;
+      }
+      return false;
+    }
+  }
+  
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.ButtonGroup buttonGroupTypeOfWork;
   private javax.swing.JCheckBox checkboxSettingsQuickMode;
@@ -1485,6 +1839,13 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel12;
   private javax.swing.JLabel jLabel2;
+  private javax.swing.JLabel jLabel3;
+  private javax.swing.JLabel jLabel4;
+  private javax.swing.JLabel jLabel5;
+  private javax.swing.JLabel jLabel6;
+  private javax.swing.JLabel jLabel7;
+  private javax.swing.JLabel jLabel8;
+  private javax.swing.JLabel jLabel9;
   private javax.swing.JMenu jMenu1;
   private javax.swing.JMenu jMenu2;
   private javax.swing.JMenuBar jMenuBar1;
@@ -1495,6 +1856,7 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JPanel jPanel4;
   private javax.swing.JPanel jPanel5;
   private javax.swing.JPanel jPanel6;
+  private javax.swing.JPanel jPanel7;
   private javax.swing.JPanel jPanel8;
   private javax.swing.JPanel jPanelStatusBar;
   private javax.swing.JScrollPane jScrollPane1;
@@ -1531,6 +1893,13 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JTextField jtextfieldQsoRepeatPeriod;
   private javax.swing.JTextField jtextfieldRcv;
   private javax.swing.JTextField jtextfieldSnt;
+  private javax.swing.JTextField jtextfieldf1;
+  private javax.swing.JTextField jtextfieldf10;
+  private javax.swing.JTextField jtextfieldf3;
+  private javax.swing.JTextField jtextfieldf6;
+  private javax.swing.JTextField jtextfieldf7;
+  private javax.swing.JTextField jtextfieldf8;
+  private javax.swing.JTextField jtextfieldf9;
   private javax.swing.JToggleButton jtogglebuttonConnectToRadio;
   private javax.swing.JTextField textfieldSettingsDefaultPrefix;
   private javax.swing.JTextField textfieldSettingsMyCallsign;

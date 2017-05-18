@@ -46,6 +46,9 @@ public final class ApplicationSettings
     static final String PROPERTY_MAIN_WINDOW_Y        = "y";
     static final String PROPERTY_MAIN_WINDOW_WIDTH    = "w";
     static final String PROPERTY_MAIN_WINDOW_HEIGHT   = "h";
+    static final String PROPERTY_FUNCTION_KEYS        = "function_key";
+    
+    public static final int FUNCTION_KEYS_COUNT = 12; // The number of function keys
 
     private String             comPort;
     private String             myCallsign;
@@ -53,6 +56,7 @@ public final class ApplicationSettings
     private String             defaultPrefix;
     private String             qsoRepeatPeriod;
     private Rectangle          jFrameDimensions; // JFrame settings: position and size
+    private final String[]     arrayFunctionKeysTexts;  // texts for the function keys
     
     private final Properties   prop;
     
@@ -63,7 +67,8 @@ public final class ApplicationSettings
     {     
         this.prop         = new Properties();
         jFrameDimensions  = new Rectangle();
-
+        arrayFunctionKeysTexts  = new String[FUNCTION_KEYS_COUNT];
+        
         this.LoadSettingsFromDisk();
     }
 
@@ -150,6 +155,29 @@ public final class ApplicationSettings
     
     
     /**
+     * Returns the text for the desired function key
+     * 
+     * @param keyIndex - Index 0 is for the F1 key, 1 for F2 and so on...
+     * @return 
+     */
+    public String getFunctionKeyText(int keyIndex)
+    {
+        return arrayFunctionKeysTexts[keyIndex];
+    }
+    
+    
+    /**
+     * Sets the text for the desired function key
+     * @param keyIndex - Index 0 is for the F1 key, 1 for F2 and so on...
+     * @param text - the text that will be set for the desired function key
+     */
+    public void setFunctionKeyText(int keyIndex, String text)
+    {
+        arrayFunctionKeysTexts[keyIndex] = text;
+    }
+    
+    
+    /**
      * Stores the array of values into properties which are named using
      * key+index of the value
      * 
@@ -184,6 +212,9 @@ public final class ApplicationSettings
         prop.setProperty(PROPERTY_QUICK_CALLSIGN_MODE, Boolean.toString(isQuickCallsignModeEnabled));
         prop.setProperty(PROPERTY_DEFAULT_PREFIX, defaultPrefix);
         prop.setProperty(PROPERTY_QSO_REPEAT_PERIOD_SEC, qsoRepeatPeriod);
+        
+        // Now save the texts for the function keys
+        setProperties(PROPERTY_FUNCTION_KEYS, arrayFunctionKeysTexts);
         
         // Now save the JFrame dimensions:
         prop.setProperty(PROPERTY_MAIN_WINDOW_X, Integer.toString(jFrameDimensions.x));
@@ -221,6 +252,14 @@ public final class ApplicationSettings
             if(myCallsign == null)
                 throwMissingPropertyException(PROPERTY_MY_CALL_SIGN);
             
+            // Now read the texts for the function keys
+            getProperties(PROPERTY_FUNCTION_KEYS, arrayFunctionKeysTexts);
+            for(String str : arrayFunctionKeysTexts)
+            {
+              if(str == null)
+                throwMissingPropertyException(PROPERTY_FUNCTION_KEYS);
+            }
+            
             // Quick callsign mode
             String temp = prop.getProperty(PROPERTY_QUICK_CALLSIGN_MODE);
             if(temp == null)
@@ -236,6 +275,8 @@ public final class ApplicationSettings
             qsoRepeatPeriod = prop.getProperty(PROPERTY_QSO_REPEAT_PERIOD_SEC);
              if(qsoRepeatPeriod == null)
               throwMissingPropertyException(PROPERTY_QSO_REPEAT_PERIOD_SEC);
+            
+            
             
             // Read the JFrame dimensions:
             int x = Integer.parseInt(prop.getProperty(PROPERTY_MAIN_WINDOW_X));
@@ -274,6 +315,21 @@ public final class ApplicationSettings
         isQuickCallsignModeEnabled = false;     
         defaultPrefix = "LZ0";
         qsoRepeatPeriod = "30";
+        
+        // Set texts for the direction buttons
+        arrayFunctionKeysTexts[0]  = "test {mycall}";       // F1
+        arrayFunctionKeysTexts[1]  = "not defined by user"; // F2
+        arrayFunctionKeysTexts[2]  = "tu";                  // F3
+        arrayFunctionKeysTexts[3]  = "not defined by user";
+        arrayFunctionKeysTexts[4]  = "not defined by user";
+        arrayFunctionKeysTexts[5]  = "agn";
+        arrayFunctionKeysTexts[6]  = "?";
+        arrayFunctionKeysTexts[7]  = "dupe";
+        arrayFunctionKeysTexts[8]  = "";    
+        arrayFunctionKeysTexts[9]  = "";
+        arrayFunctionKeysTexts[10]  = "not defined by user";
+        arrayFunctionKeysTexts[11]  = "not defined by user";
+        
         
         // We have minimum size so we don't have to worry about the values:
         jFrameDimensions.height = 0;

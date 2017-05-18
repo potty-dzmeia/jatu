@@ -274,22 +274,36 @@ public class RadioController
     @Override
     public void eventFrequency(final FrequencyEvent e)
     {
-      if (e.getVfo() == RadioVfos.A)
+      try
       {
-        freqVfoA = Integer.parseInt(e.getFrequency()); //Misc.formatFrequency(e.getFrequency());
-      } else if (e.getVfo() == RadioVfos.B)
-      {
-        freqVfoB = Integer.parseInt(e.getFrequency());
-      } else
-      {
-        logger.warning("Frequency event from unknown VFO!");
-        return;
-      }
+        if (e.getVfo() == RadioVfos.A)
+        {
+          freqVfoA = Integer.parseInt(e.getFrequency()); //Misc.formatFrequency(e.getFrequency());
+        } else if (e.getVfo() == RadioVfos.B)
+        {
+          freqVfoB = Integer.parseInt(e.getFrequency());
+        } else
+        {
+          logger.warning("Frequency event from unknown VFO!");
+          return;
+        }
 
-      // Notify any listeners
-      for (RadioControllerListener listener : eventListeners)
+        // Notify any listeners
+        for (RadioControllerListener listener : eventListeners)
+        {
+          listener.frequency();
+        }
+      }catch(Exception exc)
       {
-        listener.frequency();
+        try
+        {
+          // frequency data was damaged - request the data again
+          radio.getFrequency(e.getVfo().getCode());
+        }
+        catch (Exception ex)
+        {
+          // do nothing
+        }
       }
     }
 

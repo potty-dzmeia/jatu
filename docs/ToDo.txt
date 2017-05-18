@@ -5,16 +5,15 @@
  
 
 - [EntryWindow] Tab - goes through all entries; Space - goes throught non-default entries
-- determine how to send the serial number (e.g. 0 to be ----- or -)
+- determine how to send the serial number (e.g. 0 to be ----- or -) Put additional option in the settings.
 - [LogWindow2] to be able to show only certain qsos (e.g. callsign filter) and edit them fast. For example like n1mm in a sub-table below the main log.
 
 
 - "Incoming Qso" to show the first 10 incoming calls
 - "INcoming Qso" to keep a not worked station for max 5 minutes
 - Bandmap to show last two frequencies of a certain station
-- Implement keyer
 - Space should not delete DUPE qso from entry window (important if time is about to elapse)
-- update SNT if a Qso is deleted from the Log!
+- update SNT if a Qso is deleted from the Log! (snt should be maybe taken from the last qso)
 - Function keys to be the same as N1MM
 - CQ or SP is determined if F1 is pressed and then if frequency is changed by 500Hz
 - 
