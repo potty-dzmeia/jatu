@@ -214,6 +214,44 @@ class Elecraft(Radio):
         return list([EncodedTransaction(result)])
 
 
+    @classmethod
+    def encodeSendCW(cls, text):
+        """
+        Gets the command with which we can tell the radio to send morse code
+
+        :param text: The text that we would like to send as morse
+        :type text: str
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
+        """
+        if len(text) > 24:
+            logger.warning("Text for CW is too long.")
+
+        result = "KY {0};".format('{: <24}'.format(text))
+
+        # logger.debug("returns: {0}".format(result))
+        return list([EncodedTransaction(result)])
+
+
+    @classmethod
+    def encodeInterruptSendCW(cls):
+        """
+        Gets the command with which we can tell the radio to stop sending morse code
+        :return:
+        """
+        result = "KY@;"
+        return list([EncodedTransaction(result)])
+
+
+    @classmethod
+    def encodeGetActiveVfo(cls):
+        """
+        Gets the command with which we can tell the radio to send us the active VFO
+        :return:
+        """
+        result = "FT;"
+        return list([EncodedTransaction(result)])
+
     #+--------------------------------------------------------------------------+
     #|  Decode methods below                                                    |
     #+--------------------------------------------------------------------------+
@@ -311,6 +349,25 @@ class Elecraft(Radio):
 
 
     @classmethod
+    def __parse_active_vfo(cls, command):
+        """
+        Extracts active VFO from the command
+
+        :param command: String of the type "FT1;"
+        :type command: str
+        :return: The dict with the parsed data
+        :rtype: dict
+        """
+        result = dict()
+        if command[2] == '0':
+            DecodedTransaction.insertActiveVfo(result, vfo=Radio.VFO_A)
+        else:
+            DecodedTransaction.insertActiveVfo(result, vfo=Radio.VFO_B)
+
+        return result
+
+
+    @classmethod
     def __parse_mode(cls, command):
         """
         Extracts the Mode value from the command
@@ -329,6 +386,24 @@ class Elecraft(Radio):
             m = cls.__mode_from_byte_to_string(int(command[3]))
             DecodedTransaction.insertMode(result, m, vfo=Radio.VFO_B)
 
+        return result
+
+
+    @classmethod
+    def __parse_smeter(cls, command):
+        """
+        Extracts the Smeter value from the command
+
+        :param command: String starting of the type "SM0005;"
+        :type command: str
+        :return: The dict with the parsed data
+        :rtype: dict
+        """
+
+        result = dict()
+
+        smeter = command[2:-1]
+        DecodedTransaction.insertSmeter(result, smeter.lstrip('0'))
         return result
 
 
@@ -420,9 +495,10 @@ class Elecraft(Radio):
     # Commands coming from the Elecraft that we can understand(parse)
     parsers = { "FA": __parse_frequency_vfo_a,       # VFO A frequency
                 "FB": __parse_frequency_vfo_b,       # VFO B frequency
+                "FT": __parse_active_vfo,            # active Vfo
                 "MD": __parse_mode,                  # Operating mode
-                "IF": __parse_info}                  # IF (Transceiver Information; GET only)
-
+                "IF": __parse_info,                  # IF (Transceiver Information; GET only)
+                "SM": __parse_smeter}                # S-meter values
 
     #+--------------------------------------------------------------------------+
     #|   Elecraft command codes

@@ -183,10 +183,11 @@ class Kenwood(Radio):
     def encodeSetMode(cls, mode, vfo):
         """
         Get the command that must be send to the radio in order to set mode (e.g. CW)
+        VFO param is not taken into account - we always set the currently active VFO
 
         :param mode: Specifies the mode - see Radio.MODES for expected values
         :type mode: str
-        :param vfo: The vfo which mode must be changed - see Radio.VFO_....
+        :param vfo: The vfo which mode must be changed - NOT SUPPORTED by Kenwood
         :type vfo: int
         :return: Object containing transaction with some additional control settings
         :rtype: EncodedTransaction
@@ -195,12 +196,12 @@ class Kenwood(Radio):
         if not cls.mode_codes.__contains__(mode):
             raise ValueError("Unsupported mode: " + mode + " !")
 
-        if vfo == Radio.VFO_A:
-            result = "MD%d;"%(cls.mode_codes[mode])
-        elif vfo == Radio.VFO_B:
-            result = "MD$%d;"%(cls.mode_codes[mode])
-        else:
-            logger.warning("encodeSetMode(): Set VFO_NONE is not supported")
+        #if vfo == Radio.VFO_A:
+        result = "MD%d;"%(cls.mode_codes[mode])
+        # elif vfo == Radio.VFO_B:
+        #     result = "MD$%d;"%(cls.mode_codes[mode])
+        # else:
+        #     logger.warning("encodeSetMode(): Set VFO_NONE is not supported")
 
         logger.debug("returns: {0}".format(result))
         return list([EncodedTransaction(result)])
@@ -211,8 +212,8 @@ class Kenwood(Radio):
         """
         Gets the command with which we can tell the radio to send morse code
 
-        :param text: The VFO for which we want the current mode
-        :type vfo: str
+        :param text: The text the we would likt to send as morse
+        :type text: str
         :return: Object containing transaction with some additional control settings
         :rtype: EncodedTransaction
         """
