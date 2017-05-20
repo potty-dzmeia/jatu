@@ -177,7 +177,7 @@ public class Qso
 
   
   @Override
-  public String toString()
+  public synchronized String toString()
   {
     StringBuilder str = new StringBuilder(60);
 
@@ -194,7 +194,7 @@ public class Qso
   /**
    * @return The count of the total Qso parameters
    */
-  public int getParamsCount()
+  public synchronized int getParamsCount()
   {
     return qsoParams.size();
   }
@@ -210,7 +210,7 @@ public class Qso
   /**
    * @return Date in yyyy-mm-dd format
    */
-  public String getDate()
+  public synchronized String getDate()
   {
     return qsoParams.get(DATE_INDEX).value;
   }
@@ -219,7 +219,7 @@ public class Qso
   /**
    * @return Date in hhmm 24hour format
    */
-  public String getTime()
+  public synchronized String getTime()
   {
     return qsoParams.get(TIME_INDEX).value;
   }
@@ -228,7 +228,7 @@ public class Qso
   /**
    * @return Frequency on Hz
    */
-  public String getFrequency()
+  public synchronized String getFrequency()
   {
     return qsoParams.get(FREQ_INDEX).value;
   }
@@ -237,19 +237,19 @@ public class Qso
   /**
    * @return see class RadioModes for valid strings
    */
-  public String getMode()
+  public synchronized String getMode()
   {
     return qsoParams.get(MODE_INDEX).value;
   }
 
   
-  public String getMyCallsign()
+  public synchronized String getMyCallsign()
   {
     return qsoParams.get(MYCALL_INDEX).value;
   }
 
   
-  public String getHisCallsign()
+  public synchronized String getHisCallsign()
   {
     return qsoParams.get(HISCALL_INDEX).value;
   }
@@ -259,7 +259,7 @@ public class Qso
    * Gets the "Snt" parameter of the Qso
    * @return Snt is the data that we have sent to the other station
    */
-  public String getSnt()
+  public synchronized String getSnt()
   {
     return qsoParams.get(SNT_INDEX).value;
   }
@@ -269,7 +269,7 @@ public class Qso
    * Gets the "Rcv" parameter of the Qso
    * @return 
    */
-  public String getRcv()
+  public synchronized String getRcv()
   {
     return qsoParams.get(RCV_INDEX).value;
   }
@@ -279,23 +279,23 @@ public class Qso
    *  The Type of work during which the QSO was made (CQ or SP)
    * @return 
    */
-  public String getType()
+  public synchronized String getType()
   {
     return qsoParams.get(TYPE_INDEX).value;
   }
   
   
-  public String getParamName(int parameterIndex)
+  public synchronized String getParamName(int parameterIndex)
   {
     return qsoParams.get(parameterIndex).name;
   }
 
-  public String getParamValue(int parameterIndex)
+  public synchronized String getParamValue(int parameterIndex)
   {
     return qsoParams.get(parameterIndex).value;
   }
 
-  public String setParamValue(int parameterIndex, String value)
+  public synchronized String setParamValue(int parameterIndex, String value)
   {
     return qsoParams.get(parameterIndex).value = value;
   }
@@ -311,32 +311,43 @@ public class Qso
    * variables defined in this class for accessing the standard params (e.g. DATE_INDEX).
    * @return Object describing the extra parameter
    */
-  public QsoParameter getParam(int parameterIndex)
+  public synchronized QsoParameter getParam(int parameterIndex)
   {
     return qsoParams.get(parameterIndex);
   }
 
   
   
-  public long getElapsedSeconds()
+  public synchronized long getElapsedSeconds()
   { 
     return (TimeUtils.getUTC().getMillis()-utc.getMillis())/1000;
   }
   
-//  /**
-//   * Get the time of the QSO (time zone agnostic)
-//   * 
-//   * @return 
-//   */
-//  public LocalDateTime getQsoDateTime()
-//  {
-//    String yyyy= this.getDate().substring(0,3); // yyyy-mm-dd
-//    String mm = this.getDate().substring(5, 6);
-//    String dd = this.getDate().substring(8, 9);
-//    
-//    String hh = this.getTime()
-//    new Loca this.getDate().substring(0, 3)
-//  }
+  
+  /**
+   * Checks if the call sign has at least a number a letter and is 3 digits long
+   *
+   * @param call
+   * @return
+   */
+  public static boolean isValidCallsign(String call)
+  {
+    return call.matches(".*\\d+.*")                                 && 
+           (call.matches(".*[a-z].*") || call.matches(".*[A-Z].*")) &&
+           call.length() >= CALLSIGN_MIN_LEN;
+  }
+
+  /** 
+   * Checks it the type is SP or CQ
+   * 
+   * @param type
+   * @return - true if the type has been recognized
+   */
+  public static boolean isValidType(String type)
+  {
+    return type.toUpperCase().equals("CQ") || type.toUpperCase().equals("SP");
+  }
+  
   
   /**
    * Throws exception if the input is not valid
@@ -413,27 +424,4 @@ public class Qso
     return true;
   }
 
-  /**
-   * Checks if the call sign has at least a number a letter and is 3 digits long
-   *
-   * @param call
-   * @return
-   */
-  public static boolean isValidCallsign(String call)
-  {
-    return call.matches(".*\\d+.*")                                 && 
-           (call.matches(".*[a-z].*") || call.matches(".*[A-Z].*")) &&
-           call.length() >= CALLSIGN_MIN_LEN;
-  }
-
-  /** 
-   * Checks it the type is SP or CQ
-   * 
-   * @param type
-   * @return - true if the type has been recognized
-   */
-  public static boolean isValidType(String type)
-  {
-    return type.toUpperCase().equals("CQ") || type.toUpperCase().equals("SP");
-  }
 }

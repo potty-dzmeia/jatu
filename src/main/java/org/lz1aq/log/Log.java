@@ -66,7 +66,7 @@ public class Log
    * @param qso - Reference to a new Qso object. Insert only newly created Qso
    * objects.
    */
-  public void add(Qso qso)
+  public synchronized void add(Qso qso)
   {
     db.add(qso);      // Add the qso to the database
     qsoList.add(qso); // Add the qso to RAM (i.e local list)
@@ -80,7 +80,7 @@ public class Log
    * @param index - Qso index inside the log (0 is being the first QSO in the log)
    * @return  Reference to the QSO object
    */
-  public Qso get(int index)
+  public synchronized Qso get(int index)
   {
     return qsoList.get(index);
   }
@@ -91,7 +91,7 @@ public class Log
    * 
    * @param index Index of the Qso object to be removed
    */
-  public void remove(int index)
+  public synchronized void remove(int index)
   {
     db.remove(qsoList.get(index)); // Remove the qso from the RAM (i.e local list)
     qsoList.remove(index);         // Remove the qso from the database
@@ -104,7 +104,7 @@ public class Log
    * 
    * @return Returns the amount of QSO objects contained in the Log.
    */
-  public int getRowCount()
+  public synchronized int getRowCount()
   {
     return qsoList.size();
   }
@@ -123,7 +123,7 @@ public class Log
    * @return The number of columns inside the log. If log is empty the return 
    * value will be 0.
    */
-  public int getColumnCount()
+  public synchronized int getColumnCount()
   {
     return exampleQso.getParamsCount();
   }
@@ -135,7 +135,7 @@ public class Log
    * @param col Column index of which we would like to get the name
    * @return Name of the column (i.e. name of the Qso param)
    */
-  public String getColumnName(int col)
+  public synchronized String getColumnName(int col)
   {
     return exampleQso.getParamName(col);
   }
@@ -150,7 +150,7 @@ public class Log
    * @param col Column index (i.e. index of Qso param)
    * @return 
    */
-  public String getValueAt(int row, int col)
+  public synchronized String getValueAt(int row, int col)
   {
     Qso qso = qsoList.get(row);
     return qso.getParamValue(col);
@@ -166,7 +166,7 @@ public class Log
    * @param row - Row index. This is equivalent to a Qso index.
    * @param col - Column index. This is equivalent to a Qso parameter index
    */
-  public void setValueAt(String value, int row, int col)
+  public synchronized void setValueAt(String value, int row, int col)
   {
     Qso qso = qsoList.get(row); 
     qso.setParamValue(col,value); // Update 
@@ -174,7 +174,7 @@ public class Log
     db.commit();
   }
   
-  public int getQsoCount()
+  public synchronized int getQsoCount()
   {
       return qsoList.size();
   }
@@ -187,7 +187,7 @@ public class Log
    * Second part is the first three figures of received report during previous Qso.
    * Report for the  first Qso is 001 000.
    */
-  public String getNextSentReport()
+  public synchronized String getNextSentReport()
   {
     // If the log is empty send "001000"
     if(getRowCount() == 0)
@@ -213,7 +213,7 @@ public class Log
    * @param callsign station callsign
    * @return Qso object
    */
-  public Qso getLastQso(String callsign)
+  public synchronized Qso getLastQso(String callsign)
   {
     //find last Qso with this station
     for (int i = qsoList.size() - 1; i >= 0; i--)
@@ -235,10 +235,11 @@ public class Log
    * @param allowedQsoRepeatPeriod - the repeat period for another qso with the same station (in seconds)
    * @return
    */
-  public long getSecondsLeft(Qso qso, int allowedQsoRepeatPeriod)
+  public synchronized long getSecondsLeft(Qso qso, int allowedQsoRepeatPeriod)
   {
     return allowedQsoRepeatPeriod-qso.getElapsedSeconds();
   }
+  
   
   /**
    * Same as getSecondsLeft but returns the seconds left in the following format mm:ss
@@ -247,15 +248,17 @@ public class Log
    * @param allowedQsoRepeatPeriod  - the repeat period for another qso with the same station (in seconds)
    * @return 
    */
-  public String getTimeLeftFormatted(Qso qso, int allowedQsoRepeatPeriod)
+  public synchronized String getTimeLeftFormatted(Qso qso, int allowedQsoRepeatPeriod)
   {
     long secondsleft = getSecondsLeft(qso, allowedQsoRepeatPeriod);
 
     long second = secondsleft % 60;
     long minute = (secondsleft / 60) % 60;
-    String timeleft = String.format("%02d:%02d", minute, second);
     
-    return timeleft;
+    if(secondsleft < 0)
+      return String.format("-%02d:%02d", Math.abs(minute), Math.abs(second));
+    else
+      return String.format(" %02d:%02d", Math.abs(minute), Math.abs(second));
   }
   
   
@@ -282,5 +285,20 @@ public class Log
     return secondsLeft > 0;
   }
  
+  
+  public synchronized ArrayList<String> getUniqueCallsigns()
+  {
+    ArrayList<String> list = new ArrayList<>(0);
+    
+    for (Qso qso : qsoList)
+    {
+      if(!list.contains(qso.getHisCallsign()))
+      {
+        list.add(qso.getHisCallsign());
+      }
+    }
+    
+    return list;
+  }
   
 }

@@ -19,6 +19,7 @@
 // ***************************************************************************
 package org.lz1aq.lzhfqrp;
 
+import java.util.EventListener;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -358,5 +359,12 @@ public class RadioController
         listener.vfo();
       }
     }
+  }
+  
+  public interface RadioControllerListener extends EventListener
+  {
+    public void frequency();
+    public void mode();
+    public void vfo();
   }
 }

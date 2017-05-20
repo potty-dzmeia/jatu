@@ -30,9 +30,9 @@ import javax.swing.table.AbstractTableModel;
 public class LogTableModel extends AbstractTableModel
 {
   /** Reference to the Log that is to be mapped to the JTable*/
-  private Log log;
+  private final Log log;
   /** This is holding indeces of the columns which shouldn't be visible on the table */
-  private Set<Integer> hiddenColumns;
+  private final Set<Integer> hiddenColumns;
   
   public LogTableModel(Log log)
   {
@@ -140,15 +140,6 @@ public class LogTableModel extends AbstractTableModel
     
     throw new ArrayIndexOutOfBoundsException("Invalid index for tableColumn!");
   }
+
   
-  
-//  int getSelectedRow()
-//  {
-//    int[] selection = table.getSelectedRows();
-//    for (int i = 0; i < selection.length; i++)
-//    {
-//      selection[i] = table.convertRowIndexToModel(selection[i]);
-//    }
-//   
-//  }
 }
