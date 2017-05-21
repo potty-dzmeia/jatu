@@ -5,3 +5,4 @@
 /target/
 *.pyc
 *.class
+*.db4o
