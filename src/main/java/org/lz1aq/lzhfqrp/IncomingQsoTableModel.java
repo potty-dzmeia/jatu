@@ -24,6 +24,7 @@ import java.util.Collections;
 import javax.swing.table.AbstractTableModel;
 import org.lz1aq.log.Log;
 import org.lz1aq.log.Qso;
+import org.lz1aq.utils.TimeUtils;
 
 /**
  *
@@ -61,7 +62,7 @@ public class IncomingQsoTableModel extends AbstractTableModel
   }
   
   
-   @Override
+  @Override
   public String getColumnName(int col)
   {
     switch(col)
@@ -92,7 +93,7 @@ public class IncomingQsoTableModel extends AbstractTableModel
       case 2: 
         return incomingQsoArrayList.get(rowIndex).frequency;
       case 3: 
-        return incomingQsoArrayList.get(rowIndex).timeLeftFormatted;
+        return TimeUtils.getTimeLeftFormatted(incomingQsoArrayList.get(rowIndex).getSecondsLeft());
       default:
           return "should not happen";
     }
@@ -106,8 +107,28 @@ public class IncomingQsoTableModel extends AbstractTableModel
   }
   
   
+  public int getFrequency(int row) throws Exception
+  {
+    return Integer.parseInt(incomingQsoArrayList.get(row).frequency);
+  }
+  
+  
+  /**
+   * If we should go and work the callsign contained in this cell.
+   * @param row
+   * @param col
+   * @return 
+   */
+  public boolean containsExpiredCallsign(int row, int col)
+  {
+    return incomingQsoArrayList.get(row).isExpired();
+  }
+  
   /**
    * Updates the content of the table.
+   * @param allowedQsoRepeatPeriodInSec
+   * @param hideAfterSeconds
+   * @param maxEntriesCount
    */
   public synchronized void refresh(int allowedQsoRepeatPeriodInSec, int hideAfterSeconds, int maxEntriesCount)
   {
@@ -127,7 +148,7 @@ public class IncomingQsoTableModel extends AbstractTableModel
                                              lastQso.getType(), 
                                              lastQso.getFrequency(), 
                                              lastQso.getElapsedSeconds(),
-                                             log.getTimeLeftFormatted(lastQso, allowedQsoRepeatPeriodInSec));
+                                             log.getSecondsLeft(lastQso, allowedQsoRepeatPeriodInSec));
               
       incomingQsoArrayList.add(incoming);
       
@@ -147,18 +168,19 @@ public class IncomingQsoTableModel extends AbstractTableModel
     private String  hisCall;
     private String  typeOfWork; // CQ or SP
     private String  frequency;
-    private String  timeLeftFormatted;
+    //private String  timeLeftFormatted;
+    private long    secondsLeft;
     private long    elapsedSeconds; // How many seconds before being able to work the station again
 
    
     
-    public IncomingQso(String hisCall, String typeOfWork, String freq, long secondsElapsed, String timeLeftFormatted)
+    public IncomingQso(String hisCall, String typeOfWork, String freq, long secondsElapsed, long secondsLeft)
     {
       this.hisCall = hisCall;
       this.typeOfWork = typeOfWork;
       this.frequency = freq;
       this.elapsedSeconds = secondsElapsed;
-      this.timeLeftFormatted = timeLeftFormatted;
+      this.secondsLeft = secondsLeft;
     }
    
    
@@ -200,9 +222,9 @@ public class IncomingQsoTableModel extends AbstractTableModel
       this.elapsedSeconds = elapsedSeconds;
     }
 
-    public void setTimeLeftFormatted(String timeLeftFormatted)
+    public void setSecondsLeft(int left)
     {
-      this.timeLeftFormatted = timeLeftFormatted;
+      this.secondsLeft = left;
     }
 
     public long getElapsedSeconds()
@@ -210,12 +232,16 @@ public class IncomingQsoTableModel extends AbstractTableModel
       return elapsedSeconds;
     }
 
-    public String getTimeLeftFormatted()
+    public long getSecondsLeft()
     {
-      return timeLeftFormatted;
+      return secondsLeft;
+    }
+    
+    public boolean isExpired()
+    {
+      return (secondsLeft<=0);
     }
 
-    
     @Override
     public int compareTo(IncomingQso o)
     {
@@ -226,8 +252,6 @@ public class IncomingQsoTableModel extends AbstractTableModel
       else
         return -1;
     }
-
-   
   }
 
   

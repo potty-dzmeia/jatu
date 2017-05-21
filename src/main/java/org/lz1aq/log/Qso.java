@@ -232,6 +232,11 @@ public class Qso
   {
     return qsoParams.get(FREQ_INDEX).value;
   }
+  
+  public synchronized int getFrequencyInt()
+  {
+    return Integer.parseInt(qsoParams.get(FREQ_INDEX).value);
+  }
 
   
   /**
@@ -348,6 +353,18 @@ public class Qso
     return type.toUpperCase().equals("CQ") || type.toUpperCase().equals("SP");
   }
   
+  
+  /**
+   * Checks if the current qso is Search and Pounce (SP)
+   * @return 
+   */
+  public boolean isSP()
+  {
+    if(this.getType().equals("SP"))
+      return true;
+    else
+      return false;
+  }
   
   /**
    * Throws exception if the input is not valid

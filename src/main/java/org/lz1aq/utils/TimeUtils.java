@@ -48,4 +48,21 @@ public class TimeUtils
   {
     return qsoDate.print(dt);
   }
+  
+  
+  /**
+   * 
+   * @param secondsleft
+   * @return 
+   */
+  public static String getTimeLeftFormatted(long secondsleft)
+  {
+    long second = secondsleft % 60;
+    long minute = (secondsleft / 60) % 60;
+    
+    if(secondsleft < 0)
+      return String.format("-%02d:%02d", Math.abs(minute), Math.abs(second));
+    else
+      return String.format(" %02d:%02d", Math.abs(minute), Math.abs(second));
+  }
 }

@@ -2,5 +2,6 @@
 /build/
 /nbproject/private/
 /dist/
+/target/
 *.pyc
 *.class

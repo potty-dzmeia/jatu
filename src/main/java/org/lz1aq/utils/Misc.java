@@ -46,18 +46,18 @@ public class Misc
   /**
    * Inserts "," between the thousands 
    * 
-   * @param freq - the frequency that we would like to format
+   * @param freqInHz - the frequency that we would like to format
    * @return - new frequency with the "," between the thousands
    */
-  public static String formatFrequency(String freq)
+  public static String formatFrequency(String freqInHz)
   {
     StringBuilder buf = new StringBuilder();
     int counter = 0;
     
-    for(int i=freq.length()-1; i>=0 ; i--)
+    for(int i=freqInHz.length()-1; i>=0 ; i--)
     {
       counter++;
-      buf.append(freq.charAt(i));
+      buf.append(freqInHz.charAt(i));
       if(counter==3 && i!=0)
       {
         buf.append(",");
@@ -67,6 +67,41 @@ public class Misc
     buf.reverse();
 
     return buf.toString();
+  }
+  
+  
+   /**
+   * E.g. makes 3500500 to 550.5 
+   * 
+   * @param freqInHz - the frequency that we would like to format
+   * @return - new frequency with the "," between the thousands
+   */
+  public static String toBandmapFreq(int freqInHz)
+  {
+    String freq = Integer.toString(freqInHz);
+    
+    StringBuilder buf = new StringBuilder();
+    int counter = 0;
+    
+    for(int i=freq.length()-3; i>=0 && counter<4; i--)
+    {
+      counter++;
+      buf.append(freq.charAt(i));
+      if(counter==1 && i!=0)
+      {
+        buf.append(".");
+      }
+    }
+    buf.reverse();
+
+    return buf.toString();
+  }
+  
+  
+  public static String toShortCallsign(String callsign, String defaultPrefix)
+  {
+    return callsign.substring(defaultPrefix.length());
+    
   }
   
   

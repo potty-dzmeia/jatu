@@ -22,7 +22,6 @@ package org.lz1aq.log;
 import java.util.ArrayList;
 
 
-
 /**
  * This class is a container for Qso objects. 
  * 
@@ -34,8 +33,6 @@ import java.util.ArrayList;
  */
 public class Log
 {
-  public  static final String DEFAULT_CALLSIGN_PREFIX = "LZ0";
-  
   private final LogDatabase db;         // Interface to a db4o database, stand-alone or client/server. 
   private final ArrayList<Qso> qsoList; // Log is also mirrored in RAM
   private final Qso   exampleQso;
@@ -229,6 +226,27 @@ public class Log
   
   
   /**
+   * Return the last S&P (search and pounce) Qso that we had with this station
+   * @param callsign station callsign
+   * @return Qso object. Null if no SP qso was found
+   */
+  public synchronized Qso getLastSpQso(String callsign)
+  {
+    //find last Qso with this station
+    for (int i = qsoList.size() - 1; i >= 0; i--)
+    {
+      if (callsign.equalsIgnoreCase(qsoList.get(i).getHisCallsign()) && qsoList.get(i).isSP())
+      {
+        return qsoList.get(i);
+      }
+    }
+    
+    return null;
+  }
+  
+  
+  
+  /**
    * Returns time left till the next possible contact
    * 
    * @param qso
@@ -241,25 +259,7 @@ public class Log
   }
   
   
-  /**
-   * Same as getSecondsLeft but returns the seconds left in the following format mm:ss
-   * 
-   * @param qso
-   * @param allowedQsoRepeatPeriod  - the repeat period for another qso with the same station (in seconds)
-   * @return 
-   */
-  public synchronized String getTimeLeftFormatted(Qso qso, int allowedQsoRepeatPeriod)
-  {
-    long secondsleft = getSecondsLeft(qso, allowedQsoRepeatPeriod);
-
-    long second = secondsleft % 60;
-    long minute = (secondsleft / 60) % 60;
-    
-    if(secondsleft < 0)
-      return String.format("-%02d:%02d", Math.abs(minute), Math.abs(second));
-    else
-      return String.format(" %02d:%02d", Math.abs(minute), Math.abs(second));
-  }
+  
   
   
   /**
@@ -285,7 +285,10 @@ public class Log
     return secondsLeft > 0;
   }
  
-  
+  /**
+   * Returns a list of all unique callsigns in the log
+   * @return  - array of callsign strings
+   */
   public synchronized ArrayList<String> getUniqueCallsigns()
   {
     ArrayList<String> list = new ArrayList<>(0);
@@ -301,4 +304,33 @@ public class Log
     return list;
   }
   
+  
+  /**
+   * Returns any list of the last SP contacts for each unique callsign
+   * @return 
+   */
+  public synchronized  ArrayList<Qso> getLastSpContacts()
+  {
+    ArrayList<Qso>    qsos = new ArrayList<>(0);
+    ArrayList<String> callsigns = getUniqueCallsigns();
+    Qso qso;
+    
+    //ArrayList<BandmapSpot> list = new ArrayList<>(0);
+    
+    for (String call : callsigns)
+    {
+      qso = getLastSpQso(call);
+      if(qso != null)
+      {
+        qsos.add(qso);
+      }
+      
+//      if(!list.contains(qso.getHisCallsign()))
+//      {
+//        list.add(qso.getHisCallsign());
+//      }
+    }
+    
+    return qsos;
+  }
 }

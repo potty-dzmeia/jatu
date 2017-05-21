@@ -19,26 +19,55 @@
 // ***************************************************************************
 package org.lz1aq.lzhfqrp;
 
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DocumentFilter;
-
 /**
  *
  * @author potty
  */
-class UppercaseDocumentFilter extends DocumentFilter {
-    @Override
-    public void insertString(DocumentFilter.FilterBypass fb, int offset,
-            String text, AttributeSet attr) throws BadLocationException {
+public class BandmapSpot
+{
 
-        fb.insertString(offset, text.toUpperCase(), attr);
+  final String callsign;
+  final int freq;
+  final boolean isManualSpot;
+
+  public BandmapSpot(String callsign, int freq, boolean isManualSpot)
+  {
+    this.callsign = callsign;
+    this.freq = freq;
+    this.isManualSpot = isManualSpot;
+  }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj == null)
+    {
+      return false;
+    }
+    if (!BandmapSpot.class.isAssignableFrom(obj.getClass()))
+    {
+      return false;
+    }
+    final BandmapSpot other = (BandmapSpot) obj;
+    if ((this.callsign == null) ? (other.callsign != null) : !this.callsign.equals(other.callsign))
+    {
+      return false;
+    }
+    if (this.isManualSpot != other.isManualSpot)
+    {
+      return false;
     }
 
-    @Override
-    public void replace(DocumentFilter.FilterBypass fb, int offset, int length,
-            String text, AttributeSet attrs) throws BadLocationException {
+    return true;
+  }
 
-        fb.replace(offset, length, text.toUpperCase(), attrs);
-    }
+  @Override
+  public int hashCode()
+  {
+    int hash = 3;
+    hash = 53 * hash + (this.callsign != null ? this.callsign.hashCode() : 0);
+    hash = 53 * hash + ((this.isManualSpot) ? 1 : 0);
+    return hash;
+  }
+
 }

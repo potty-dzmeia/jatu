@@ -19,6 +19,8 @@
 // ***************************************************************************
 package org.lz1aq.lzhfqrp;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -31,12 +33,19 @@ import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import jssc.SerialPortList;
 import org.lz1aq.log.Log;
@@ -45,6 +54,7 @@ import org.lz1aq.log.LogTableModel;
 import org.lz1aq.log.Qso;
 import org.lz1aq.rsi.Radio;
 import org.lz1aq.utils.RadioModes;
+import org.lz1aq.utils.TimeUtils;
 
 /**
  *
@@ -58,6 +68,7 @@ public class MainWindow extends javax.swing.JFrame
   private Log                           log;
   private LogTableModel                 qsoTableModel;
   private IncomingQsoTableModel         incomingQsoTableModel;
+  private BandmapQsoTableModel          bandmapQsoTableModel;
   private final ApplicationSettings     applicationSettings;
   private final RadioController         radioController;
   private int                           cqFrequency;
@@ -93,13 +104,22 @@ public class MainWindow extends javax.swing.JFrame
     
     // Init TableModel for the incoming qso panel
     incomingQsoTableModel = new IncomingQsoTableModel(log);
+    // Init table model for the bandmap
+    bandmapQsoTableModel = new BandmapQsoTableModel(log, 3500000, 500, applicationSettings);
     
     // Init GUI
     initComponents();
     
+    
+    // renderer for the bandmap
+    jtableBandmap.setDefaultRenderer(Object.class, new BandmapTableCellRender());
+    jtableIncomingQso.setDefaultRenderer(Object.class, new IncomingQsoTableCellRender());
+    
+    // For communicating with the radio
     radioController = new RadioController();
     
     
+    resizeColumnWidth(jtableBandmap);
     
     //This is used for catching global key presses (i.e. needed for F1-F12 presses)
     KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
@@ -114,9 +134,9 @@ public class MainWindow extends javax.swing.JFrame
     
     
     // Configure the FileChooser
-      chooser = new JFileChooser();
-      chooser.setFileFilter(new FileNameExtensionFilter("Python files", "py"));
-      chooser.setCurrentDirectory(new File(System.getProperty("user.dir")+"/src/main/pyrig"));
+    chooser = new JFileChooser();
+    chooser.setFileFilter(new FileNameExtensionFilter("Python files", "py"));
+    chooser.setCurrentDirectory(new File(System.getProperty("user.dir")+"/src/main/pyrig"));
 
     // Needed so that jTable to scroll automatically upon entering a new Qso
     jtableLog.addComponentListener(new ComponentAdapter()
@@ -134,6 +154,34 @@ public class MainWindow extends javax.swing.JFrame
     secondTimer.start();
   }
 
+  
+  public void resizeColumnWidth(JTable table)
+  {
+    final TableColumnModel columnModel = table.getColumnModel();
+    for (int column = 0; column < table.getColumnCount(); column++)
+    {
+      int width = 15; // Min width
+      for (int row = 0; row < table.getRowCount(); row++)
+      {
+        TableCellRenderer renderer = table.getCellRenderer(row, column);
+        Component comp = table.prepareRenderer(renderer, row, column);
+        width = Math.max(comp.getPreferredSize().width + 1, width);
+      }
+      
+      // If frequency column
+      if(column%2==0)
+      {
+        columnModel.getColumn(column).setPreferredWidth(width/2);
+      }
+      else
+      {
+        
+      }
+     
+     
+      
+    }
+  }
   
   private DefaultComboBoxModel getBandsComboboxModel()
   {
@@ -158,6 +206,8 @@ public class MainWindow extends javax.swing.JFrame
           incomingQsoTableModel.refresh(applicationSettings.getQsoRepeatPeriod(),       // How often we can repeat qso
                                         applicationSettings.getIncomingQsoHiderAfter(), // Hide qso after certain overtime
                                         applicationSettings.getIncomingQsoMaxEntries());// how many entries to show
+        
+          bandmapQsoTableModel.refresh(applicationSettings);
         }
     };
     
@@ -174,6 +224,7 @@ public class MainWindow extends javax.swing.JFrame
 
     buttonGroupTypeOfWork = new javax.swing.ButtonGroup();
     jDialogSettings = new javax.swing.JDialog();
+    jScrollPane4 = new javax.swing.JScrollPane();
     jPanel1 = new javax.swing.JPanel();
     jPanel4 = new javax.swing.JPanel();
     jComboBoxComPort = new javax.swing.JComboBox();
@@ -221,7 +272,7 @@ public class MainWindow extends javax.swing.JFrame
     jtableSearch = new javax.swing.JTable();
     jPanel8 = new javax.swing.JPanel();
     jScrollPane5 = new javax.swing.JScrollPane();
-    jTable3 = new javax.swing.JTable();
+    jtableBandmap = new javax.swing.JTable();
     jsplitLeftPanel = new javax.swing.JSplitPane();
     jpanelEntry = new javax.swing.JPanel();
     jpanelCallsign = new javax.swing.JPanel();
@@ -252,7 +303,7 @@ public class MainWindow extends javax.swing.JFrame
     jlabelCallsignStatus = new javax.swing.JLabel();
     jpanelIncomingQso = new javax.swing.JPanel();
     jScrollPane2 = new javax.swing.JScrollPane();
-    jTable1 = new javax.swing.JTable();
+    jtableIncomingQso = new javax.swing.JTable();
     jpanelRadio = new javax.swing.JPanel();
     jpanelVfoA = new javax.swing.JPanel();
     jtogglebuttonConnectToRadio = new javax.swing.JToggleButton();
@@ -560,13 +611,16 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
     jPanel1.add(jPanel5, gridBagConstraints);
 
+    jScrollPane4.setViewportView(jPanel1);
+
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    jDialogSettings.getContentPane().add(jPanel1, gridBagConstraints);
+    jDialogSettings.getContentPane().add(jScrollPane4, gridBagConstraints);
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+    setTitle("LZ log by LZ1ABC");
     addWindowListener(new java.awt.event.WindowAdapter()
     {
       public void windowOpened(java.awt.event.WindowEvent evt)
@@ -672,20 +726,16 @@ public class MainWindow extends javax.swing.JFrame
     jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Bandmap"));
     jPanel8.setLayout(new java.awt.GridLayout(1, 0));
 
-    jTable3.setModel(new javax.swing.table.DefaultTableModel(
-      new Object [][]
+    jtableBandmap.setModel(bandmapQsoTableModel);
+    jtableBandmap.setCellSelectionEnabled(true);
+    jtableBandmap.addMouseListener(new java.awt.event.MouseAdapter()
+    {
+      public void mouseClicked(java.awt.event.MouseEvent evt)
       {
-        {null, null, null, null},
-        {null, null, null, null},
-        {null, null, null, null},
-        {null, null, null, null}
-      },
-      new String []
-      {
-        "Title 1", "Title 2", "Title 3", "Title 4"
+        jtableBandmapMouseClicked(evt);
       }
-    ));
-    jScrollPane5.setViewportView(jTable3);
+    });
+    jScrollPane5.setViewportView(jtableBandmap);
 
     jPanel8.add(jScrollPane5);
 
@@ -699,12 +749,13 @@ public class MainWindow extends javax.swing.JFrame
     jpanelEntry.setLayout(new java.awt.GridBagLayout());
 
     jpanelCallsign.setFocusCycleRoot(true);
-    jpanelCallsign.setLayout(new java.awt.GridLayout(1, 0));
+    jpanelCallsign.setLayout(new java.awt.GridLayout());
 
     jtextfieldCallsign.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
     jtextfieldCallsign.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-    jtextfieldCallsign.setText("Callsign");
     jtextfieldCallsign.setBorder(javax.swing.BorderFactory.createTitledBorder("Callsign"));
+    jtextfieldCallsign.setMinimumSize(new java.awt.Dimension(0, 80));
+    jtextfieldCallsign.setPreferredSize(new java.awt.Dimension(30, 58));
     jtextfieldCallsign.addKeyListener(new java.awt.event.KeyAdapter()
     {
       public void keyTyped(java.awt.event.KeyEvent evt)
@@ -720,15 +771,14 @@ public class MainWindow extends javax.swing.JFrame
 
     jtextfieldSnt.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
     jtextfieldSnt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-    jtextfieldSnt.setText("020 043");
     jtextfieldSnt.setBorder(javax.swing.BorderFactory.createTitledBorder("Snt"));
+    jtextfieldSnt.setMinimumSize(new java.awt.Dimension(0, 80));
     jpanelCallsign.add(jtextfieldSnt);
 
     jtextfieldRcv.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
     jtextfieldRcv.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-    jtextfieldRcv.setText("299 209");
     jtextfieldRcv.setBorder(javax.swing.BorderFactory.createTitledBorder("Rcv"));
-    jtextfieldRcv.setMinimumSize(new java.awt.Dimension(210, 58));
+    jtextfieldRcv.setMinimumSize(new java.awt.Dimension(0, 80));
     jtextfieldRcv.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -743,6 +793,8 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
     jpanelEntry.add(jpanelCallsign, gridBagConstraints);
 
     jpanelTypeOfWork.setLayout(new java.awt.GridBagLayout());
@@ -1011,10 +1063,17 @@ public class MainWindow extends javax.swing.JFrame
     jpanelIncomingQso.setBorder(javax.swing.BorderFactory.createTitledBorder("Incoming Qsos"));
     jpanelIncomingQso.setLayout(new java.awt.GridBagLayout());
 
-    jTable1.setFont(new java.awt.Font("Liberation Mono", 0, 18)); // NOI18N
-    jTable1.setModel(incomingQsoTableModel);
-    jTable1.setRowHeight(30);
-    jScrollPane2.setViewportView(jTable1);
+    jtableIncomingQso.setFont(new java.awt.Font("Liberation Mono", 0, 18)); // NOI18N
+    jtableIncomingQso.setModel(incomingQsoTableModel);
+    jtableIncomingQso.setRowHeight(30);
+    jtableIncomingQso.addMouseListener(new java.awt.event.MouseAdapter()
+    {
+      public void mouseClicked(java.awt.event.MouseEvent evt)
+      {
+        jtableIncomingQsoMouseClicked(evt);
+      }
+    });
+    jScrollPane2.setViewportView(jtableIncomingQso);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -1029,7 +1088,9 @@ public class MainWindow extends javax.swing.JFrame
     jpanelVfoA.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
     jpanelVfoA.setLayout(new java.awt.GridBagLayout());
 
-    jtogglebuttonConnectToRadio.setText("Connect/Disconnect");
+    jtogglebuttonConnectToRadio.setText("Connect");
+    jtogglebuttonConnectToRadio.setToolTipText("");
+    jtogglebuttonConnectToRadio.setActionCommand("Connect");
     jtogglebuttonConnectToRadio.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -1057,6 +1118,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
     jpanelVfoA.add(jtextfieldFrequency, gridBagConstraints);
@@ -1071,7 +1133,8 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 0.2;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.5;
     gridBagConstraints.weighty = 1.0;
     jpanelVfoA.add(jtextfieldMode, gridBagConstraints);
 
@@ -1349,6 +1412,47 @@ public class MainWindow extends javax.swing.JFrame
         // Your deselected code here.
     }
   }//GEN-LAST:event_jradiobuttonCQItemStateChanged
+
+  private void jtableIncomingQsoMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jtableIncomingQsoMouseClicked
+  {//GEN-HEADEREND:event_jtableIncomingQsoMouseClicked
+    if (evt.getClickCount() == 2)
+    {
+      JTable target = (JTable) evt.getSource();
+      int row = target.getSelectedRow();
+      try
+      {
+        radioController.setFrequency(incomingQsoTableModel.getFrequency(row));
+      }
+      catch (Exception ex)
+      {
+        Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    }
+    
+    // Return focus to callsign field
+    jtextfieldCallsign.requestFocus();
+  }//GEN-LAST:event_jtableIncomingQsoMouseClicked
+
+  private void jtableBandmapMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jtableBandmapMouseClicked
+  {//GEN-HEADEREND:event_jtableBandmapMouseClicked
+    if (evt.getClickCount() == 2)
+    {
+      JTable target = (JTable) evt.getSource();
+      int row = target.getSelectedRow();
+      int col = target.getSelectedColumn();
+      try
+      {
+        radioController.setFrequency(bandmapQsoTableModel.cellToFreq(row, col));
+      }
+      catch (Exception ex)
+      {
+        Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    }
+
+    // Return focus to callsign field
+    jtextfieldCallsign.requestFocus();
+  }//GEN-LAST:event_jtableBandmapMouseClicked
   
   
   private boolean connectToRadio()
@@ -1501,7 +1605,7 @@ public class MainWindow extends javax.swing.JFrame
     
     if(applicationSettings.isQuickCallsignModeEnabled())
     {
-      callsign = Log.DEFAULT_CALLSIGN_PREFIX+callsign;
+      callsign = applicationSettings.getDefaultPrefix()+callsign;
     }
     
     return callsign;
@@ -1536,7 +1640,8 @@ public class MainWindow extends javax.swing.JFrame
         statusText = statusText.concat("DUPE   ");
 
         //Print the time left till next possible contact
-        statusText = statusText.concat("time left " + log.getTimeLeftFormatted(qso, applicationSettings.getQsoRepeatPeriod()));
+        statusText = statusText.concat("time left " + 
+                TimeUtils.getTimeLeftFormatted(log.getSecondsLeft(qso, applicationSettings.getQsoRepeatPeriod())));
       }
       else
       {
@@ -1786,6 +1891,9 @@ public class MainWindow extends javax.swing.JFrame
           {
             jradiobuttonSP.setSelected(true);
           }
+          
+          // We need to repaint the bandmap table so that the fequency marker is updated
+          jtableBandmap.repaint();
         }
       });
      
@@ -1823,6 +1931,9 @@ public class MainWindow extends javax.swing.JFrame
           {
             jradiobuttonSP.setSelected(true);
           }
+          
+          // We need to repaint the bandmap table so that the fequency marker is updated
+          jtableBandmap.repaint();
         }
       });
     }
@@ -1942,6 +2053,92 @@ public class MainWindow extends javax.swing.JFrame
     }
   }
   
+  
+  /**
+   * Used for coloring the cells within the IncomingQso table
+   */
+  class IncomingQsoTableCellRender extends DefaultTableCellRenderer
+  {
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value,
+            boolean isSelected, boolean hasFocus, int row, int column)
+    {
+      Component comp = super.getTableCellRendererComponent(table, value,isSelected, hasFocus, row, column);
+      //SJComponent jc = (JComponent) comp;
+            
+      // 
+      if(incomingQsoTableModel.containsExpiredCallsign(row, column))
+      {
+        setForeground(Color.BLUE);
+      }
+      else
+      {
+        setForeground(Color.black);    
+      }
+      return this;
+    }
+  }
+   
+  
+  /**
+   * Used for coloring the cells within the Bandmap table
+   */
+  class BandmapTableCellRender extends DefaultTableCellRenderer
+  {
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value,
+            boolean isSelected, boolean hasFocus, int row, int column)
+    {
+      Component comp = super.getTableCellRendererComponent(table, value,isSelected, hasFocus, row, column);
+      //SJComponent jc = (JComponent) comp;
+            
+            
+      // Show the current freq of the radio by highlighting the appropriate cell
+      if(bandmapQsoTableModel.isCurrentFreqInThisCell(row, column, getFreq()))
+      {
+        setBackground(Color.LIGHT_GRAY);
+      }
+      else
+      {
+        setBackground(Color.white);    
+        setForeground(Color.black);    
+      }
+      
+      // Show which callsigns should be worked by marking them in BLUE
+      if(bandmapQsoTableModel.containsExpiredCallsign(row, column))
+      {
+        setForeground(Color.BLUE);
+      }
+      else
+      {
+        setForeground(Color.BLACK);
+      }
+      return this;
+    }
+  }
+  
+  
+  
+  class UppercaseDocumentFilter extends DocumentFilter
+  {
+
+    @Override
+    public void insertString(DocumentFilter.FilterBypass fb, int offset,
+            String text, AttributeSet attr) throws BadLocationException
+    {
+
+      fb.insertString(offset, text.toUpperCase(), attr);
+    }
+
+    @Override
+    public void replace(DocumentFilter.FilterBypass fb, int offset, int length,
+            String text, AttributeSet attrs) throws BadLocationException
+    {
+
+      fb.replace(offset, length, text.toUpperCase(), attrs);
+    }
+  }
+  
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.ButtonGroup buttonGroupTypeOfWork;
   private javax.swing.JCheckBox checkboxSettingsQuickMode;
@@ -1990,10 +2187,9 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JScrollPane jScrollPane3;
+  private javax.swing.JScrollPane jScrollPane4;
   private javax.swing.JScrollPane jScrollPane5;
   private javax.swing.JSplitPane jSplitPane2;
-  private javax.swing.JTable jTable1;
-  private javax.swing.JTable jTable3;
   private javax.swing.JTextField jTextField1;
   private javax.swing.JTextField jTextField2;
   private javax.swing.JButton jbuttonDeleteEntry;
@@ -2015,6 +2211,8 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JRadioButton jradiobuttonSP;
   private javax.swing.JSplitPane jsplitLeftPanel;
   private javax.swing.JSplitPane jsplitRighPanel;
+  private javax.swing.JTable jtableBandmap;
+  private javax.swing.JTable jtableIncomingQso;
   private javax.swing.JTable jtableLog;
   private javax.swing.JTable jtableSearch;
   private javax.swing.JTextField jtextfieldCallsign;

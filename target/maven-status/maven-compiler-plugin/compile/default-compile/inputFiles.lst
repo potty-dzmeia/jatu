@@ -23,11 +23,12 @@
 /home/potty/development/projects/jatu/src/main/java/org/lz1aq/py/contest/I_Qso.java
 /home/potty/development/projects/jatu/src/main/java/org/lz1aq/py/contest/I_CallsignCheckResult.java
 /home/potty/development/projects/jatu/src/main/java/org/lz1aq/rsi/event/ModeEvent.java
+/home/potty/development/projects/jatu/src/main/java/org/lz1aq/lzhfqrp/BandmapQsoTableModel.java
 /home/potty/development/projects/jatu/src/main/java/org/lz1aq/py/rig/I_Rig.java
-/home/potty/development/projects/jatu/src/main/java/org/lz1aq/lzhfqrp/UppercaseDocumentFilter.java
 /home/potty/development/projects/jatu/src/main/java/org/lz1aq/lzhfqrp/RadioController.java
 /home/potty/development/projects/jatu/src/main/java/org/lz1aq/lzhfqrp/IncomingQsoTableModel.java
 /home/potty/development/projects/jatu/src/main/java/org/lz1aq/lzhfqrp/ApplicationSettings.java
+/home/potty/development/projects/jatu/src/main/java/org/lz1aq/lzhfqrp/BandmapSpot.java
 /home/potty/development/projects/jatu/src/main/java/org/lz1aq/rsi/JsonMsgParser.java
 /home/potty/development/projects/jatu/src/main/java/org/lz1aq/log/Log.java
 /home/potty/development/projects/jatu/src/main/java/org/lz1aq/rsi/event/SmeterEvent.java
