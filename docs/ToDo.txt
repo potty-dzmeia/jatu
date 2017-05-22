@@ -16,4 +16,4 @@
 - update SNT if a Qso is deleted from the Log! (snt should be maybe taken from the last qso)
 - Function keys to be the same as N1MM
 - CQ or SP is determined if F1 is pressed and then if frequency is changed by 500Hz
-- 
+- if serial cable is not connected and we try to connect the band and mode buttons are disabled.

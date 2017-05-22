@@ -105,7 +105,7 @@ public class MainWindow extends javax.swing.JFrame
     // Init TableModel for the incoming qso panel
     incomingQsoTableModel = new IncomingQsoTableModel(log);
     // Init table model for the bandmap
-    bandmapQsoTableModel = new BandmapQsoTableModel(log, 3500000, 500, applicationSettings);
+    bandmapQsoTableModel = new BandmapQsoTableModel(log, 3500000, 200, applicationSettings);
     
     // Init GUI
     initComponents();
@@ -260,9 +260,14 @@ public class MainWindow extends javax.swing.JFrame
     jPanel5 = new javax.swing.JPanel();
     jButtonCancel = new javax.swing.JButton();
     jButtonSave = new javax.swing.JButton();
-    jSplitPane2 = new javax.swing.JSplitPane();
-    jsplitRighPanel = new javax.swing.JSplitPane();
-    jpanelLog = new javax.swing.JPanel();
+    jDesktopPane1 = new javax.swing.JDesktopPane();
+    intframeIncomingQso = new javax.swing.JInternalFrame();
+    jScrollPane2 = new javax.swing.JScrollPane();
+    jtableIncomingQso = new javax.swing.JTable();
+    intframeBandmap = new javax.swing.JInternalFrame();
+    jScrollPane5 = new javax.swing.JScrollPane();
+    jtableBandmap = new javax.swing.JTable();
+    intframeLog = new javax.swing.JInternalFrame();
     jpanelCompleteLog = new javax.swing.JPanel();
     jScrollPane1 = new javax.swing.JScrollPane();
     jtableLog = new javax.swing.JTable();
@@ -270,11 +275,12 @@ public class MainWindow extends javax.swing.JFrame
     jpanelSearchLog = new javax.swing.JPanel();
     jScrollPane3 = new javax.swing.JScrollPane();
     jtableSearch = new javax.swing.JTable();
-    jPanel8 = new javax.swing.JPanel();
-    jScrollPane5 = new javax.swing.JScrollPane();
-    jtableBandmap = new javax.swing.JTable();
-    jsplitLeftPanel = new javax.swing.JSplitPane();
-    jpanelEntry = new javax.swing.JPanel();
+    intframeRadio = new javax.swing.JInternalFrame();
+    jpanelVfoA = new javax.swing.JPanel();
+    jtogglebuttonConnectToRadio = new javax.swing.JToggleButton();
+    jtextfieldFrequency = new javax.swing.JTextField();
+    jtextfieldMode = new javax.swing.JTextField();
+    intframeEntry = new javax.swing.JInternalFrame();
     jpanelCallsign = new javax.swing.JPanel();
     jtextfieldCallsign = new javax.swing.JTextField();
     jtextfieldSnt = new javax.swing.JTextField();
@@ -301,14 +307,6 @@ public class MainWindow extends javax.swing.JFrame
     jpanelAdditionalKeys = new javax.swing.JPanel();
     jPanelStatusBar = new javax.swing.JPanel();
     jlabelCallsignStatus = new javax.swing.JLabel();
-    jpanelIncomingQso = new javax.swing.JPanel();
-    jScrollPane2 = new javax.swing.JScrollPane();
-    jtableIncomingQso = new javax.swing.JTable();
-    jpanelRadio = new javax.swing.JPanel();
-    jpanelVfoA = new javax.swing.JPanel();
-    jtogglebuttonConnectToRadio = new javax.swing.JToggleButton();
-    jtextfieldFrequency = new javax.swing.JTextField();
-    jtextfieldMode = new javax.swing.JTextField();
     jMenuBar1 = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     jMenu2 = new javax.swing.JMenu();
@@ -632,11 +630,61 @@ public class MainWindow extends javax.swing.JFrame
         formWindowClosing(evt);
       }
     });
-    getContentPane().setLayout(new java.awt.GridLayout(1, 0));
 
-    jsplitRighPanel.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+    jDesktopPane1.setMinimumSize(new java.awt.Dimension(600, 400));
+    jDesktopPane1.setPreferredSize(new java.awt.Dimension(600, 400));
 
-    jpanelLog.setLayout(new java.awt.GridBagLayout());
+    intframeIncomingQso.setIconifiable(true);
+    intframeIncomingQso.setMaximizable(true);
+    intframeIncomingQso.setResizable(true);
+    intframeIncomingQso.setTitle("Time to next Qso");
+    intframeIncomingQso.setVisible(true);
+
+    jtableIncomingQso.setFont(new java.awt.Font("Liberation Mono", 0, 18)); // NOI18N
+    jtableIncomingQso.setModel(incomingQsoTableModel);
+    jtableIncomingQso.setRowHeight(30);
+    jtableIncomingQso.addMouseListener(new java.awt.event.MouseAdapter()
+    {
+      public void mouseClicked(java.awt.event.MouseEvent evt)
+      {
+        jtableIncomingQsoMouseClicked(evt);
+      }
+    });
+    jScrollPane2.setViewportView(jtableIncomingQso);
+
+    intframeIncomingQso.getContentPane().add(jScrollPane2, java.awt.BorderLayout.CENTER);
+
+    jDesktopPane1.add(intframeIncomingQso);
+    intframeIncomingQso.setBounds(490, 10, 463, 435);
+
+    intframeBandmap.setIconifiable(true);
+    intframeBandmap.setMaximizable(true);
+    intframeBandmap.setResizable(true);
+    intframeBandmap.setTitle("Bandmap");
+    intframeBandmap.setVisible(true);
+
+    jtableBandmap.setModel(bandmapQsoTableModel);
+    jtableBandmap.setCellSelectionEnabled(true);
+    jtableBandmap.addMouseListener(new java.awt.event.MouseAdapter()
+    {
+      public void mouseClicked(java.awt.event.MouseEvent evt)
+      {
+        jtableBandmapMouseClicked(evt);
+      }
+    });
+    jScrollPane5.setViewportView(jtableBandmap);
+
+    intframeBandmap.getContentPane().add(jScrollPane5, java.awt.BorderLayout.CENTER);
+
+    jDesktopPane1.add(intframeBandmap);
+    intframeBandmap.setBounds(500, 520, 463, 435);
+
+    intframeLog.setIconifiable(true);
+    intframeLog.setMaximizable(true);
+    intframeLog.setResizable(true);
+    intframeLog.setTitle("Log");
+    intframeLog.setToolTipText("");
+    intframeLog.setVisible(true);
 
     jpanelCompleteLog.setBorder(javax.swing.BorderFactory.createTitledBorder("Log"));
     jpanelCompleteLog.setLayout(new java.awt.GridBagLayout());
@@ -676,12 +724,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
     jpanelCompleteLog.add(jbuttonDeleteEntry, gridBagConstraints);
 
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelLog.add(jpanelCompleteLog, gridBagConstraints);
+    intframeLog.getContentPane().add(jpanelCompleteLog, java.awt.BorderLayout.PAGE_START);
 
     jpanelSearchLog.setLayout(new java.awt.GridBagLayout());
 
@@ -712,44 +755,83 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 0.3;
     jpanelSearchLog.add(jScrollPane3, gridBagConstraints);
 
+    intframeLog.getContentPane().add(jpanelSearchLog, java.awt.BorderLayout.PAGE_END);
+
+    jDesktopPane1.add(intframeLog);
+    intframeLog.setBounds(30, 130, 410, 590);
+
+    intframeRadio.setIconifiable(true);
+    intframeRadio.setMaximizable(true);
+    intframeRadio.setResizable(true);
+    intframeRadio.setTitle("Radio");
+    intframeRadio.setVisible(true);
+
+    jpanelVfoA.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+    jpanelVfoA.setLayout(new java.awt.GridBagLayout());
+
+    jtogglebuttonConnectToRadio.setText("Connect");
+    jtogglebuttonConnectToRadio.setToolTipText("");
+    jtogglebuttonConnectToRadio.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jtogglebuttonConnectToRadioActionPerformed(evt);
+      }
+    });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 0.2;
-    gridBagConstraints.weighty = 0.2;
-    jpanelLog.add(jpanelSearchLog, gridBagConstraints);
+    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(5, 20, 5, 20);
+    jpanelVfoA.add(jtogglebuttonConnectToRadio, gridBagConstraints);
 
-    jsplitRighPanel.setRightComponent(jpanelLog);
+    jtextfieldFrequency.setEditable(false);
+    jtextfieldFrequency.setBackground(new java.awt.Color(0, 0, 0));
+    jtextfieldFrequency.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+    jtextfieldFrequency.setForeground(new java.awt.Color(255, 255, 255));
+    jtextfieldFrequency.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+    jtextfieldFrequency.setText("frequency");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    jpanelVfoA.add(jtextfieldFrequency, gridBagConstraints);
 
-    jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Bandmap"));
-    jPanel8.setLayout(new java.awt.GridLayout(1, 0));
+    jtextfieldMode.setEditable(false);
+    jtextfieldMode.setBackground(new java.awt.Color(0, 0, 0));
+    jtextfieldMode.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+    jtextfieldMode.setForeground(new java.awt.Color(255, 255, 255));
+    jtextfieldMode.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+    jtextfieldMode.setText("mode");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.5;
+    gridBagConstraints.weighty = 1.0;
+    jpanelVfoA.add(jtextfieldMode, gridBagConstraints);
 
-    jtableBandmap.setModel(bandmapQsoTableModel);
-    jtableBandmap.setCellSelectionEnabled(true);
-    jtableBandmap.addMouseListener(new java.awt.event.MouseAdapter()
-    {
-      public void mouseClicked(java.awt.event.MouseEvent evt)
-      {
-        jtableBandmapMouseClicked(evt);
-      }
-    });
-    jScrollPane5.setViewportView(jtableBandmap);
+    intframeRadio.getContentPane().add(jpanelVfoA, java.awt.BorderLayout.CENTER);
 
-    jPanel8.add(jScrollPane5);
+    jDesktopPane1.add(intframeRadio);
+    intframeRadio.setBounds(30, 20, 277, 69);
 
-    jsplitRighPanel.setTopComponent(jPanel8);
-
-    jSplitPane2.setRightComponent(jsplitRighPanel);
-
-    jsplitLeftPanel.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-
-    jpanelEntry.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-    jpanelEntry.setLayout(new java.awt.GridBagLayout());
+    intframeEntry.setIconifiable(true);
+    intframeEntry.setMaximizable(true);
+    intframeEntry.setResizable(true);
+    intframeEntry.setTitle("Entry window");
+    intframeEntry.setVisible(true);
+    intframeEntry.getContentPane().setLayout(new java.awt.GridBagLayout());
 
     jpanelCallsign.setFocusCycleRoot(true);
-    jpanelCallsign.setLayout(new java.awt.GridLayout());
+    jpanelCallsign.setLayout(new java.awt.GridLayout(1, 0));
 
     jtextfieldCallsign.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
     jtextfieldCallsign.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -795,7 +877,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    jpanelEntry.add(jpanelCallsign, gridBagConstraints);
+    intframeEntry.getContentPane().add(jpanelCallsign, gridBagConstraints);
 
     jpanelTypeOfWork.setLayout(new java.awt.GridBagLayout());
 
@@ -867,7 +949,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    jpanelEntry.add(jpanelTypeOfWork, gridBagConstraints);
+    intframeEntry.getContentPane().add(jpanelTypeOfWork, gridBagConstraints);
 
     jpanelFunctionKeys.setLayout(new java.awt.GridLayout(3, 0));
 
@@ -1023,7 +1105,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    jpanelEntry.add(jpanelFunctionKeys, gridBagConstraints);
+    intframeEntry.getContentPane().add(jpanelFunctionKeys, gridBagConstraints);
 
     jpanelAdditionalKeys.setLayout(new java.awt.GridBagLayout());
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1033,7 +1115,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    jpanelEntry.add(jpanelAdditionalKeys, gridBagConstraints);
+    intframeEntry.getContentPane().add(jpanelAdditionalKeys, gridBagConstraints);
 
     jPanelStatusBar.setLayout(new java.awt.GridBagLayout());
 
@@ -1056,107 +1138,12 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(5, 0, 10, 0);
-    jpanelEntry.add(jPanelStatusBar, gridBagConstraints);
+    intframeEntry.getContentPane().add(jPanelStatusBar, gridBagConstraints);
 
-    jsplitLeftPanel.setLeftComponent(jpanelEntry);
+    jDesktopPane1.add(intframeEntry);
+    intframeEntry.setBounds(280, 20, 453, 227);
 
-    jpanelIncomingQso.setBorder(javax.swing.BorderFactory.createTitledBorder("Incoming Qsos"));
-    jpanelIncomingQso.setLayout(new java.awt.GridBagLayout());
-
-    jtableIncomingQso.setFont(new java.awt.Font("Liberation Mono", 0, 18)); // NOI18N
-    jtableIncomingQso.setModel(incomingQsoTableModel);
-    jtableIncomingQso.setRowHeight(30);
-    jtableIncomingQso.addMouseListener(new java.awt.event.MouseAdapter()
-    {
-      public void mouseClicked(java.awt.event.MouseEvent evt)
-      {
-        jtableIncomingQsoMouseClicked(evt);
-      }
-    });
-    jScrollPane2.setViewportView(jtableIncomingQso);
-
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelIncomingQso.add(jScrollPane2, gridBagConstraints);
-
-    jpanelRadio.setBorder(javax.swing.BorderFactory.createTitledBorder("Radio"));
-    jpanelRadio.setLayout(new java.awt.GridBagLayout());
-
-    jpanelVfoA.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-    jpanelVfoA.setLayout(new java.awt.GridBagLayout());
-
-    jtogglebuttonConnectToRadio.setText("Connect");
-    jtogglebuttonConnectToRadio.setToolTipText("");
-    jtogglebuttonConnectToRadio.setActionCommand("Connect");
-    jtogglebuttonConnectToRadio.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
-        jtogglebuttonConnectToRadioActionPerformed(evt);
-      }
-    });
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 0.2;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(5, 20, 5, 20);
-    jpanelVfoA.add(jtogglebuttonConnectToRadio, gridBagConstraints);
-
-    jtextfieldFrequency.setEditable(false);
-    jtextfieldFrequency.setBackground(new java.awt.Color(0, 0, 0));
-    jtextfieldFrequency.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-    jtextfieldFrequency.setForeground(new java.awt.Color(255, 255, 255));
-    jtextfieldFrequency.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-    jtextfieldFrequency.setText("frequency");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelVfoA.add(jtextfieldFrequency, gridBagConstraints);
-
-    jtextfieldMode.setEditable(false);
-    jtextfieldMode.setBackground(new java.awt.Color(0, 0, 0));
-    jtextfieldMode.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-    jtextfieldMode.setForeground(new java.awt.Color(255, 255, 255));
-    jtextfieldMode.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-    jtextfieldMode.setText("mode");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 0.5;
-    gridBagConstraints.weighty = 1.0;
-    jpanelVfoA.add(jtextfieldMode, gridBagConstraints);
-
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jpanelRadio.add(jpanelVfoA, gridBagConstraints);
-
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 0.1;
-    jpanelIncomingQso.add(jpanelRadio, gridBagConstraints);
-
-    jsplitLeftPanel.setBottomComponent(jpanelIncomingQso);
-
-    jSplitPane2.setLeftComponent(jsplitLeftPanel);
-
-    getContentPane().add(jSplitPane2);
+    getContentPane().add(jDesktopPane1, java.awt.BorderLayout.CENTER);
 
     jMenu1.setText("File");
     jMenuBar1.add(jMenu1);
@@ -2142,6 +2129,11 @@ public class MainWindow extends javax.swing.JFrame
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.ButtonGroup buttonGroupTypeOfWork;
   private javax.swing.JCheckBox checkboxSettingsQuickMode;
+  private javax.swing.JInternalFrame intframeBandmap;
+  private javax.swing.JInternalFrame intframeEntry;
+  private javax.swing.JInternalFrame intframeIncomingQso;
+  private javax.swing.JInternalFrame intframeLog;
+  private javax.swing.JInternalFrame intframeRadio;
   private javax.swing.JButton jButton1;
   private javax.swing.JButton jButton10;
   private javax.swing.JButton jButton11;
@@ -2157,6 +2149,7 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JButton jButtonCancel;
   private javax.swing.JButton jButtonSave;
   private javax.swing.JComboBox jComboBoxComPort;
+  private javax.swing.JDesktopPane jDesktopPane1;
   private javax.swing.JDialog jDialogSettings;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel10;
@@ -2181,7 +2174,6 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JPanel jPanel5;
   private javax.swing.JPanel jPanel6;
   private javax.swing.JPanel jPanel7;
-  private javax.swing.JPanel jPanel8;
   private javax.swing.JPanel jPanel9;
   private javax.swing.JPanel jPanelStatusBar;
   private javax.swing.JScrollPane jScrollPane1;
@@ -2189,7 +2181,6 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JScrollPane jScrollPane3;
   private javax.swing.JScrollPane jScrollPane4;
   private javax.swing.JScrollPane jScrollPane5;
-  private javax.swing.JSplitPane jSplitPane2;
   private javax.swing.JTextField jTextField1;
   private javax.swing.JTextField jTextField2;
   private javax.swing.JButton jbuttonDeleteEntry;
@@ -2199,18 +2190,12 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JPanel jpanelAdditionalKeys;
   private javax.swing.JPanel jpanelCallsign;
   private javax.swing.JPanel jpanelCompleteLog;
-  private javax.swing.JPanel jpanelEntry;
   private javax.swing.JPanel jpanelFunctionKeys;
-  private javax.swing.JPanel jpanelIncomingQso;
-  private javax.swing.JPanel jpanelLog;
-  private javax.swing.JPanel jpanelRadio;
   private javax.swing.JPanel jpanelSearchLog;
   private javax.swing.JPanel jpanelTypeOfWork;
   private javax.swing.JPanel jpanelVfoA;
   private javax.swing.JRadioButton jradiobuttonCQ;
   private javax.swing.JRadioButton jradiobuttonSP;
-  private javax.swing.JSplitPane jsplitLeftPanel;
-  private javax.swing.JSplitPane jsplitRighPanel;
   private javax.swing.JTable jtableBandmap;
   private javax.swing.JTable jtableIncomingQso;
   private javax.swing.JTable jtableLog;

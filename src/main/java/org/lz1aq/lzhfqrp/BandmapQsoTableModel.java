@@ -33,7 +33,7 @@ import org.lz1aq.utils.Misc;
 public class BandmapQsoTableModel extends AbstractTableModel
 {
   private final static int NUMBER_OF_COLUMNS = 16;
-  private final static int NUMBER_OF_ROWS    = 20;
+  private final static int NUMBER_OF_ROWS    = 30;
   private int startFreqInHz;
   private int stepInHz; 
   private ApplicationSettings appSettings;
