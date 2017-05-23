@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
@@ -105,7 +106,7 @@ public class MainWindow extends javax.swing.JFrame
     // Init TableModel for the incoming qso panel
     incomingQsoTableModel = new IncomingQsoTableModel(log);
     // Init table model for the bandmap
-    bandmapQsoTableModel = new BandmapQsoTableModel(log, 3500000, 200, applicationSettings);
+    bandmapQsoTableModel = new BandmapQsoTableModel(log, 3500000, applicationSettings);
     
     // Init GUI
     initComponents();
@@ -194,6 +195,22 @@ public class MainWindow extends javax.swing.JFrame
     return new DefaultComboBoxModel(new String[] { "SSB", "CW" });
   }
   
+  private DefaultComboBoxModel getBandmapStepInHzComboboxModel()
+  {
+    return new DefaultComboBoxModel(new String[] { "100", "200", "500"});
+  }
+  
+  
+  private DefaultComboBoxModel getBandmapColumnCountComboboxModel()
+  {
+    return new DefaultComboBoxModel(new String[] { "8", "10", "12", "14", "16", "18", "20", "22", "24" });
+  }
+  
+  private DefaultComboBoxModel getBandmapRowCountComboboxModel()
+  {
+    return new DefaultComboBoxModel(new String[] { "5", "10", "15", "20", "25", "30", "35", "40","45","50"});
+  }
+  
   
   /**
      * Handler for the automatic direction switching
@@ -267,6 +284,11 @@ public class MainWindow extends javax.swing.JFrame
     intframeBandmap = new javax.swing.JInternalFrame();
     jScrollPane5 = new javax.swing.JScrollPane();
     jtableBandmap = new javax.swing.JTable();
+    jPanel8 = new javax.swing.JPanel();
+    jcomboboxStepInHz = new javax.swing.JComboBox<>();
+    jcomboboxColumnCount = new javax.swing.JComboBox<>();
+    jcomboboxRowCount = new javax.swing.JComboBox<>();
+    jlabelBandmapFreeSpace = new javax.swing.JLabel();
     intframeLog = new javax.swing.JInternalFrame();
     jpanelCompleteLog = new javax.swing.JPanel();
     jScrollPane1 = new javax.swing.JScrollPane();
@@ -632,7 +654,6 @@ public class MainWindow extends javax.swing.JFrame
     });
 
     jDesktopPane1.setMinimumSize(new java.awt.Dimension(600, 400));
-    jDesktopPane1.setPreferredSize(new java.awt.Dimension(600, 400));
 
     intframeIncomingQso.setIconifiable(true);
     intframeIncomingQso.setMaximizable(true);
@@ -662,6 +683,7 @@ public class MainWindow extends javax.swing.JFrame
     intframeBandmap.setResizable(true);
     intframeBandmap.setTitle("Bandmap");
     intframeBandmap.setVisible(true);
+    intframeBandmap.getContentPane().setLayout(new java.awt.GridBagLayout());
 
     jtableBandmap.setModel(bandmapQsoTableModel);
     jtableBandmap.setCellSelectionEnabled(true);
@@ -674,10 +696,79 @@ public class MainWindow extends javax.swing.JFrame
     });
     jScrollPane5.setViewportView(jtableBandmap);
 
-    intframeBandmap.getContentPane().add(jScrollPane5, java.awt.BorderLayout.CENTER);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    intframeBandmap.getContentPane().add(jScrollPane5, gridBagConstraints);
+
+    jPanel8.setLayout(new java.awt.GridBagLayout());
+
+    jcomboboxStepInHz.setModel(getBandmapStepInHzComboboxModel());
+    jcomboboxStepInHz.addItemListener(new java.awt.event.ItemListener()
+    {
+      public void itemStateChanged(java.awt.event.ItemEvent evt)
+      {
+        jcomboboxStepInHzItemStateChanged(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.01;
+    gridBagConstraints.weighty = 1.0;
+    jPanel8.add(jcomboboxStepInHz, gridBagConstraints);
+
+    jcomboboxColumnCount.setModel(getBandmapColumnCountComboboxModel());
+    jcomboboxColumnCount.addItemListener(new java.awt.event.ItemListener()
+    {
+      public void itemStateChanged(java.awt.event.ItemEvent evt)
+      {
+        jcomboboxColumnCountItemStateChanged(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.01;
+    gridBagConstraints.weighty = 1.0;
+    jPanel8.add(jcomboboxColumnCount, gridBagConstraints);
+
+    jcomboboxRowCount.setModel(getBandmapRowCountComboboxModel());
+    jcomboboxRowCount.addItemListener(new java.awt.event.ItemListener()
+    {
+      public void itemStateChanged(java.awt.event.ItemEvent evt)
+      {
+        jcomboboxRowCountItemStateChanged(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.01;
+    gridBagConstraints.weighty = 1.0;
+    jPanel8.add(jcomboboxRowCount, gridBagConstraints);
+
+    jlabelBandmapFreeSpace.setText(" ");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    jPanel8.add(jlabelBandmapFreeSpace, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 0.001;
+    intframeBandmap.getContentPane().add(jPanel8, gridBagConstraints);
 
     jDesktopPane1.add(intframeBandmap);
-    intframeBandmap.setBounds(500, 520, 463, 435);
+    intframeBandmap.setBounds(500, 520, 463, 459);
 
     intframeLog.setIconifiable(true);
     intframeLog.setMaximizable(true);
@@ -685,8 +776,8 @@ public class MainWindow extends javax.swing.JFrame
     intframeLog.setTitle("Log");
     intframeLog.setToolTipText("");
     intframeLog.setVisible(true);
+    intframeLog.getContentPane().setLayout(new java.awt.GridBagLayout());
 
-    jpanelCompleteLog.setBorder(javax.swing.BorderFactory.createTitledBorder("Log"));
     jpanelCompleteLog.setLayout(new java.awt.GridBagLayout());
 
     jScrollPane1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
@@ -720,11 +811,16 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 0.1;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+    gridBagConstraints.weighty = 0.01;
+    gridBagConstraints.insets = new java.awt.Insets(1, 25, 1, 25);
     jpanelCompleteLog.add(jbuttonDeleteEntry, gridBagConstraints);
 
-    intframeLog.getContentPane().add(jpanelCompleteLog, java.awt.BorderLayout.PAGE_START);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    intframeLog.getContentPane().add(jpanelCompleteLog, gridBagConstraints);
 
     jpanelSearchLog.setLayout(new java.awt.GridBagLayout());
 
@@ -755,7 +851,14 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 0.3;
     jpanelSearchLog.add(jScrollPane3, gridBagConstraints);
 
-    intframeLog.getContentPane().add(jpanelSearchLog, java.awt.BorderLayout.PAGE_END);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 0.4;
+    intframeLog.getContentPane().add(jpanelSearchLog, gridBagConstraints);
 
     jDesktopPane1.add(intframeLog);
     intframeLog.setBounds(30, 130, 410, 590);
@@ -1193,6 +1296,14 @@ public class MainWindow extends javax.swing.JFrame
 
   private void formWindowClosing(java.awt.event.WindowEvent evt)//GEN-FIRST:event_formWindowClosing
   {//GEN-HEADEREND:event_formWindowClosing
+    // Read the dimensions of the different frames
+    applicationSettings.setFrameDimensions(ApplicationSettings.FrameIndex.ENTRY, intframeEntry.getBounds());
+    applicationSettings.setFrameDimensions(ApplicationSettings.FrameIndex.BANDMAP, intframeBandmap.getBounds());
+    applicationSettings.setFrameDimensions(ApplicationSettings.FrameIndex.INCOMING_QSO, intframeIncomingQso.getBounds());
+    applicationSettings.setFrameDimensions(ApplicationSettings.FrameIndex.JFRAME, this.getBounds());
+    applicationSettings.setFrameDimensions(ApplicationSettings.FrameIndex.LOG, intframeLog.getBounds());
+    applicationSettings.setFrameDimensions(ApplicationSettings.FrameIndex.RADIO, intframeRadio.getBounds());
+    
     applicationSettings.SaveSettingsToDisk(); // Save all settings to disk
   }//GEN-LAST:event_formWindowClosing
 
@@ -1440,6 +1551,30 @@ public class MainWindow extends javax.swing.JFrame
     // Return focus to callsign field
     jtextfieldCallsign.requestFocus();
   }//GEN-LAST:event_jtableBandmapMouseClicked
+
+  private void jcomboboxColumnCountItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_jcomboboxColumnCountItemStateChanged
+  {//GEN-HEADEREND:event_jcomboboxColumnCountItemStateChanged
+     if (evt.getStateChange() == ItemEvent.SELECTED) 
+     {
+       applicationSettings.setBandmapColumnCount(Integer.parseInt((String)jcomboboxColumnCount.getSelectedItem()));
+     }
+  }//GEN-LAST:event_jcomboboxColumnCountItemStateChanged
+
+  private void jcomboboxRowCountItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_jcomboboxRowCountItemStateChanged
+  {//GEN-HEADEREND:event_jcomboboxRowCountItemStateChanged
+     if (evt.getStateChange() == ItemEvent.SELECTED) 
+     {
+       applicationSettings.setBandmapRowCount(Integer.parseInt((String)jcomboboxRowCount.getSelectedItem()));
+     }
+  }//GEN-LAST:event_jcomboboxRowCountItemStateChanged
+
+  private void jcomboboxStepInHzItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_jcomboboxStepInHzItemStateChanged
+  {//GEN-HEADEREND:event_jcomboboxStepInHzItemStateChanged
+     if (evt.getStateChange() == ItemEvent.SELECTED) 
+     {
+       applicationSettings.setBandmapStepInHz(Integer.parseInt((String)jcomboboxStepInHz.getSelectedItem()));
+     }
+  }//GEN-LAST:event_jcomboboxStepInHzItemStateChanged
   
   
   private boolean connectToRadio()
@@ -1671,16 +1806,18 @@ public class MainWindow extends javax.swing.JFrame
    */
   private void initMainWindow(boolean isStartup)
   {
-    
-//    // Read last used JFrame dimensions and restore it
-//    if (isStartup)
-//    {
-//      if (applicationSettings.getJFrameDimensions().isEmpty() == false)
-//      {
-//        this.setBounds(applicationSettings.getJFrameDimensions());
-//      }
-//
-//    }
+    // Restore the last used dimensions for the different frames
+    this.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.JFRAME));
+    intframeBandmap.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.BANDMAP));
+    intframeEntry.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.ENTRY));
+    intframeIncomingQso.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.INCOMING_QSO));
+    intframeLog.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.LOG));
+    intframeRadio.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.RADIO));
+  
+    // Restore the bandmap settings
+    jcomboboxStepInHz.setSelectedItem(Integer.toString(applicationSettings.getBandmapStepInHz()));
+    jcomboboxColumnCount.setSelectedItem(Integer.toString(applicationSettings.getBandmapColumnCount()));
+    jcomboboxRowCount.setSelectedItem(Integer.toString(applicationSettings.getBandmapRowCount()));
   }
     
     
@@ -2174,6 +2311,7 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JPanel jPanel5;
   private javax.swing.JPanel jPanel6;
   private javax.swing.JPanel jPanel7;
+  private javax.swing.JPanel jPanel8;
   private javax.swing.JPanel jPanel9;
   private javax.swing.JPanel jPanelStatusBar;
   private javax.swing.JScrollPane jScrollPane1;
@@ -2185,7 +2323,11 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JTextField jTextField2;
   private javax.swing.JButton jbuttonDeleteEntry;
   private javax.swing.JComboBox jcomboboxBand;
+  private javax.swing.JComboBox<String> jcomboboxColumnCount;
   private javax.swing.JComboBox jcomboboxMode;
+  private javax.swing.JComboBox<String> jcomboboxRowCount;
+  private javax.swing.JComboBox<String> jcomboboxStepInHz;
+  private javax.swing.JLabel jlabelBandmapFreeSpace;
   private javax.swing.JLabel jlabelCallsignStatus;
   private javax.swing.JPanel jpanelAdditionalKeys;
   private javax.swing.JPanel jpanelCallsign;

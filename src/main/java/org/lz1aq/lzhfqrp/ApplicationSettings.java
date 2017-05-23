@@ -36,31 +36,51 @@ public final class ApplicationSettings
 
   static final String SETTINGS_FILE_NAME = "settings.properties";
 
-  static final String PROPERTY_COMPORT = "comPort";
-  static final String PROPERTY_MY_CALL_SIGN = "myCallSign";
-  static final String PROPERTY_QUICK_CALLSIGN_MODE = "quickCallsignMode";
-  static final String PROPERTY_DEFAULT_PREFIX = "defaultPrefix";
-  static final String PROPERTY_QSO_REPEAT_PERIOD_SEC = "qsoRepeatPeriod";
-  static final String PROPERTY_INCOMING_QSO_MAX_ENTRIES = "incomingQsoMaxEntries";
-  static final String PROPERTY_INCOMING_QSO_HIDE_AFTER = "incomingQsoHideAfter";
-  static final String PROPERTY_MAIN_WINDOW_X = "x";
-  static final String PROPERTY_MAIN_WINDOW_Y = "y";
-  static final String PROPERTY_MAIN_WINDOW_WIDTH = "w";
-  static final String PROPERTY_MAIN_WINDOW_HEIGHT = "h";
-  static final String PROPERTY_FUNCTION_KEYS = "function_key";
-
+  static final String PROPERTY_COMPORT = "com_port";
+  static final String PROPERTY_MY_CALL_SIGN = "my_callsign";
+  static final String PROPERTY_QUICK_CALLSIGN_MODE = "quick_callsign_mode";
+  static final String PROPERTY_DEFAULT_PREFIX = "default_prefix";
+  static final String PROPERTY_QSO_REPEAT_PERIOD_SEC = "qso_repeat_period";
+  static final String PROPERTY_INCOMING_QSO_MAX_ENTRIES = "incoming_qso_max_entries";
+  static final String PROPERTY_INCOMING_QSO_HIDE_AFTER = "incoming_qso_hide_after";
+  static final String PROPERTY_FUNCTION_KEYS = "function_keys";
+  static final String PROPERTY_INTERNAL_FRAMES_BOUNDS = "internal_frames_dimensions";
+  static final String PROPERTY_BANDMAP_STEP = "bandmap_step_in_hz";
+  static final String PROPERTY_BANDMAP_COLUMN_COUNT = "bandmap_column_count";
+  static final String PROPERTY_BANDMAP_ROW_COUNT = "bandmap_row_count";
+  
+  
   public static final int FUNCTION_KEYS_COUNT = 12; // The number of function keys
+ 
+  
+  public enum FrameIndex
+  {
+    JFRAME(0),
+    ENTRY(1),       
+    LOG(2),       
+    INCOMING_QSO(3),    
+    BANDMAP(4), 
+    RADIO(5);
+    
+    private final int code;
+    FrameIndex(int code)  { this.code = code; }
+    public int toInt() { return code; }
+  }
+  
 
   private String comPort;
   private String myCallsign;
   private boolean isQuickCallsignModeEnabled;
   private String defaultPrefix;
-  private String qsoRepeatPeriod;
-  private Rectangle jFrameDimensions; // JFrame settings: position and size
-  private final String[] arrayFunctionKeysTexts;  // texts for the function keys
+  private int qsoRepeatPeriodInSeconds;
+  private Rectangle[] framesDimensions; // Postition and size of all frames used by the program
+  private final String[] functionKeyTexts;  // texts for the function keys
   private int incomingQsoMaxEntries; // How many entries will be shown on the IncomingQsoPanel
   private int incomingQsoHiderAfter; // Specifies due time after which we hide the entry
-
+  private int bandmapStepInHz;
+  private int bandmapRowCount;
+  private int bandmapColumnCount;
+  
   private final Properties prop;
 
   /**
@@ -69,22 +89,53 @@ public final class ApplicationSettings
   public ApplicationSettings()
   {
     this.prop = new Properties();
-    jFrameDimensions = new Rectangle();
-    arrayFunctionKeysTexts = new String[FUNCTION_KEYS_COUNT];
+    framesDimensions = new Rectangle[FrameIndex.values().length];
+    functionKeyTexts = new String[FUNCTION_KEYS_COUNT];
 
     this.LoadSettingsFromDisk();
   }
 
-  public Rectangle getJFrameDimensions()
+  public Rectangle getFrameDimensions(ApplicationSettings.FrameIndex index)
   {
-    return jFrameDimensions;
+    return framesDimensions[index.toInt()];
   }
 
-  public void setJFrameDimensions(Rectangle jFrameDimensions)
+  public void setFrameDimensions(ApplicationSettings.FrameIndex index, Rectangle rect)
   {
-    this.jFrameDimensions = jFrameDimensions;
+    this.framesDimensions[index.toInt()] = rect;
   }
 
+  
+  public void setBandmapStepInHz(int bandmapStepInHz)
+  {
+    this.bandmapStepInHz = bandmapStepInHz;
+  }
+
+  public void setBandmapRowCount(int bandmapRowCount)
+  {
+    this.bandmapRowCount = bandmapRowCount;
+  }
+
+  public void setBandmapColumnCount(int bandmapColumnCount)
+  {
+    this.bandmapColumnCount = bandmapColumnCount;
+  }
+
+  public int getBandmapStepInHz()
+  {
+    return bandmapStepInHz;
+  }
+
+  public int getBandmapRowCount()
+  {
+    return bandmapRowCount;
+  }
+
+  public int getBandmapColumnCount()
+  {
+    return bandmapColumnCount;
+  }
+  
   public String getComPort()
   {
     return comPort;
@@ -142,7 +193,7 @@ public final class ApplicationSettings
    */
   public int getQsoRepeatPeriod()
   {
-    return Integer.parseInt(this.qsoRepeatPeriod);
+    return this.qsoRepeatPeriodInSeconds;
   }
 
   /**
@@ -152,7 +203,7 @@ public final class ApplicationSettings
    */
   public void setQsoRepeatPeriod(int periodInSeconds)
   {
-    this.qsoRepeatPeriod = Integer.toString(periodInSeconds);
+    this.qsoRepeatPeriodInSeconds = periodInSeconds;
   }
 
   /**
@@ -163,7 +214,7 @@ public final class ApplicationSettings
    */
   public String getFunctionKeyText(int keyIndex)
   {
-    return arrayFunctionKeysTexts[keyIndex];
+    return functionKeyTexts[keyIndex];
   }
 
   /**
@@ -174,9 +225,10 @@ public final class ApplicationSettings
    */
   public void setFunctionKeyText(int keyIndex, String text)
   {
-    arrayFunctionKeysTexts[keyIndex] = text;
+    functionKeyTexts[keyIndex] = text;
   }
-
+  
+  
   public void setIncomingQsoMaxEntries(int incomingQsoMaxEntries)
   {
     this.incomingQsoMaxEntries = incomingQsoMaxEntries;
@@ -218,6 +270,32 @@ public final class ApplicationSettings
       values[i] = prop.getProperty(key + i);
     }
   }
+  
+  
+  private void setPropertiesFramesSizes()
+  {
+    for(int i=0; i<framesDimensions.length; i++)
+    {
+      prop.setProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"x", Integer.toString(framesDimensions[i].x));
+      prop.setProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"y", Integer.toString(framesDimensions[i].y));
+      prop.setProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"width", Integer.toString(framesDimensions[i].width));
+      prop.setProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"height", Integer.toString(framesDimensions[i].height));
+    } 
+  }
+  
+  private void getPropertiesFramesSizes()
+  {
+    for(int i=0; i<framesDimensions.length; i++)
+    {
+      // Read the JFrame dimensions:
+      int x = Integer.parseInt(prop.getProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"x"));
+      int y = Integer.parseInt(prop.getProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"y"));
+      int w = Integer.parseInt(prop.getProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"width"));
+      int h = Integer.parseInt(prop.getProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"height"));
+
+      this.framesDimensions[i] = new Rectangle(x, y, w, h);
+    }
+  }
 
   /**
    * Saves the settings into a file called "DLineSettings.properties"
@@ -228,19 +306,22 @@ public final class ApplicationSettings
     prop.setProperty(PROPERTY_MY_CALL_SIGN, myCallsign);
     prop.setProperty(PROPERTY_QUICK_CALLSIGN_MODE, Boolean.toString(isQuickCallsignModeEnabled));
     prop.setProperty(PROPERTY_DEFAULT_PREFIX, defaultPrefix);
-    prop.setProperty(PROPERTY_QSO_REPEAT_PERIOD_SEC, qsoRepeatPeriod);
+    prop.setProperty(PROPERTY_QSO_REPEAT_PERIOD_SEC, Integer.toString(qsoRepeatPeriodInSeconds));
 
     // Now save the texts for the function keys
-    setProperties(PROPERTY_FUNCTION_KEYS, arrayFunctionKeysTexts);
+    setProperties(PROPERTY_FUNCTION_KEYS, functionKeyTexts);
 
     prop.setProperty(PROPERTY_INCOMING_QSO_HIDE_AFTER, Integer.toString(incomingQsoHiderAfter));
     prop.setProperty(PROPERTY_INCOMING_QSO_MAX_ENTRIES, Integer.toString(incomingQsoMaxEntries));
 
-    // Now save the JFrame dimensions:
-    prop.setProperty(PROPERTY_MAIN_WINDOW_X, Integer.toString(jFrameDimensions.x));
-    prop.setProperty(PROPERTY_MAIN_WINDOW_Y, Integer.toString(jFrameDimensions.y));
-    prop.setProperty(PROPERTY_MAIN_WINDOW_WIDTH, Integer.toString(jFrameDimensions.width));
-    prop.setProperty(PROPERTY_MAIN_WINDOW_HEIGHT, Integer.toString(jFrameDimensions.height));
+    // Save the dimensions for the different frames
+    setPropertiesFramesSizes();
+    
+    // Save the bandmap settings
+    prop.setProperty(PROPERTY_BANDMAP_COLUMN_COUNT, Integer.toString(bandmapColumnCount));
+    prop.setProperty(PROPERTY_BANDMAP_ROW_COUNT, Integer.toString(bandmapRowCount));
+    prop.setProperty(PROPERTY_BANDMAP_STEP, Integer.toString(bandmapStepInHz));
+
 
     try
     {
@@ -260,97 +341,86 @@ public final class ApplicationSettings
   {
     try
     {
-
       prop.load(new FileInputStream(SETTINGS_FILE_NAME));
 
       // Comport
       comPort = prop.getProperty(PROPERTY_COMPORT);
       if (comPort == null)
-      {
         throwMissingPropertyException(PROPERTY_COMPORT);
-      }
 
       // My callsign
       myCallsign = prop.getProperty(PROPERTY_MY_CALL_SIGN);
       if (myCallsign == null)
-      {
         throwMissingPropertyException(PROPERTY_MY_CALL_SIGN);
-      }
 
       // Now read the texts for the function keys
-      getProperties(PROPERTY_FUNCTION_KEYS, arrayFunctionKeysTexts);
-      for (String str : arrayFunctionKeysTexts)
+      getProperties(PROPERTY_FUNCTION_KEYS, functionKeyTexts);
+      for (String str : functionKeyTexts)
       {
         if (str == null)
-        {
           throwMissingPropertyException(PROPERTY_FUNCTION_KEYS);
-        }
       }
 
       // Quick callsign mode
       String temp = prop.getProperty(PROPERTY_QUICK_CALLSIGN_MODE);
       if (temp == null)
-      {
         throwMissingPropertyException(PROPERTY_QUICK_CALLSIGN_MODE);
-      }
       isQuickCallsignModeEnabled = Boolean.parseBoolean(temp);
 
       // Default prefix
       defaultPrefix = prop.getProperty(PROPERTY_DEFAULT_PREFIX);
       if (defaultPrefix == null)
-      {
         throwMissingPropertyException(PROPERTY_DEFAULT_PREFIX);
-      }
 
       // Repeat period for Qso
-      qsoRepeatPeriod = prop.getProperty(PROPERTY_QSO_REPEAT_PERIOD_SEC);
-      if (qsoRepeatPeriod == null)
-      {
+      temp = prop.getProperty(PROPERTY_QSO_REPEAT_PERIOD_SEC);
+      if(temp == null)
         throwMissingPropertyException(PROPERTY_QSO_REPEAT_PERIOD_SEC);
-      }
-
+      qsoRepeatPeriodInSeconds = Integer.parseInt(temp);
       
       // Incoming qso hide after
       temp = prop.getProperty(PROPERTY_INCOMING_QSO_HIDE_AFTER);
       if (temp == null)
-      {
         throwMissingPropertyException(PROPERTY_QSO_REPEAT_PERIOD_SEC);
-      }
-      incomingQsoHiderAfter = Integer.parseInt(temp);
-      
+      incomingQsoHiderAfter = Integer.parseInt(temp); 
       
       // Incoming qso max entries
       temp = prop.getProperty(PROPERTY_INCOMING_QSO_MAX_ENTRIES);
       if (temp == null)
-      {
         throwMissingPropertyException(PROPERTY_INCOMING_QSO_MAX_ENTRIES);
-      }
       incomingQsoMaxEntries = Integer.parseInt(temp);
+     
+      // Read the dimensions for the different frames
+      getPropertiesFramesSizes();
       
-
-      qsoRepeatPeriod = prop.getProperty(PROPERTY_QSO_REPEAT_PERIOD_SEC);
-      if (qsoRepeatPeriod == null)
+      
+      // Read the bandmap settings
+      temp = prop.getProperty(PROPERTY_BANDMAP_COLUMN_COUNT);
+      if (temp == null)
+        throwMissingPropertyException(PROPERTY_BANDMAP_COLUMN_COUNT);
+      bandmapColumnCount = Integer.parseInt(temp);
+      
+      temp = prop.getProperty(PROPERTY_BANDMAP_ROW_COUNT);
+      if (temp == null)
       {
-        throwMissingPropertyException(PROPERTY_QSO_REPEAT_PERIOD_SEC);
+        throwMissingPropertyException(PROPERTY_BANDMAP_ROW_COUNT);
       }
-
-      // Read the JFrame dimensions:
-      int x = Integer.parseInt(prop.getProperty(PROPERTY_MAIN_WINDOW_X));
-      int y = Integer.parseInt(prop.getProperty(PROPERTY_MAIN_WINDOW_Y));
-      int w = Integer.parseInt(prop.getProperty(PROPERTY_MAIN_WINDOW_WIDTH));
-      int h = Integer.parseInt(prop.getProperty(PROPERTY_MAIN_WINDOW_HEIGHT));
-
-      this.jFrameDimensions = new Rectangle(x, y, w, h);
+      bandmapRowCount = Integer.parseInt(temp);
+      
+      temp = prop.getProperty(PROPERTY_BANDMAP_STEP);
+      if (temp == null)
+      {
+        throwMissingPropertyException(PROPERTY_BANDMAP_STEP);
+      }
+      bandmapStepInHz = Integer.parseInt(temp);
     }
     catch (IOException ex)
     {
-      // If some error we will set to default values
       this.SetSettingsToDefault();
       Logger.getLogger(ApplicationSettings.class.getName()).log(Level.SEVERE, null, ex);
     }
     catch (NumberFormatException ex)
     {
-      // If some error we will set to default values
       this.SetSettingsToDefault();
       Logger.getLogger(ApplicationSettings.class.getName()).log(Level.SEVERE, null, ex);
     }
@@ -371,30 +441,36 @@ public final class ApplicationSettings
     myCallsign = "LZ1ABC";
     isQuickCallsignModeEnabled = false;
     defaultPrefix = "LZ0";
-    qsoRepeatPeriod = "1800";
+    qsoRepeatPeriodInSeconds = 1800;
 
     // Set texts for the direction buttons
-    arrayFunctionKeysTexts[0] = "test {mycall}";       // F1
-    arrayFunctionKeysTexts[1] = "not defined by user"; // F2
-    arrayFunctionKeysTexts[2] = "tu";                  // F3
-    arrayFunctionKeysTexts[3] = "not defined by user";
-    arrayFunctionKeysTexts[4] = "not defined by user";
-    arrayFunctionKeysTexts[5] = "agn";
-    arrayFunctionKeysTexts[6] = "?";
-    arrayFunctionKeysTexts[7] = "dupe";
-    arrayFunctionKeysTexts[8] = "";
-    arrayFunctionKeysTexts[9] = "";
-    arrayFunctionKeysTexts[10] = "not defined by user";
-    arrayFunctionKeysTexts[11] = "not defined by user";
+    functionKeyTexts[0] = "test {mycall}";       // F1
+    functionKeyTexts[1] = "not defined by user"; // F2
+    functionKeyTexts[2] = "tu";                  // F3
+    functionKeyTexts[3] = "not defined by user";
+    functionKeyTexts[4] = "not defined by user";
+    functionKeyTexts[5] = "agn";
+    functionKeyTexts[6] = "?";
+    functionKeyTexts[7] = "dupe";
+    functionKeyTexts[8] = "";
+    functionKeyTexts[9] = "";
+    functionKeyTexts[10] = "not defined by user";
+    functionKeyTexts[11] = "not defined by user";
 
     incomingQsoHiderAfter = -360; // If overtime is 6 minutes don't show the entry
     incomingQsoMaxEntries = 10;  // Number of entries visible on the Incoming Qso panel
     
-    // We have minimum size so we don't have to worry about the values:
-    jFrameDimensions.height = 0;
-    jFrameDimensions.width = 0;
-    jFrameDimensions.x = 0;
-    jFrameDimensions.y = 0;
+    // Default positions for the different frames
+    framesDimensions[FrameIndex.JFRAME.toInt()] = new Rectangle(20, 20, 600, 600); // Main window
+    framesDimensions[FrameIndex.BANDMAP.toInt()] = new Rectangle(10, 10, 200, 200);
+    framesDimensions[FrameIndex.ENTRY.toInt()] = new Rectangle(40, 40, 200, 200);
+    framesDimensions[FrameIndex.INCOMING_QSO.toInt()] = new Rectangle(60, 60, 200, 200);
+    framesDimensions[FrameIndex.LOG.toInt()] = new Rectangle(80, 80, 200, 200);
+    framesDimensions[FrameIndex.RADIO.toInt()] = new Rectangle(100, 100, 300, 50);
+    
+    bandmapColumnCount = 16;
+    bandmapRowCount = 15;
+    bandmapStepInHz = 200;
   }
 
   void throwMissingPropertyException(String propertyName) throws Exception

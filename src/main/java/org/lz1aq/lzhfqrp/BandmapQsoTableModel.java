@@ -20,7 +20,6 @@
 package org.lz1aq.lzhfqrp;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import javax.swing.table.AbstractTableModel;
 import org.lz1aq.log.Log;
 import org.lz1aq.log.Qso;
@@ -32,11 +31,8 @@ import org.lz1aq.utils.Misc;
  */
 public class BandmapQsoTableModel extends AbstractTableModel
 {
-  private final static int NUMBER_OF_COLUMNS = 16;
-  private final static int NUMBER_OF_ROWS    = 30;
   private int startFreqInHz;
-  private int stepInHz; 
-  private ApplicationSettings appSettings;
+  private ApplicationSettings applicationSettings;
   
   /** Reference to the Log */
   private final Log log;
@@ -45,12 +41,11 @@ public class BandmapQsoTableModel extends AbstractTableModel
   ArrayList<Qso> lastSpQsos;
   
   
-  public BandmapQsoTableModel(Log log, int startFreq, int stepInHz, ApplicationSettings appSettings)
+  public BandmapQsoTableModel(Log log, int startFreq, ApplicationSettings appSettings)
   {
     this.log = log;
     this.startFreqInHz = startFreq;
-    this.stepInHz = stepInHz;
-    this.appSettings = appSettings;
+    this.applicationSettings = appSettings;
     
     lastSpQsos = log.getLastSpContacts();
   }
@@ -59,13 +54,13 @@ public class BandmapQsoTableModel extends AbstractTableModel
   @Override
   public int getRowCount()
   {
-    return NUMBER_OF_ROWS;
+    return applicationSettings.getBandmapRowCount();
   }
 
   @Override
   public int getColumnCount()
   {
-    return NUMBER_OF_COLUMNS;
+    return applicationSettings.getBandmapColumnCount();
   }
 
   @Override
@@ -91,8 +86,8 @@ public class BandmapQsoTableModel extends AbstractTableModel
       {
         if(isQsoInThisCell(rowIndex, columnIndex, qso))
         {
-         if(appSettings.isQuickCallsignModeEnabled())
-           cellText.append(Misc.toShortCallsign(qso.getHisCallsign(), appSettings.getDefaultPrefix()));
+         if(applicationSettings.isQuickCallsignModeEnabled())
+           cellText.append(Misc.toShortCallsign(qso.getHisCallsign(), applicationSettings.getDefaultPrefix()));
          else
            cellText.append(qso.getHisCallsign());
          
@@ -114,11 +109,12 @@ public class BandmapQsoTableModel extends AbstractTableModel
   public synchronized void refresh(ApplicationSettings appSettings)
           //int allowedQsoRepeatPeriodInSec, int hideAfterSeconds, int maxEntriesCount)
   {
-    this.appSettings = appSettings;
+    this.applicationSettings = appSettings;
     
     lastSpQsos = log.getLastSpContacts();
     
-    this.fireTableDataChanged();
+    //this.fireTableDataChanged();
+    this.fireTableStructureChanged();
   }
   
   /**
@@ -134,12 +130,12 @@ public class BandmapQsoTableModel extends AbstractTableModel
     // Odd column - means a callsign is hold in the cell
     if(column%2 == 1)
     {
-      return startFreqInHz+((row)*stepInHz)+((NUMBER_OF_ROWS/2)*(column-1)*stepInHz);
+      return startFreqInHz+((row)*applicationSettings.getBandmapStepInHz())+((applicationSettings.getBandmapRowCount()/2)*(column-1)*applicationSettings.getBandmapStepInHz());
     }
     // Even - a frequency is hold in this cell
     else
     {
-      return startFreqInHz+((row)*stepInHz)+((NUMBER_OF_ROWS/2)*column*stepInHz);
+      return startFreqInHz+((row)*applicationSettings.getBandmapStepInHz())+((applicationSettings.getBandmapRowCount()/2)*column*applicationSettings.getBandmapStepInHz());
     }
   }
  
@@ -155,7 +151,7 @@ public class BandmapQsoTableModel extends AbstractTableModel
   {
     int cellFreq = cellToFreq(row, col);
     
-    return freq >= cellFreq && freq < cellFreq+stepInHz;
+    return freq >= cellFreq && freq < cellFreq+applicationSettings.getBandmapStepInHz();
   }
   
   
@@ -171,7 +167,7 @@ public class BandmapQsoTableModel extends AbstractTableModel
   {
     int cellFreq = cellToFreq(row, col);
     
-    return (qso.getFrequencyInt() >= cellFreq) && (qso.getFrequencyInt() < cellFreq+stepInHz);
+    return (qso.getFrequencyInt() >= cellFreq) && (qso.getFrequencyInt() < cellFreq+applicationSettings.getBandmapStepInHz());
   }
   
   
@@ -181,7 +177,7 @@ public class BandmapQsoTableModel extends AbstractTableModel
     for(Qso qso: lastSpQsos)
     {    
       if(isQsoInThisCell(row, col, qso) && 
-        (appSettings.getQsoRepeatPeriod()-log.getLastQso(qso.getHisCallsign()).getElapsedSeconds())<=0 )
+        (applicationSettings.getQsoRepeatPeriod()-log.getLastQso(qso.getHisCallsign()).getElapsedSeconds())<=0 )
         return true;
     }
     return false;
