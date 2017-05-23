@@ -21,6 +21,9 @@ package org.lz1aq.lzhfqrp;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -38,6 +41,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -54,6 +58,7 @@ import org.lz1aq.log.LogDatabase;
 import org.lz1aq.log.LogTableModel;
 import org.lz1aq.log.Qso;
 import org.lz1aq.rsi.Radio;
+import org.lz1aq.utils.FontChooser;
 import org.lz1aq.utils.RadioModes;
 import org.lz1aq.utils.TimeUtils;
 
@@ -74,7 +79,8 @@ public class MainWindow extends javax.swing.JFrame
   private final RadioController         radioController;
   private int                           cqFrequency;
   private Timer                         secondTimer;
-          
+  private FontChooser                   fontchooser = new FontChooser();
+  
   private DocumentFilter                filter = new UppercaseDocumentFilter();
   private final JFileChooser            chooser;
   
@@ -203,12 +209,12 @@ public class MainWindow extends javax.swing.JFrame
   
   private DefaultComboBoxModel getBandmapColumnCountComboboxModel()
   {
-    return new DefaultComboBoxModel(new String[] { "8", "10", "12", "14", "16", "18", "20", "22", "24" });
+    return new DefaultComboBoxModel(new String[] { "8", "10", "12", "14", "16", "18", "20", "22", "24", "26", "28", "30", "32", "34", "36" });
   }
   
   private DefaultComboBoxModel getBandmapRowCountComboboxModel()
   {
-    return new DefaultComboBoxModel(new String[] { "5", "10", "15", "20", "25", "30", "35", "40","45","50"});
+    return new DefaultComboBoxModel(new String[] { "5", "10", "15", "20", "25", "30", "35", "40","45","50", "55", "60"});
   }
   
   
@@ -227,6 +233,42 @@ public class MainWindow extends javax.swing.JFrame
           bandmapQsoTableModel.refresh(applicationSettings);
         }
     };
+    
+    
+//    public void setCallsignFont(JTextField textfield)
+//    {
+//      Font font = textfield.getFont();
+//      FontMetrics fontMetrics = textfield.getFontMetrics(font);
+//      int fontWidth = fontMetrics.stringWidth("LZ1ABC");
+//      
+//      int textfieldWidth = textfield.getWidth();
+//      float fontSize = font.getSize();
+//      // Font is too big
+//      if(fontWidth > (textfieldWidth-30))
+//      {
+//        // Start decreasing
+//        while(fontWidth > (textfieldWidth-10))
+//        {
+//          font = font.deriveFont(fontSize--);
+//          fontMetrics = textfield.getFontMetrics(font);
+//          fontWidth = fontMetrics.stringWidth("LZ1ABC");
+//        }
+//      }
+//      // Font is too small
+//      else
+//      {
+//        while(fontWidth < (textfieldWidth-30))
+//        {
+//          font = font.deriveFont(fontSize++);
+//          fontMetrics = textfield.getFontMetrics(font);
+//          fontWidth = fontMetrics.stringWidth("LZ1ABC");
+//        }
+//       
+//      }
+//      
+//      textfield.setFont(font);
+//    }
+
     
     
   /**
@@ -277,6 +319,15 @@ public class MainWindow extends javax.swing.JFrame
     jPanel5 = new javax.swing.JPanel();
     jButtonCancel = new javax.swing.JButton();
     jButtonSave = new javax.swing.JButton();
+    jDialogFontChooser = new javax.swing.JDialog();
+    jPanel10 = new javax.swing.JPanel();
+    jButton13 = new javax.swing.JButton();
+    jButton14 = new javax.swing.JButton();
+    jButton15 = new javax.swing.JButton();
+    jButton16 = new javax.swing.JButton();
+    jButton17 = new javax.swing.JButton();
+    jButton18 = new javax.swing.JButton();
+    jButton19 = new javax.swing.JButton();
     jDesktopPane1 = new javax.swing.JDesktopPane();
     intframeIncomingQso = new javax.swing.JInternalFrame();
     jScrollPane2 = new javax.swing.JScrollPane();
@@ -285,10 +336,13 @@ public class MainWindow extends javax.swing.JFrame
     jScrollPane5 = new javax.swing.JScrollPane();
     jtableBandmap = new javax.swing.JTable();
     jPanel8 = new javax.swing.JPanel();
-    jcomboboxStepInHz = new javax.swing.JComboBox<>();
-    jcomboboxColumnCount = new javax.swing.JComboBox<>();
-    jcomboboxRowCount = new javax.swing.JComboBox<>();
+    jcomboboxStepInHz = new javax.swing.JComboBox<String>();
+    jcomboboxColumnCount = new javax.swing.JComboBox<String>();
+    jcomboboxRowCount = new javax.swing.JComboBox<String>();
     jlabelBandmapFreeSpace = new javax.swing.JLabel();
+    jLabel13 = new javax.swing.JLabel();
+    jLabel14 = new javax.swing.JLabel();
+    jLabel15 = new javax.swing.JLabel();
     intframeLog = new javax.swing.JInternalFrame();
     jpanelCompleteLog = new javax.swing.JPanel();
     jScrollPane1 = new javax.swing.JScrollPane();
@@ -333,6 +387,7 @@ public class MainWindow extends javax.swing.JFrame
     jMenu1 = new javax.swing.JMenu();
     jMenu2 = new javax.swing.JMenu();
     jMenuItem1 = new javax.swing.JMenuItem();
+    jMenuItem2 = new javax.swing.JMenuItem();
 
     jDialogSettings.setTitle("Settings");
     jDialogSettings.setAlwaysOnTop(true);
@@ -639,6 +694,91 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 1.0;
     jDialogSettings.getContentPane().add(jScrollPane4, gridBagConstraints);
 
+    jDialogFontChooser.setTitle("Choose fonts...");
+    jDialogFontChooser.setAlwaysOnTop(true);
+    jDialogFontChooser.setMinimumSize(new java.awt.Dimension(200, 300));
+    jDialogFontChooser.setPreferredSize(new java.awt.Dimension(200, 300));
+    jDialogFontChooser.getContentPane().setLayout(new java.awt.GridBagLayout());
+
+    jPanel10.setLayout(new java.awt.GridLayout(7, 1));
+
+    jButton13.setText("Callsign");
+    jButton13.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton13ActionPerformed(evt);
+      }
+    });
+    jPanel10.add(jButton13);
+
+    jButton14.setText("Snt");
+    jButton14.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton14ActionPerformed(evt);
+      }
+    });
+    jPanel10.add(jButton14);
+
+    jButton15.setText("Rcv");
+    jButton15.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton15ActionPerformed(evt);
+      }
+    });
+    jPanel10.add(jButton15);
+
+    jButton16.setText("IncomingQso");
+    jButton16.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton16ActionPerformed(evt);
+      }
+    });
+    jPanel10.add(jButton16);
+
+    jButton17.setText("Log");
+    jButton17.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton17ActionPerformed(evt);
+      }
+    });
+    jPanel10.add(jButton17);
+
+    jButton18.setText("Bandmap");
+    jButton18.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton18ActionPerformed(evt);
+      }
+    });
+    jPanel10.add(jButton18);
+
+    jButton19.setText("OK");
+    jButton19.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+    jButton19.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButton19ActionPerformed(evt);
+      }
+    });
+    jPanel10.add(jButton19);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    jDialogFontChooser.getContentPane().add(jPanel10, gridBagConstraints);
+
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("LZ log by LZ1ABC");
     addWindowListener(new java.awt.event.WindowAdapter()
@@ -714,10 +854,13 @@ public class MainWindow extends javax.swing.JFrame
       }
     });
     gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 0.01;
     gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
     jPanel8.add(jcomboboxStepInHz, gridBagConstraints);
 
     jcomboboxColumnCount.setModel(getBandmapColumnCountComboboxModel());
@@ -729,10 +872,13 @@ public class MainWindow extends javax.swing.JFrame
       }
     });
     gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 3;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 0.01;
     gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
     jPanel8.add(jcomboboxColumnCount, gridBagConstraints);
 
     jcomboboxRowCount.setModel(getBandmapRowCountComboboxModel());
@@ -744,19 +890,61 @@ public class MainWindow extends javax.swing.JFrame
       }
     });
     gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 5;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 0.01;
     gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
     jPanel8.add(jcomboboxRowCount, gridBagConstraints);
 
     jlabelBandmapFreeSpace.setText(" ");
     gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 6;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
     jPanel8.add(jlabelBandmapFreeSpace, gridBagConstraints);
+
+    jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+    jLabel13.setText("Step in Hz:");
+    jLabel13.setToolTipText("Step in Hz");
+    jLabel13.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.01;
+    gridBagConstraints.weighty = 1.0;
+    jPanel8.add(jLabel13, gridBagConstraints);
+
+    jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+    jLabel14.setText("Rows:");
+    jLabel14.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 4;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.01;
+    gridBagConstraints.weighty = 1.0;
+    jPanel8.add(jLabel14, gridBagConstraints);
+
+    jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+    jLabel15.setText("Columns:");
+    jLabel15.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.01;
+    gridBagConstraints.weighty = 1.0;
+    jPanel8.add(jLabel15, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -941,6 +1129,23 @@ public class MainWindow extends javax.swing.JFrame
     jtextfieldCallsign.setBorder(javax.swing.BorderFactory.createTitledBorder("Callsign"));
     jtextfieldCallsign.setMinimumSize(new java.awt.Dimension(0, 80));
     jtextfieldCallsign.setPreferredSize(new java.awt.Dimension(30, 58));
+    jtextfieldCallsign.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jtextfieldCallsignActionPerformed(evt);
+      }
+    });
+    jtextfieldCallsign.addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener()
+    {
+      public void ancestorMoved(java.awt.event.HierarchyEvent evt)
+      {
+      }
+      public void ancestorResized(java.awt.event.HierarchyEvent evt)
+      {
+        jtextfieldCallsignAncestorResized(evt);
+      }
+    });
     jtextfieldCallsign.addKeyListener(new java.awt.event.KeyAdapter()
     {
       public void keyTyped(java.awt.event.KeyEvent evt)
@@ -1263,6 +1468,16 @@ public class MainWindow extends javax.swing.JFrame
     });
     jMenu2.add(jMenuItem1);
 
+    jMenuItem2.setText("Fonts");
+    jMenuItem2.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuItem2ActionPerformed(evt);
+      }
+    });
+    jMenu2.add(jMenuItem2);
+
     jMenuBar1.add(jMenu2);
 
     setJMenuBar(jMenuBar1);
@@ -1279,8 +1494,6 @@ public class MainWindow extends javax.swing.JFrame
   {//GEN-HEADEREND:event_jButtonSaveActionPerformed
     jDialogSettings.setVisible(false); // Hide the SettingsDialog
     storeSettingsDialogParams();       // Read the state of the controls and save them
-
-    initMainWindow(false);
   }//GEN-LAST:event_jButtonSaveActionPerformed
 
   private void jDialogSettingsComponentShown(java.awt.event.ComponentEvent evt)//GEN-FIRST:event_jDialogSettingsComponentShown
@@ -1303,6 +1516,14 @@ public class MainWindow extends javax.swing.JFrame
     applicationSettings.setFrameDimensions(ApplicationSettings.FrameIndex.JFRAME, this.getBounds());
     applicationSettings.setFrameDimensions(ApplicationSettings.FrameIndex.LOG, intframeLog.getBounds());
     applicationSettings.setFrameDimensions(ApplicationSettings.FrameIndex.RADIO, intframeRadio.getBounds());
+    
+    // Store the fonts being in use
+    applicationSettings.setFont(ApplicationSettings.FontIndex.BANDMAP, jtableBandmap.getFont());
+    applicationSettings.setFont(ApplicationSettings.FontIndex.CALLSIGN, jtextfieldCallsign.getFont());
+    applicationSettings.setFont(ApplicationSettings.FontIndex.INCOMING_QSO, jtableIncomingQso.getFont());
+    applicationSettings.setFont(ApplicationSettings.FontIndex.LOG, jtableLog.getFont());
+    applicationSettings.setFont(ApplicationSettings.FontIndex.RCV, jtextfieldRcv.getFont());
+    applicationSettings.setFont(ApplicationSettings.FontIndex.SNT, jtextfieldSnt.getFont());
     
     applicationSettings.SaveSettingsToDisk(); // Save all settings to disk
   }//GEN-LAST:event_formWindowClosing
@@ -1575,6 +1796,68 @@ public class MainWindow extends javax.swing.JFrame
        applicationSettings.setBandmapStepInHz(Integer.parseInt((String)jcomboboxStepInHz.getSelectedItem()));
      }
   }//GEN-LAST:event_jcomboboxStepInHzItemStateChanged
+
+  private void jtextfieldCallsignActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jtextfieldCallsignActionPerformed
+  {//GEN-HEADEREND:event_jtextfieldCallsignActionPerformed
+    // TODO add your handling code here:
+  }//GEN-LAST:event_jtextfieldCallsignActionPerformed
+
+  private void jtextfieldCallsignAncestorResized(java.awt.event.HierarchyEvent evt)//GEN-FIRST:event_jtextfieldCallsignAncestorResized
+  {//GEN-HEADEREND:event_jtextfieldCallsignAncestorResized
+
+  }//GEN-LAST:event_jtextfieldCallsignAncestorResized
+
+  private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem2ActionPerformed
+  {//GEN-HEADEREND:event_jMenuItem2ActionPerformed
+    jDialogFontChooser.setVisible(true);
+  }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+  private void jButton13ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton13ActionPerformed
+  {//GEN-HEADEREND:event_jButton13ActionPerformed
+    fontchooser.setSelectedFont(jtextfieldCallsign.getFont());
+    if(fontchooser.showDialog(jtextfieldCallsign)==FontChooser.OK_OPTION)
+      jtextfieldCallsign.setFont(fontchooser.getSelectedFont());
+  }//GEN-LAST:event_jButton13ActionPerformed
+
+  private void jButton19ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton19ActionPerformed
+  {//GEN-HEADEREND:event_jButton19ActionPerformed
+    jDialogFontChooser.setVisible(false);
+  }//GEN-LAST:event_jButton19ActionPerformed
+
+  private void jButton14ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton14ActionPerformed
+  {//GEN-HEADEREND:event_jButton14ActionPerformed
+    fontchooser.setSelectedFont(jtextfieldSnt.getFont());
+    if(fontchooser.showDialog(jtextfieldSnt)==FontChooser.OK_OPTION)
+      jtextfieldSnt.setFont(fontchooser.getSelectedFont());
+  }//GEN-LAST:event_jButton14ActionPerformed
+
+  private void jButton15ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton15ActionPerformed
+  {//GEN-HEADEREND:event_jButton15ActionPerformed
+    fontchooser.setSelectedFont(jtextfieldRcv.getFont());
+    if(fontchooser.showDialog(jtextfieldRcv)==FontChooser.OK_OPTION)
+      jtextfieldRcv.setFont(fontchooser.getSelectedFont());
+  }//GEN-LAST:event_jButton15ActionPerformed
+
+  private void jButton16ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton16ActionPerformed
+  {//GEN-HEADEREND:event_jButton16ActionPerformed
+    fontchooser.setSelectedFont(jtableIncomingQso.getFont());
+    if(fontchooser.showDialog(jtableIncomingQso)==FontChooser.OK_OPTION)
+      jtableIncomingQso.setFont(fontchooser.getSelectedFont());
+  }//GEN-LAST:event_jButton16ActionPerformed
+
+  private void jButton17ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton17ActionPerformed
+  {//GEN-HEADEREND:event_jButton17ActionPerformed
+    fontchooser.setSelectedFont(jtableLog.getFont());
+    if(fontchooser.showDialog(jtableLog)==FontChooser.OK_OPTION)
+      jtableLog.setFont(fontchooser.getSelectedFont());
+  }//GEN-LAST:event_jButton17ActionPerformed
+
+  private void jButton18ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton18ActionPerformed
+  {//GEN-HEADEREND:event_jButton18ActionPerformed
+    fontchooser.setSelectedFont(jtableBandmap.getFont());
+    if(fontchooser.showDialog(jtableBandmap)==FontChooser.OK_OPTION)
+      jtableBandmap.setFont(fontchooser.getSelectedFont());
+  }//GEN-LAST:event_jButton18ActionPerformed
   
   
   private boolean connectToRadio()
@@ -1813,11 +2096,19 @@ public class MainWindow extends javax.swing.JFrame
     intframeIncomingQso.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.INCOMING_QSO));
     intframeLog.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.LOG));
     intframeRadio.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.RADIO));
-  
+    
     // Restore the bandmap settings
     jcomboboxStepInHz.setSelectedItem(Integer.toString(applicationSettings.getBandmapStepInHz()));
     jcomboboxColumnCount.setSelectedItem(Integer.toString(applicationSettings.getBandmapColumnCount()));
     jcomboboxRowCount.setSelectedItem(Integer.toString(applicationSettings.getBandmapRowCount()));
+    
+    // Restore the fonts
+    jtextfieldCallsign.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.CALLSIGN));
+    jtextfieldSnt.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.SNT));
+    jtextfieldRcv.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.RCV));
+    jtableBandmap.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.BANDMAP));
+    jtableIncomingQso.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.INCOMING_QSO));
+    jtableLog.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.LOG));
   }
     
     
@@ -2275,6 +2566,13 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JButton jButton10;
   private javax.swing.JButton jButton11;
   private javax.swing.JButton jButton12;
+  private javax.swing.JButton jButton13;
+  private javax.swing.JButton jButton14;
+  private javax.swing.JButton jButton15;
+  private javax.swing.JButton jButton16;
+  private javax.swing.JButton jButton17;
+  private javax.swing.JButton jButton18;
+  private javax.swing.JButton jButton19;
   private javax.swing.JButton jButton2;
   private javax.swing.JButton jButton3;
   private javax.swing.JButton jButton4;
@@ -2287,11 +2585,15 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JButton jButtonSave;
   private javax.swing.JComboBox jComboBoxComPort;
   private javax.swing.JDesktopPane jDesktopPane1;
+  private javax.swing.JDialog jDialogFontChooser;
   private javax.swing.JDialog jDialogSettings;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel10;
   private javax.swing.JLabel jLabel11;
   private javax.swing.JLabel jLabel12;
+  private javax.swing.JLabel jLabel13;
+  private javax.swing.JLabel jLabel14;
+  private javax.swing.JLabel jLabel15;
   private javax.swing.JLabel jLabel2;
   private javax.swing.JLabel jLabel3;
   private javax.swing.JLabel jLabel4;
@@ -2304,7 +2606,9 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JMenu jMenu2;
   private javax.swing.JMenuBar jMenuBar1;
   private javax.swing.JMenuItem jMenuItem1;
+  private javax.swing.JMenuItem jMenuItem2;
   private javax.swing.JPanel jPanel1;
+  private javax.swing.JPanel jPanel10;
   private javax.swing.JPanel jPanel2;
   private javax.swing.JPanel jPanel3;
   private javax.swing.JPanel jPanel4;

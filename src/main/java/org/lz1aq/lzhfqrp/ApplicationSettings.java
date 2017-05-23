@@ -19,6 +19,7 @@
 // ***************************************************************************
 package org.lz1aq.lzhfqrp;
 
+import java.awt.Font;
 import java.awt.Rectangle;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -44,10 +45,11 @@ public final class ApplicationSettings
   static final String PROPERTY_INCOMING_QSO_MAX_ENTRIES = "incoming_qso_max_entries";
   static final String PROPERTY_INCOMING_QSO_HIDE_AFTER = "incoming_qso_hide_after";
   static final String PROPERTY_FUNCTION_KEYS = "function_keys";
-  static final String PROPERTY_INTERNAL_FRAMES_BOUNDS = "internal_frames_dimensions";
+  static final String PROPERTY_FRAMES_DIMENSIONS = "internal_frames_dimensions";
   static final String PROPERTY_BANDMAP_STEP = "bandmap_step_in_hz";
   static final String PROPERTY_BANDMAP_COLUMN_COUNT = "bandmap_column_count";
   static final String PROPERTY_BANDMAP_ROW_COUNT = "bandmap_row_count";
+  static final String PROPERTY_FONTS = "fonts";
   
   
   public static final int FUNCTION_KEYS_COUNT = 12; // The number of function keys
@@ -67,6 +69,20 @@ public final class ApplicationSettings
     public int toInt() { return code; }
   }
   
+   public enum FontIndex
+  {
+    CALLSIGN(0),
+    SNT(1),       
+    RCV(2),       
+    INCOMING_QSO(3),    
+    BANDMAP(4), 
+    LOG(5);
+    
+    private final int code;
+    FontIndex(int code)  { this.code = code; }
+    public int toInt() { return code; }
+  }
+  
 
   private String comPort;
   private String myCallsign;
@@ -74,6 +90,7 @@ public final class ApplicationSettings
   private String defaultPrefix;
   private int qsoRepeatPeriodInSeconds;
   private Rectangle[] framesDimensions; // Postition and size of all frames used by the program
+  private Font[] fonts; 
   private final String[] functionKeyTexts;  // texts for the function keys
   private int incomingQsoMaxEntries; // How many entries will be shown on the IncomingQsoPanel
   private int incomingQsoHiderAfter; // Specifies due time after which we hide the entry
@@ -90,17 +107,28 @@ public final class ApplicationSettings
   {
     this.prop = new Properties();
     framesDimensions = new Rectangle[FrameIndex.values().length];
+    fonts = new Font[FontIndex.values().length];
     functionKeyTexts = new String[FUNCTION_KEYS_COUNT];
 
     this.LoadSettingsFromDisk();
   }
 
-  public Rectangle getFrameDimensions(ApplicationSettings.FrameIndex index)
+  public Font getFonts(FontIndex index)
+  {
+    return fonts[index.toInt()];
+  }
+  
+  public void setFont(FontIndex index, Font font)
+  {
+    fonts[index.toInt()] = font;
+  }
+  
+  public Rectangle getFrameDimensions(FrameIndex index)
   {
     return framesDimensions[index.toInt()];
   }
 
-  public void setFrameDimensions(ApplicationSettings.FrameIndex index, Rectangle rect)
+  public void setFrameDimensions(FrameIndex index, Rectangle rect)
   {
     this.framesDimensions[index.toInt()] = rect;
   }
@@ -276,27 +304,75 @@ public final class ApplicationSettings
   {
     for(int i=0; i<framesDimensions.length; i++)
     {
-      prop.setProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"x", Integer.toString(framesDimensions[i].x));
-      prop.setProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"y", Integer.toString(framesDimensions[i].y));
-      prop.setProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"width", Integer.toString(framesDimensions[i].width));
-      prop.setProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"height", Integer.toString(framesDimensions[i].height));
+      prop.setProperty(PROPERTY_FRAMES_DIMENSIONS+i+"x", Integer.toString(framesDimensions[i].x));
+      prop.setProperty(PROPERTY_FRAMES_DIMENSIONS+i+"y", Integer.toString(framesDimensions[i].y));
+      prop.setProperty(PROPERTY_FRAMES_DIMENSIONS+i+"width", Integer.toString(framesDimensions[i].width));
+      prop.setProperty(PROPERTY_FRAMES_DIMENSIONS+i+"height", Integer.toString(framesDimensions[i].height));
     } 
   }
   
-  private void getPropertiesFramesSizes()
+  private boolean getPropertiesFramesSizes()
   {
-    for(int i=0; i<framesDimensions.length; i++)
+    int x, y, w, h;
+    
+    
+    try
     {
-      // Read the JFrame dimensions:
-      int x = Integer.parseInt(prop.getProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"x"));
-      int y = Integer.parseInt(prop.getProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"y"));
-      int w = Integer.parseInt(prop.getProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"width"));
-      int h = Integer.parseInt(prop.getProperty(PROPERTY_INTERNAL_FRAMES_BOUNDS+i+"height"));
+      for(int i=0; i<framesDimensions.length; i++)
+      {
+        // Read the JFrame dimensions:
+        x = Integer.parseInt(prop.getProperty(PROPERTY_FRAMES_DIMENSIONS+i+"x"));
+        y = Integer.parseInt(prop.getProperty(PROPERTY_FRAMES_DIMENSIONS+i+"y"));
+        w = Integer.parseInt(prop.getProperty(PROPERTY_FRAMES_DIMENSIONS+i+"width"));
+        h = Integer.parseInt(prop.getProperty(PROPERTY_FRAMES_DIMENSIONS+i+"height"));
 
-      this.framesDimensions[i] = new Rectangle(x, y, w, h);
+        this.framesDimensions[i] = new Rectangle(x, y, w, h);
+      }
+    }catch(Exception exc)
+    {
+      return false;
     }
+    
+    
+    return true;
   }
 
+  
+  private void setPropertiesFonts()
+  {
+    for(int i=0; i<fonts.length; i++)
+    {
+      prop.setProperty(PROPERTY_FONTS+i+"name", fonts[i].getName());
+      prop.setProperty(PROPERTY_FONTS+i+"style", Integer.toString(fonts[i].getStyle()));
+      prop.setProperty(PROPERTY_FONTS+i+"size", Integer.toString(fonts[i].getSize()));
+    } 
+  }
+  
+  
+  private boolean getPropertiesFonts() throws Exception
+  {
+    String name;
+    int style, size;
+    
+    try
+    {
+      for(int i=0; i<fonts.length; i++)
+      {
+        name = prop.getProperty(PROPERTY_FONTS+i+"name");
+        style = Integer.parseInt(prop.getProperty(PROPERTY_FONTS+i+"style"));
+        size = Integer.parseInt(prop.getProperty(PROPERTY_FONTS+i+"size"));
+
+        fonts[i] = new Font(name, style, size);
+      } 
+    }catch(Exception exc)
+    {
+      return false;
+    }
+    
+    return true;
+  }
+   
+   
   /**
    * Saves the settings into a file called "DLineSettings.properties"
    */
@@ -316,6 +392,9 @@ public final class ApplicationSettings
 
     // Save the dimensions for the different frames
     setPropertiesFramesSizes();
+    
+    // Save the fonts
+    setPropertiesFonts();
     
     // Save the bandmap settings
     prop.setProperty(PROPERTY_BANDMAP_COLUMN_COUNT, Integer.toString(bandmapColumnCount));
@@ -391,8 +470,12 @@ public final class ApplicationSettings
       incomingQsoMaxEntries = Integer.parseInt(temp);
      
       // Read the dimensions for the different frames
-      getPropertiesFramesSizes();
-      
+      if(getPropertiesFramesSizes() == false)
+        throwMissingPropertyException(PROPERTY_FRAMES_DIMENSIONS);
+          
+      // Read the fonts
+      if(getPropertiesFonts() == false)
+        throwMissingPropertyException(PROPERTY_FONTS);
       
       // Read the bandmap settings
       temp = prop.getProperty(PROPERTY_BANDMAP_COLUMN_COUNT);
@@ -467,6 +550,14 @@ public final class ApplicationSettings
     framesDimensions[FrameIndex.INCOMING_QSO.toInt()] = new Rectangle(60, 60, 200, 200);
     framesDimensions[FrameIndex.LOG.toInt()] = new Rectangle(80, 80, 200, 200);
     framesDimensions[FrameIndex.RADIO.toInt()] = new Rectangle(100, 100, 300, 50);
+    
+    // Fonts
+    fonts[FontIndex.BANDMAP.toInt()] = new Font("Dialog", Font.PLAIN, 12);
+    fonts[FontIndex.CALLSIGN.toInt()] = new Font("Dialog", Font.PLAIN, 24);
+    fonts[FontIndex.INCOMING_QSO.toInt()] = new Font("Dialog", 1, 18);
+    fonts[FontIndex.LOG.toInt()] = new Font("Dialog", Font.PLAIN, 12);
+    fonts[FontIndex.RCV.toInt()] = new Font("Dialog", Font.PLAIN, 24);
+    fonts[FontIndex.SNT.toInt()] = new Font("Dialog", Font.PLAIN, 24);
     
     bandmapColumnCount = 16;
     bandmapRowCount = 15;
