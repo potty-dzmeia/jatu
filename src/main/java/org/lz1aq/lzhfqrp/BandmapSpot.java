@@ -19,6 +19,8 @@
 // ***************************************************************************
 package org.lz1aq.lzhfqrp;
 
+import java.util.Objects;
+
 /**
  *
  * @author potty
@@ -26,48 +28,46 @@ package org.lz1aq.lzhfqrp;
 public class BandmapSpot
 {
 
-  final String callsign;
-  final int freq;
-  final boolean isManualSpot;
+  private final String callsign;
+  private final int freq;
 
-  public BandmapSpot(String callsign, int freq, boolean isManualSpot)
+  
+  public BandmapSpot(String callsign, int freq)
   {
     this.callsign = callsign;
     this.freq = freq;
-    this.isManualSpot = isManualSpot;
   }
 
   @Override
   public boolean equals(Object obj)
   {
-    if (obj == null)
+    if (obj == this) return true;
+    
+    if (!(obj instanceof BandmapSpot))
     {
       return false;
     }
-    if (!BandmapSpot.class.isAssignableFrom(obj.getClass()))
-    {
-      return false;
-    }
-    final BandmapSpot other = (BandmapSpot) obj;
-    if ((this.callsign == null) ? (other.callsign != null) : !this.callsign.equals(other.callsign))
-    {
-      return false;
-    }
-    if (this.isManualSpot != other.isManualSpot)
-    {
-      return false;
-    }
-
-    return true;
+    BandmapSpot user = (BandmapSpot) obj;
+    return Objects.equals(callsign, user.callsign);     
   }
 
   @Override
   public int hashCode()
   {
-    int hash = 3;
-    hash = 53 * hash + (this.callsign != null ? this.callsign.hashCode() : 0);
-    hash = 53 * hash + ((this.isManualSpot) ? 1 : 0);
-    return hash;
+    return Objects.hash(callsign);
+//    int hash = 3;
+//    hash = 53 * hash + (this.callsign != null ? this.callsign.hashCode() : 0);
+//    return hash;
   }
-
+  
+  
+  public int getFreq()
+  {
+    return freq;
+  }
+  
+  public String getCallsign()
+  {
+    return callsign;
+  }
 }

@@ -329,6 +329,18 @@ public class Qso
   }
   
   
+  
+  /**
+   * Check if the allowed period after which we can work again the station has
+   * elapsed.
+   * @param allowedPeriod - the allowed period specified in the contest rules
+   * @return true - is the period has not expired yet
+   */
+  public synchronized boolean isDupe(long allowedPeriod)
+  {
+    return (allowedPeriod - getElapsedSeconds()) > 0;
+  }
+  
   /**
    * Checks if the call sign has at least a number a letter and is 3 digits long
    *

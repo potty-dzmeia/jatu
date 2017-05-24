@@ -2272,7 +2272,7 @@ public class MainWindow extends javax.swing.JFrame
   
   private void pressedF11()
   {
-    // TODO  add to bandmap
+    bandmapQsoTableModel.addSpot(getCallsignFromTextField(), getFreq());
   }
   
   private void pressedF12()
@@ -2519,15 +2519,15 @@ public class MainWindow extends javax.swing.JFrame
         setForeground(Color.black);    
       }
       
-      // Show which callsigns should be worked by marking them in BLUE
-      if(bandmapQsoTableModel.containsExpiredCallsign(row, column))
-      {
-        setForeground(Color.BLUE);
-      }
-      else
-      {
-        setForeground(Color.BLACK);
-      }
+//      // Show which callsigns should be worked by marking them in BLUE
+//      if(bandmapQsoTableModel.containsExpiredCallsign(row, column))
+//      {
+//        setForeground(Color.BLUE);
+//      }
+//      else
+//      {
+//        setForeground(Color.BLACK);
+//      }
       return this;
     }
   }

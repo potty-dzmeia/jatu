@@ -20,6 +20,7 @@
 package org.lz1aq.lzhfqrp;
 
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import org.lz1aq.log.Log;
 import org.lz1aq.log.Qso;
@@ -32,20 +33,21 @@ import org.lz1aq.utils.Misc;
 public class BandmapQsoTableModel extends AbstractTableModel
 {
   private int startFreqInHz;
-  private ApplicationSettings applicationSettings;
+  private ApplicationSettings appSettings;
   
   /** Reference to the Log */
   private final Log log;
 
   
   ArrayList<Qso> lastSpQsos;
+  List<BandmapSpot> manualSpots= new ArrayList();
   
   
   public BandmapQsoTableModel(Log log, int startFreq, ApplicationSettings appSettings)
   {
     this.log = log;
     this.startFreqInHz = startFreq;
-    this.applicationSettings = appSettings;
+    this.appSettings = appSettings;
     
     lastSpQsos = log.getLastSpContacts();
   }
@@ -54,53 +56,126 @@ public class BandmapQsoTableModel extends AbstractTableModel
   @Override
   public int getRowCount()
   {
-    return applicationSettings.getBandmapRowCount();
+    return appSettings.getBandmapRowCount();
   }
 
   @Override
   public int getColumnCount()
   {
-    return applicationSettings.getBandmapColumnCount();
+    return appSettings.getBandmapColumnCount();
   }
 
   @Override
   public Object getValueAt(int rowIndex, int columnIndex)
   {
-    StringBuilder cellText = new StringBuilder();
+    CellBuilder cell = new CellBuilder(appSettings);
+    String temp;
+    boolean isHtml = false; // if we need to enter HTML text
     
-    
+   
     // If frequency cell ...
+    // ---------------------
     if(columnIndex%2 == 0)
-    {
-      cellText.append(Misc.toBandmapFreq(cellToFreq(rowIndex, columnIndex))); // Add the frequncy value
-    }
+      return Misc.toBandmapFreq(cellToFreq(rowIndex, columnIndex));
+    
+    
+    
     // If Callsign cell...
-    else
+    // ---------------------
+      
+    // Last worked SP
+    for (Qso qso : lastSpQsos)
     {
-      //String value;
-      
-      //for each Manual Spor check if should be inserted here
-      
-      // for each last worked SP check if should be inserted here
-      for(Qso qso: lastSpQsos)
+      if (isQsoInThisCell(rowIndex, columnIndex, qso))
       {
-        if(isQsoInThisCell(rowIndex, columnIndex, qso))
+        if(qso.isDupe(appSettings.getQsoRepeatPeriod()))
         {
-         if(applicationSettings.isQuickCallsignModeEnabled())
-           cellText.append(Misc.toShortCallsign(qso.getHisCallsign(), applicationSettings.getDefaultPrefix()));
-         else
-           cellText.append(qso.getHisCallsign());
-         
-         cellText.append(" ");
+          
         }
+        
+                
+        if (appSettings.isQuickCallsignModeEnabled())
+        {
+          temp = Misc.toShortCallsign(qso.getHisCallsign(), appSettings.getDefaultPrefix());
+        } else
+        {
+          temp = qso.getHisCallsign();
+        }
+
+        // Blue color if it needs to be worked  
+        if ((appSettings.getQsoRepeatPeriod() - qso.getElapsedSeconds()) <= 0)
+        {
+          isHtml = true;
+          cellText.append("<b><font color=blue>").append(temp).append("</b></font>");
+        } else
+        {
+          cellText.append(temp);
+        }
+        cellText.append(" ");
       }
-      
-      
     }
     
+    
+    // Manual Spots
+    for (BandmapSpot spot : manualSpots)
+    {
+      if (isCurrentFreqInThisCell(rowIndex, columnIndex, spot.getFreq()))
+      {
+        if (isExpired(spot.getCallsign()))
+        {
+          if (appSettings.isQuickCallsignModeEnabled())
+          {
+            temp = Misc.toShortCallsign(spot.getCallsign(), appSettings.getDefaultPrefix());
+          }
+          
+          isHtml = true;
+          cellText.append("*").append("<b><font color=blue>").append(spot.getCallsign()).append("</b></font>");
+        } else
+        {
+          if (appSettings.isQuickCallsignModeEnabled())
+          {
+            temp = Misc.toShortCallsign(spot.getCallsign(), appSettings.getDefaultPrefix());
+          }
+          cellText.append("*").append(spot.getCallsign());
+        }
+        
+        cellText.append(" ");
+      }
+    }
+     
+    
+    if(isHtml)
+    {
+      cellText.insert(0, "<html>");
+      cellText.append("</html>");
+    }
     return cellText.toString();
   }
   
+  
+  private class CellBuilder
+  {
+    StringBuilder cellText = new StringBuilder();
+    ApplicationSettings appSettings;
+    boolean bIsHtml = false;
+    
+    
+    public CellBuilder(ApplicationSettings appSettings)
+    {
+      this.appSettings = appSettings;
+    }
+    
+    void addBalckCallsign
+    void add
+            
+            
+  }
+  
+  
+  public void addSpot(String callsign, int freq)
+  {
+    manualSpots.add(new BandmapSpot(callsign, freq));
+  }
   
   /**
    * Updates the content of the table.
@@ -109,7 +184,7 @@ public class BandmapQsoTableModel extends AbstractTableModel
   public synchronized void refresh(ApplicationSettings appSettings)
           //int allowedQsoRepeatPeriodInSec, int hideAfterSeconds, int maxEntriesCount)
   {
-    this.applicationSettings = appSettings;
+    this.appSettings = appSettings;
     
     lastSpQsos = log.getLastSpContacts();
     
@@ -130,12 +205,12 @@ public class BandmapQsoTableModel extends AbstractTableModel
     // Odd column - means a callsign is hold in the cell
     if(column%2 == 1)
     {
-      return startFreqInHz+((row)*applicationSettings.getBandmapStepInHz())+((applicationSettings.getBandmapRowCount()/2)*(column-1)*applicationSettings.getBandmapStepInHz());
+      return startFreqInHz+((row)*appSettings.getBandmapStepInHz())+((appSettings.getBandmapRowCount()/2)*(column-1)*appSettings.getBandmapStepInHz());
     }
     // Even - a frequency is hold in this cell
     else
     {
-      return startFreqInHz+((row)*applicationSettings.getBandmapStepInHz())+((applicationSettings.getBandmapRowCount()/2)*column*applicationSettings.getBandmapStepInHz());
+      return startFreqInHz+((row)*appSettings.getBandmapStepInHz())+((appSettings.getBandmapRowCount()/2)*column*appSettings.getBandmapStepInHz());
     }
   }
  
@@ -151,7 +226,7 @@ public class BandmapQsoTableModel extends AbstractTableModel
   {
     int cellFreq = cellToFreq(row, col);
     
-    return freq >= cellFreq && freq < cellFreq+applicationSettings.getBandmapStepInHz();
+    return freq >= cellFreq && freq < cellFreq+appSettings.getBandmapStepInHz();
   }
   
   
@@ -167,22 +242,32 @@ public class BandmapQsoTableModel extends AbstractTableModel
   {
     int cellFreq = cellToFreq(row, col);
     
-    return (qso.getFrequencyInt() >= cellFreq) && (qso.getFrequencyInt() < cellFreq+applicationSettings.getBandmapStepInHz());
+    return (qso.getFrequencyInt() >= cellFreq) && (qso.getFrequencyInt() < cellFreq+appSettings.getBandmapStepInHz());
   }
   
   
-  public boolean containsExpiredCallsign(int row, int col)
+//  public boolean containsExpiredCallsign(int row, int col)
+//  {
+//    
+//    for(Qso qso: lastSpQsos)
+//    {    
+//      if(isQsoInThisCell(row, col, qso) && 
+//        (applicationSettings.getQsoRepeatPeriod()-log.getLastQso(qso.getHisCallsign()).getElapsedSeconds())<=0 )
+//        return true;
+//    }
+//    return false;
+//  }
+//  
+  
+  private boolean isExpired(Qso qso)
   {
-    
-    for(Qso qso: lastSpQsos)
-    {    
-      if(isQsoInThisCell(row, col, qso) && 
-        (applicationSettings.getQsoRepeatPeriod()-log.getLastQso(qso.getHisCallsign()).getElapsedSeconds())<=0 )
-        return true;
-    }
-    return false;
+    return appSettings.getQsoRepeatPeriod()-qso.getElapsedSeconds()<=0;
   }
   
+  private boolean isExpired(String callsign)
+  {
+    return log.isDupe(callsign, appSettings.getQsoRepeatPeriod());
+  }
   
   
 //  /**
