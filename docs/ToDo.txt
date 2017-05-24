@@ -21,3 +21,4 @@
 - format frequency so that it is shown as 3.534.2
 - band map should be updated depending on the current freq and mode
 - there should be an option for entering worked frequency for people that do not use CAT
+- when freq is written in the callsign window - transciever should change frequency.

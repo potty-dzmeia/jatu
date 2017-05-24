@@ -120,6 +120,15 @@ class Radio(I_Radio):
         raise NotImplementedError("encodeSendCW")
 
     @classmethod
+    def encodeInterruptSendCW(cls):
+        """
+        Gets the command with which we can tell the radio to stop sending morse code
+        :return:
+        """
+        raise NotImplementedError("encodeSendCW")
+
+
+    @classmethod
     def encodeGetActiveVfo(cls):
         raise NotImplementedError("encodeGetActiveVfo")
 

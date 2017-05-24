@@ -109,5 +109,5 @@ public interface I_Radio extends I_Rig
    * Interrupt the previous command sendCW
    * @return - array of Transactions which are to be sent to the radio.
    */
-  public I_EncodedTransaction[] interruptSendCW();
+  public I_EncodedTransaction[] encodeInterruptSendCW();
 }

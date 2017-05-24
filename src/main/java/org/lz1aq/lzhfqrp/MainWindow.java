@@ -126,7 +126,7 @@ public class MainWindow extends javax.swing.JFrame
     radioController = new RadioController();
     
     
-    resizeColumnWidth(jtableBandmap);
+    //resizeColumnWidth(jtableBandmap);
     
     //This is used for catching global key presses (i.e. needed for F1-F12 presses)
     KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
@@ -162,33 +162,33 @@ public class MainWindow extends javax.swing.JFrame
   }
 
   
-  public void resizeColumnWidth(JTable table)
-  {
-    final TableColumnModel columnModel = table.getColumnModel();
-    for (int column = 0; column < table.getColumnCount(); column++)
-    {
-      int width = 15; // Min width
-      for (int row = 0; row < table.getRowCount(); row++)
-      {
-        TableCellRenderer renderer = table.getCellRenderer(row, column);
-        Component comp = table.prepareRenderer(renderer, row, column);
-        width = Math.max(comp.getPreferredSize().width + 1, width);
-      }
-      
-      // If frequency column
-      if(column%2==0)
-      {
-        columnModel.getColumn(column).setPreferredWidth(width/2);
-      }
-      else
-      {
-        
-      }
-     
-     
-      
-    }
-  }
+//  public void resizeColumnWidth(JTable table)
+//  {
+//    final TableColumnModel columnModel = table.getColumnModel();
+//    for (int column = 0; column < table.getColumnCount(); column++)
+//    {
+//      int width = 15; // Min width
+//      for (int row = 0; row < table.getRowCount(); row++)
+//      {
+//        TableCellRenderer renderer = table.getCellRenderer(row, column);
+//        Component comp = table.prepareRenderer(renderer, row, column);
+//        width = Math.max(comp.getPreferredSize().width + 1, width);
+//      }
+//      
+//      // If frequency column
+//      if(column%2==0)
+//      {
+//        columnModel.getColumn(column).setPreferredWidth(width/2);
+//      }
+//      else
+//      {
+//        
+//      }
+//     
+//     
+//      
+//    }
+//  }
   
   private DefaultComboBoxModel getBandsComboboxModel()
   {
@@ -2272,7 +2272,13 @@ public class MainWindow extends javax.swing.JFrame
   
   private void pressedF11()
   {
-    bandmapQsoTableModel.addSpot(getCallsignFromTextField(), getFreq());
+    if(Qso.isValidCallsign(getCallsignFromTextField()))
+      bandmapQsoTableModel.addSpot(getCallsignFromTextField(), getFreq());
+  }
+  
+  private void pressedEsc()
+  {
+    radioController.interruptMorseSending();
   }
   
   private void pressedF12()
@@ -2462,6 +2468,9 @@ public class MainWindow extends javax.swing.JFrame
         case KeyEvent.VK_F12:
           pressedF12();
           evt.consume();
+          break;
+        case KeyEvent.VK_ESCAPE:
+          pressedEsc();
           break;
       }
       return false;

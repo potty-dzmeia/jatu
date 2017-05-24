@@ -68,16 +68,13 @@ public class BandmapQsoTableModel extends AbstractTableModel
   @Override
   public Object getValueAt(int rowIndex, int columnIndex)
   {
-    CellBuilder cell = new CellBuilder(appSettings);
-    String temp;
-    boolean isHtml = false; // if we need to enter HTML text
-    
+    CellBuilder cellBuilder = new CellBuilder();
+
    
     // If frequency cell ...
     // ---------------------
     if(columnIndex%2 == 0)
       return Misc.toBandmapFreq(cellToFreq(rowIndex, columnIndex));
-    
     
     
     // If Callsign cell...
@@ -88,30 +85,7 @@ public class BandmapQsoTableModel extends AbstractTableModel
     {
       if (isQsoInThisCell(rowIndex, columnIndex, qso))
       {
-        if(qso.isDupe(appSettings.getQsoRepeatPeriod()))
-        {
-          
-        }
-        
-                
-        if (appSettings.isQuickCallsignModeEnabled())
-        {
-          temp = Misc.toShortCallsign(qso.getHisCallsign(), appSettings.getDefaultPrefix());
-        } else
-        {
-          temp = qso.getHisCallsign();
-        }
-
-        // Blue color if it needs to be worked  
-        if ((appSettings.getQsoRepeatPeriod() - qso.getElapsedSeconds()) <= 0)
-        {
-          isHtml = true;
-          cellText.append("<b><font color=blue>").append(temp).append("</b></font>");
-        } else
-        {
-          cellText.append(temp);
-        }
-        cellText.append(" ");
+        cellBuilder.addWorkedOnSp(qso);
       }
     }
     
@@ -121,59 +95,103 @@ public class BandmapQsoTableModel extends AbstractTableModel
     {
       if (isCurrentFreqInThisCell(rowIndex, columnIndex, spot.getFreq()))
       {
-        if (isExpired(spot.getCallsign()))
-        {
-          if (appSettings.isQuickCallsignModeEnabled())
-          {
-            temp = Misc.toShortCallsign(spot.getCallsign(), appSettings.getDefaultPrefix());
-          }
-          
-          isHtml = true;
-          cellText.append("*").append("<b><font color=blue>").append(spot.getCallsign()).append("</b></font>");
-        } else
-        {
-          if (appSettings.isQuickCallsignModeEnabled())
-          {
-            temp = Misc.toShortCallsign(spot.getCallsign(), appSettings.getDefaultPrefix());
-          }
-          cellText.append("*").append(spot.getCallsign());
-        }
-        
-        cellText.append(" ");
+        cellBuilder.addSpot(spot.getCallsign());
       }
     }
      
-    
-    if(isHtml)
-    {
-      cellText.insert(0, "<html>");
-      cellText.append("</html>");
-    }
-    return cellText.toString();
+    return cellBuilder.getResult();
   }
   
   
   private class CellBuilder
   {
     StringBuilder cellText = new StringBuilder();
-    ApplicationSettings appSettings;
-    boolean bIsHtml = false;
+    boolean isIsHtml = false;
+  
     
+    /**
+     * Adds callsign which has '*' in front (all Manually spotted callsigns have '*' in front)
+     * @param callsign 
+     */
+    void addSpot(String callsign)
+    {  
+      String call;
+      
+      if(appSettings.isQuickCallsignModeEnabled())
+      {
+        call = "*"+Misc.toShortCallsign(callsign, appSettings.getDefaultPrefix());
+      }
+      else
+      {
+        call = "*"+callsign;
+      }
+      
     
-    public CellBuilder(ApplicationSettings appSettings)
-    {
-      this.appSettings = appSettings;
+      // If not a Dupe the callsign must be in BLUE
+      if(!log.isDupe(callsign, appSettings.getQsoRepeatPeriod()))
+      {
+        isIsHtml = true; // If we add one blue callsign the whole cell must be HTML formatted
+        cellText.append("<b><font color=blue>");
+        cellText.append(call);
+        cellText.append("</b></font>");
+      }
+      else
+      {
+        cellText.append(call);
+      }
+      
+      cellText.append(" ");
     }
     
-    void addBalckCallsign
-    void add
-            
-            
+    
+    /**
+     * Add a callsign 
+     * @param callsign 
+     */
+    public void addWorkedOnSp(Qso qso)
+    {
+      String call;
+      
+      if(appSettings.isQuickCallsignModeEnabled())
+      {
+        call = Misc.toShortCallsign(qso.getHisCallsign(), appSettings.getDefaultPrefix());
+      }
+      else
+      {
+        call = qso.getHisCallsign();
+      }
+      
+      // If not a Dupe the callsign must be in BLUE
+      if(!qso.isDupe(appSettings.getQsoRepeatPeriod()))
+      {
+        isIsHtml = true; // If we add one blue callsign the whole cell must be HTML formatted
+        cellText.append("<b><font color=blue>");
+        cellText.append(call);
+        cellText.append("</b></font>");
+      }
+      else
+      {
+        cellText.append(call);
+      }
+      
+      cellText.append(" ");
+    }
+    
+    public String getResult()
+    {
+      if(isIsHtml)
+      {
+        cellText.insert(0, "<html>");
+        cellText.append("</html>");
+      }
+      return cellText.toString();
+    }         
   }
   
   
   public void addSpot(String callsign, int freq)
   {
+    // If a manual sport is available update the frequency 
     manualSpots.add(new BandmapSpot(callsign, freq));
   }
   
@@ -182,7 +200,6 @@ public class BandmapQsoTableModel extends AbstractTableModel
    * @param appSettings
    */
   public synchronized void refresh(ApplicationSettings appSettings)
-          //int allowedQsoRepeatPeriodInSec, int hideAfterSeconds, int maxEntriesCount)
   {
     this.appSettings = appSettings;
     
@@ -258,17 +275,6 @@ public class BandmapQsoTableModel extends AbstractTableModel
 //    return false;
 //  }
 //  
-  
-  private boolean isExpired(Qso qso)
-  {
-    return appSettings.getQsoRepeatPeriod()-qso.getElapsedSeconds()<=0;
-  }
-  
-  private boolean isExpired(String callsign)
-  {
-    return log.isDupe(callsign, appSettings.getQsoRepeatPeriod());
-  }
-  
   
 //  /**
 //   * Use this function to determine the position of the marker inside the bandmap table.

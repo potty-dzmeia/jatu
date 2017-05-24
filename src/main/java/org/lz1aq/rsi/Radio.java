@@ -237,7 +237,7 @@ public class Radio
    */
   public void interruptSendCW() throws Exception
   {
-    this.queueTransactions(radioProtocolParser.interruptSendCW());
+    this.queueTransactions(radioProtocolParser.encodeInterruptSendCW());
   }
   
   
