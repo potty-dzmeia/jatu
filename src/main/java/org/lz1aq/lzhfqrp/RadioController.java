@@ -23,6 +23,7 @@ import java.util.EventListener;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import jssc.SerialPortException;
 import org.apache.commons.lang3.StringUtils;
 import org.lz1aq.jatu.JythonObjectFactory;
@@ -111,7 +112,7 @@ public class RadioController
       radio.addEventListener(new RadioController.LocalRadioListener());
       radio.connect(); // Let's not forget to call connect(). Calling disconnects() later will close the Com Port
       eventListeners.add(listener);
-      isConnected = true;
+      
       
       radio.getFrequency(RadioVfos.A.getCode());
       radio.getMode(RadioVfos.A.getCode());
@@ -119,12 +120,21 @@ public class RadioController
       radio.getMode(RadioVfos.B.getCode());
       radio.getActiveVfo();
     }
+    catch(jssc.SerialPortException exc)
+    {
+      JOptionPane.showMessageDialog(null, exc.getExceptionType(), "Error...", JOptionPane.ERROR_MESSAGE);
+      isConnected = false;
+      return false;
+    }
     catch(Exception exc)
     {
       Logger.getLogger(RadioController.class.getName()).log(Level.SEVERE, null, exc);
+      isConnected = false;
       return false;
     }
+   
     
+    isConnected = true;
     return true;
   }
   
@@ -176,6 +186,10 @@ public class RadioController
    */
   public void setFrequency(long freq)
   {
+    if (!isConnected())
+      return;
+    
+    
     try
     {
       if(activeVfo == RadioVfos.A)
@@ -204,6 +218,9 @@ public class RadioController
   
   public void sendMorse(String text)
   {
+    if (!isConnected())
+      return;
+    
     try
     {
       radio.sendCW(text);
@@ -216,6 +233,9 @@ public class RadioController
   
   public void interruptMorseSending()
   {
+    if (!isConnected())
+      return;
+    
     try
     {
       radio.interruptSendCW();

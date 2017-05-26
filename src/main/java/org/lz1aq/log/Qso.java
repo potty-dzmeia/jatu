@@ -430,7 +430,7 @@ public class Qso
    * @param serial
    * @return true if serial was valid
    */
-  private boolean isValidSerial(String serial)
+  public static boolean isValidSerial(String serial)
   {
     // Remove white spaces
     String str = serial.replaceAll("\\s", "");

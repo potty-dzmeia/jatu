@@ -29,7 +29,7 @@ public class BandmapSpot
 {
 
   private final String callsign;
-  private final int freq;
+  private int freq;
 
   
   public BandmapSpot(String callsign, int freq)
@@ -69,5 +69,10 @@ public class BandmapSpot
   public String getCallsign()
   {
     return callsign;
+  }
+  
+  public void setFreq(int freq)
+  {
+    this.freq = freq;
   }
 }

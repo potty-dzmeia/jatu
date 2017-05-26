@@ -112,6 +112,11 @@ public class IncomingQsoTableModel extends AbstractTableModel
     return Integer.parseInt(incomingQsoArrayList.get(row).frequency);
   }
   
+  public String getCallsign(int row) throws Exception
+  {
+    return incomingQsoArrayList.get(row).hisCall;
+  }
+  
   
   /**
    * If we should go and work the callsign contained in this cell.
@@ -130,7 +135,7 @@ public class IncomingQsoTableModel extends AbstractTableModel
    * @param hideAfterSeconds
    * @param maxEntriesCount
    */
-  public synchronized void refresh(int allowedQsoRepeatPeriodInSec, int hideAfterSeconds, int maxEntriesCount)
+  public synchronized void refresh(int allowedQsoRepeatPeriodInSec, int hideAfterSeconds)
   {
     ArrayList<String> callsigns = log.getUniqueCallsigns();
     
@@ -139,8 +144,6 @@ public class IncomingQsoTableModel extends AbstractTableModel
     // For each callsign insert the last qso with this station. 
     for(int i=0; i<callsigns.size(); i++)
     {
-      if(incomingQsoArrayList.size() >= maxEntriesCount)
-        break;
       Qso lastQso = log.getLastQso(callsigns.get(i));
       if(log.getSecondsLeft(lastQso, allowedQsoRepeatPeriodInSec) < hideAfterSeconds)
         continue;
@@ -151,7 +154,6 @@ public class IncomingQsoTableModel extends AbstractTableModel
                                              log.getSecondsLeft(lastQso, allowedQsoRepeatPeriodInSec));
               
       incomingQsoArrayList.add(incoming);
-      
     }
     
     // Now order the array starting from the Qso with the highest value for elapsed time 

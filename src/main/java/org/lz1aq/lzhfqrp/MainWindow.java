@@ -59,6 +59,7 @@ import org.lz1aq.log.LogTableModel;
 import org.lz1aq.log.Qso;
 import org.lz1aq.rsi.Radio;
 import org.lz1aq.utils.FontChooser;
+import org.lz1aq.utils.Misc;
 import org.lz1aq.utils.RadioModes;
 import org.lz1aq.utils.TimeUtils;
 
@@ -78,7 +79,8 @@ public class MainWindow extends javax.swing.JFrame
   private final ApplicationSettings     applicationSettings;
   private final RadioController         radioController;
   private int                           cqFrequency;
-  private Timer                         secondTimer;
+  private Timer                         timer1sec;
+  private Timer                         timer500ms;
   private FontChooser                   fontchooser = new FontChooser();
   
   private DocumentFilter                filter = new UppercaseDocumentFilter();
@@ -156,9 +158,14 @@ public class MainWindow extends javax.swing.JFrame
     });
     
     // Start a one second timer
-    secondTimer = new Timer(1000, timerListener);
-    secondTimer.setRepeats(true);
-    secondTimer.start();
+    timer1sec = new Timer(1000, timer1secListener);
+    timer1sec.setRepeats(true);
+    timer1sec.start();
+    
+    // Start a 500ms second timer
+    timer500ms = new Timer(300, timer500msListener);
+    timer500ms.setRepeats(true);
+    timer500ms.start();
   }
 
   
@@ -219,20 +226,33 @@ public class MainWindow extends javax.swing.JFrame
   
   
   /**
-     * Handler for the automatic direction switching
+     * this is called every second
      */
-    private final ActionListener timerListener = new ActionListener()
+    private final ActionListener timer1secListener = new ActionListener()
     {
         @Override
         public void actionPerformed(ActionEvent evt)
         {
           incomingQsoTableModel.refresh(applicationSettings.getQsoRepeatPeriod(),       // How often we can repeat qso
-                                        applicationSettings.getIncomingQsoHiderAfter(), // Hide qso after certain overtime
-                                        applicationSettings.getIncomingQsoMaxEntries());// how many entries to show
-        
+                                        applicationSettings.getIncomingQsoHiderAfter()); // Hide qso after certain overtime
+                                      
+          
           bandmapQsoTableModel.refresh(applicationSettings);
         }
     };
+    
+    
+    private final ActionListener timer500msListener = new ActionListener()
+    {
+        @Override
+        public void actionPerformed(ActionEvent evt)
+        {       
+          // On every second update the callsign status
+          String status = getCallsignStatusText(getCallsignFromTextField());
+          jlabelCallsignStatus.setText(status);
+        }
+    };
+    
     
     
 //    public void setCallsignFont(JTextField textfield)
@@ -314,8 +334,6 @@ public class MainWindow extends javax.swing.JFrame
     jPanel9 = new javax.swing.JPanel();
     jLabel10 = new javax.swing.JLabel();
     jTextField1 = new javax.swing.JTextField();
-    jTextField2 = new javax.swing.JTextField();
-    jLabel11 = new javax.swing.JLabel();
     jPanel5 = new javax.swing.JPanel();
     jButtonCancel = new javax.swing.JButton();
     jButtonSave = new javax.swing.JButton();
@@ -594,7 +612,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
     jPanel1.add(jPanel2, gridBagConstraints);
 
-    jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Incoming Qso panel"));
+    jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Time to next Qso"));
     jPanel9.setLayout(new java.awt.GridBagLayout());
 
     jLabel10.setText("Do not show after [sec]");
@@ -606,30 +624,13 @@ public class MainWindow extends javax.swing.JFrame
     jPanel9.add(jLabel10, gridBagConstraints);
 
     jTextField1.setText("jTextField1");
+    jTextField1.setToolTipText("This should be a negative value!");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
     jPanel9.add(jTextField1, gridBagConstraints);
-
-    jTextField2.setText("jTextField2");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jPanel9.add(jTextField2, gridBagConstraints);
-
-    jLabel11.setText("Number of entries");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    jPanel9.add(jLabel11, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -697,7 +698,6 @@ public class MainWindow extends javax.swing.JFrame
     jDialogFontChooser.setTitle("Choose fonts...");
     jDialogFontChooser.setAlwaysOnTop(true);
     jDialogFontChooser.setMinimumSize(new java.awt.Dimension(200, 300));
-    jDialogFontChooser.setPreferredSize(new java.awt.Dimension(200, 300));
     jDialogFontChooser.getContentPane().setLayout(new java.awt.GridBagLayout());
 
     jPanel10.setLayout(new java.awt.GridLayout(7, 1));
@@ -1297,7 +1297,7 @@ public class MainWindow extends javax.swing.JFrame
     });
     jpanelFunctionKeys.add(jButton3);
 
-    jButton4.setText("F4 MyCall");
+    jButton4.setText("F4 "+applicationSettings.getMyCallsign());
     jButton4.setFocusable(false);
     jButton4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
     jButton4.addActionListener(new java.awt.event.ActionListener()
@@ -1371,6 +1371,7 @@ public class MainWindow extends javax.swing.JFrame
 
     jButton10.setText("F10 Spare");
     jButton10.setToolTipText("");
+    jButton10.setEnabled(false);
     jButton10.setFocusable(false);
     jButton10.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
     jButton10.addActionListener(new java.awt.event.ActionListener()
@@ -1494,6 +1495,9 @@ public class MainWindow extends javax.swing.JFrame
   {//GEN-HEADEREND:event_jButtonSaveActionPerformed
     jDialogSettings.setVisible(false); // Hide the SettingsDialog
     storeSettingsDialogParams();       // Read the state of the controls and save them
+    
+    // Update the F4 button text
+    jButton4.setText("F4 "+applicationSettings.getMyCallsign());
   }//GEN-LAST:event_jButtonSaveActionPerformed
 
   private void jDialogSettingsComponentShown(java.awt.event.ComponentEvent evt)//GEN-FIRST:event_jDialogSettingsComponentShown
@@ -1554,17 +1558,6 @@ public class MainWindow extends javax.swing.JFrame
 
   private void jtextfieldRcvActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jtextfieldRcvActionPerformed
   {//GEN-HEADEREND:event_jtextfieldRcvActionPerformed
-    // If DUPE ask for confirmation to log
-    if(log.isDupe(getCallsignFromTextField(), applicationSettings.getQsoRepeatPeriod()))
-    {
-      int response = JOptionPane.showConfirmDialog(null, "Do you want to log DUPE Qso?", "Confirm",
-        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-      if (response == JOptionPane.NO_OPTION || response == JOptionPane.CLOSED_OPTION)
-      {
-        return; // do nothing
-      }
-    }
-
     // Log Qso
     if(addEntryToLog())
     {
@@ -1585,26 +1578,15 @@ public class MainWindow extends javax.swing.JFrame
   {//GEN-HEADEREND:event_jtextfieldCallsignKeyTyped
     switch(evt.getKeyChar())
     {
-      case KeyEvent.VK_SPACE:
-      // If Dupe - clear the fields
-      if(log.isDupe(getCallsignFromTextField(), applicationSettings.getQsoRepeatPeriod()))
-      {
-        initEntryFields();
-        evt.consume();
-      }
-      // If not DUPE - move to Rcv field
-      else
-      {
+      case KeyEvent.VK_SPACE: // Move to Rcv field    
         jtextfieldRcv.requestFocus();
         evt.consume();
-      }
-      break;
+        break;
 
-      case KeyEvent.VK_ENTER:
-      // Move to Rcv field
-      jtextfieldRcv.requestFocus();
-      evt.consume();
-      break;
+      case KeyEvent.VK_ENTER: // Move to Rcv field
+        jtextfieldRcv.requestFocus();
+        evt.consume();
+        break;
     }
   }//GEN-LAST:event_jtextfieldCallsignKeyTyped
 
@@ -1612,7 +1594,7 @@ public class MainWindow extends javax.swing.JFrame
   {//GEN-HEADEREND:event_jbuttonDeleteEntryActionPerformed
     // Ask for confirmation
     int response = JOptionPane.showConfirmDialog(null, "Delete the selected Qso entry?", "Confirm",
-      JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                                                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
     if (response == JOptionPane.NO_OPTION || response == JOptionPane.CLOSED_OPTION)
     {
       return; // do nothing
@@ -1624,6 +1606,7 @@ public class MainWindow extends javax.swing.JFrame
     {
       selection = jtableLog.convertRowIndexToModel(selection);
       qsoTableModel.removeRow(selection);
+      initEntryFields(); // We need to update the Snt field in case we deleted the last contact
     }
     else
     {
@@ -1640,19 +1623,10 @@ public class MainWindow extends javax.swing.JFrame
     if (tBtn.isSelected())
     {
       // Select the python file describing the radio protocol
-      boolean result = loadRadioProtocolParser();
-      if (!result)
+      if(loadRadioProtocolParser())
       {
-        jtogglebuttonConnectToRadio.setSelected(false);
-        return;
-      }
-
-      // Now establish connection with the radio
-      result = connectToRadio();
-      if(!result)
-      {
-        jtogglebuttonConnectToRadio.setSelected(false);
-      }
+        connectToRadio(); // now we can try to connect
+      } 
     }
     // Disconnect
     // --------------------
@@ -1661,11 +1635,21 @@ public class MainWindow extends javax.swing.JFrame
       if (radioController != null)
       {
         radioController.disconnect();
-        // If we are disconnecting from the radio we need to enable the Frequency and the Mode comboboxes
-        jcomboboxBand.setEnabled(true);
-        jcomboboxMode.setEnabled(true);
       }
-
+    }
+    
+    
+    if(radioController.isConnected())
+    {
+      jtogglebuttonConnectToRadio.setSelected(true);
+      jcomboboxBand.setEnabled(false);
+      jcomboboxMode.setEnabled(false);
+    }
+    else
+    {
+      jtogglebuttonConnectToRadio.setSelected(false);
+      jcomboboxBand.setEnabled(true);
+      jcomboboxMode.setEnabled(true);
     }
   }//GEN-LAST:event_jtogglebuttonConnectToRadioActionPerformed
 
@@ -1738,9 +1722,27 @@ public class MainWindow extends javax.swing.JFrame
     {
       JTable target = (JTable) evt.getSource();
       int row = target.getSelectedRow();
+      String callsign;
+      
       try
       {
-        radioController.setFrequency(incomingQsoTableModel.getFrequency(row));
+        
+        // Jump to freq
+        radioController.setFrequency(incomingQsoTableModel.getFrequency(row)); // jump to freq
+        
+        // Add the callsign into the Entry field
+        initEntryFields();  // clear the fields
+        if(applicationSettings.isQuickCallsignModeEnabled()) // If quick mode is enabled add only the suffix
+        {
+          callsign = Misc.toShortCallsign(incomingQsoTableModel.getCallsign(row), applicationSettings.getDefaultPrefix());
+        }
+        else
+        {
+          callsign = incomingQsoTableModel.getCallsign(row);
+        }
+  
+        jtextfieldCallsign.setText(callsign);// set the callsign inside the callsign field
+      
       }
       catch (Exception ex)
       {
@@ -1762,6 +1764,7 @@ public class MainWindow extends javax.swing.JFrame
       try
       {
         radioController.setFrequency(bandmapQsoTableModel.cellToFreq(row, col));
+        initEntryFields();
       }
       catch (Exception ex)
       {
@@ -1868,9 +1871,6 @@ public class MainWindow extends javax.swing.JFrame
       JOptionPane.showMessageDialog(null, "Coud not connect to radio!", "Serial connection error...", JOptionPane.ERROR_MESSAGE);
     }
     
-    // If we are connected to the radio we need to disable the Frequency and the Mode comboboxes
-    jcomboboxBand.setEnabled(false);
-    jcomboboxMode.setEnabled(false);
     return result;
   }
   
@@ -1912,9 +1912,45 @@ public class MainWindow extends javax.swing.JFrame
    *         false - 
    */
   boolean addEntryToLog()
-  {
-    Qso qso;
+  {   
+    // Do some validation of the data
+    // ------------------------------
+    if(jtextfieldCallsign.getText().isEmpty() || !Qso.isValidCallsign(getCallsignFromTextField()))
+    {
+      JOptionPane.showMessageDialog(null, "Invalid callsign!");
+      jtextfieldCallsign.requestFocus();
+      return false;
+    }
 
+    if(!Qso.isValidSerial(jtextfieldSnt.getText()))
+    {
+      JOptionPane.showMessageDialog(null, "Invalid Snt!");
+      jtextfieldSnt.requestFocus();
+      return false;
+    }
+    
+    if(!Qso.isValidSerial(jtextfieldRcv.getText()))
+    {
+      JOptionPane.showMessageDialog(null, "Invalid Rcv!");
+      jtextfieldRcv.requestFocus();
+      return false;
+    }
+      
+    // If it is DUPE
+    if(log.isDupe(getCallsignFromTextField(), applicationSettings.getQsoRepeatPeriod()))
+    {
+      int response = JOptionPane.showConfirmDialog(null, "Do you want to log DUPE Qso?", "Confirm",
+                                                   JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+      if (response == JOptionPane.NO_OPTION || response == JOptionPane.CLOSED_OPTION)
+      {
+        return false; // do nothing
+      }
+    }
+    
+    
+    // Add qso to log
+    // ------------------------------
+    Qso qso;
     try
     {
      
@@ -1931,7 +1967,7 @@ public class MainWindow extends javax.swing.JFrame
       return false;
     }
 
-    qsoTableModel.addRow(qso);;
+    qsoTableModel.addRow(qso);
     return true;
   }
 
@@ -2034,11 +2070,11 @@ public class MainWindow extends javax.swing.JFrame
     // Unknown callsign - OK to work
     if (qso == null)
     {
-      statusText = "New";
+      statusText = "NEW";
     }
     else
     {
-      // Required time has not elapsed
+      // DUPE
       if (log.getSecondsLeft(qso, applicationSettings.getQsoRepeatPeriod()) > 0)
       {
         // Print DUPE
@@ -2047,6 +2083,8 @@ public class MainWindow extends javax.swing.JFrame
         //Print the time left till next possible contact
         statusText = statusText.concat("time left " + 
                 TimeUtils.getTimeLeftFormatted(log.getSecondsLeft(qso, applicationSettings.getQsoRepeatPeriod())));
+        // Make it red
+        statusText = "<html><font color=red>"+statusText+"</font></html>";
       }
       else
       {
@@ -2071,6 +2109,8 @@ public class MainWindow extends javax.swing.JFrame
     jtextfieldRcv.setText("");
     // Clean the callsign status
     jlabelCallsignStatus.setText("New");
+    // Set focus to callsign field
+    jtextfieldCallsign.requestFocus();
   }
   
 
@@ -2109,6 +2149,9 @@ public class MainWindow extends javax.swing.JFrame
     jtableBandmap.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.BANDMAP));
     jtableIncomingQso.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.INCOMING_QSO));
     jtableLog.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.LOG));
+    
+    // Update the F4 button text
+    jButton4.setText("F4 "+applicationSettings.getMyCallsign());
   }
     
     
@@ -2150,7 +2193,7 @@ public class MainWindow extends javax.swing.JFrame
     jTextField1.setText(Integer.toString(applicationSettings.getIncomingQsoHiderAfter()));
    
     // Incoming qso max entries
-    jTextField2.setText(Integer.toString(applicationSettings.getIncomingQsoMaxEntries()));
+    //jTextField2.setText(Integer.toString(applicationSettings.getIncomingQsoMaxEntries()));
   }
     
     
@@ -2193,7 +2236,11 @@ public class MainWindow extends javax.swing.JFrame
     // Qso repeat period
     try
     {
-      applicationSettings.setQsoRepeatPeriod(Integer.parseInt(jtextfieldQsoRepeatPeriod.getText()));
+      int temp = Integer.parseInt(jtextfieldQsoRepeatPeriod.getText());
+      if(temp<=0)
+        throw new Exception("invalid Qso repeat period!");
+        
+      applicationSettings.setQsoRepeatPeriod(temp);
     }catch(Exception exc)
     {
       JOptionPane.showMessageDialog(null, "Invalid repeat Qso period! Must be a number.");
@@ -2203,8 +2250,11 @@ public class MainWindow extends javax.swing.JFrame
     // Incoming Qso "hideAfter" and "maxEntries"
     try
     {
-      applicationSettings.setIncomingQsoHiderAfter(Integer.parseInt(jTextField1.getText()));
-      applicationSettings.setIncomingQsoMaxEntries(Integer.parseInt(jTextField2.getText()));
+      int temp = Integer.parseInt(jTextField1.getText());
+      if(temp>=0)
+        throw new Exception("Invalid hideAfter entry!");
+      applicationSettings.setIncomingQsoHiderAfter(temp);
+      //applicationSettings.setIncomingQsoMaxEntries(Integer.parseInt(jTextField2.getText()));
     }catch(Exception exc)
     {
       JOptionPane.showMessageDialog(null, "Incoming Qso panel - invalid entry");
@@ -2227,7 +2277,15 @@ public class MainWindow extends javax.swing.JFrame
   
   private void pressedF2()
   {
-    radioController.sendMorse(jtextfieldSnt.getText());
+    // If F2 is pressed and jtextfieldCallsign is empty we should Snt from the last qso 
+    if(jtextfieldCallsign.getText().isEmpty() && log.getSize()>0)
+    {
+      radioController.sendMorse(log.getLastQso().getSnt());
+    }
+    else
+    {
+      radioController.sendMorse(jtextfieldSnt.getText());
+    }
   }
   
   private void pressedF3()
@@ -2274,6 +2332,7 @@ public class MainWindow extends javax.swing.JFrame
   {
     if(Qso.isValidCallsign(getCallsignFromTextField()))
       bandmapQsoTableModel.addSpot(getCallsignFromTextField(), getFreq());
+    initEntryFields();
   }
   
   private void pressedEsc()
@@ -2457,10 +2516,10 @@ public class MainWindow extends javax.swing.JFrame
           pressedF9();
           evt.consume();
           break;
-        case KeyEvent.VK_F10:
-          pressedF10();
-          evt.consume();
-          break;
+//        case KeyEvent.VK_F10:
+//          pressedF10();
+//          evt.consume();
+//          break;
         case KeyEvent.VK_F11:
           pressedF11();
           evt.consume();
@@ -2598,7 +2657,6 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JDialog jDialogSettings;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel10;
-  private javax.swing.JLabel jLabel11;
   private javax.swing.JLabel jLabel12;
   private javax.swing.JLabel jLabel13;
   private javax.swing.JLabel jLabel14;
@@ -2633,7 +2691,6 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JScrollPane jScrollPane4;
   private javax.swing.JScrollPane jScrollPane5;
   private javax.swing.JTextField jTextField1;
-  private javax.swing.JTextField jTextField2;
   private javax.swing.JButton jbuttonDeleteEntry;
   private javax.swing.JComboBox jcomboboxBand;
   private javax.swing.JComboBox<String> jcomboboxColumnCount;

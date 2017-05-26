@@ -79,6 +79,9 @@ public class Log
    */
   public synchronized Qso get(int index)
   {
+    if(index >= qsoList.size())
+      return null;
+    
     return qsoList.get(index);
   }
  
@@ -90,6 +93,10 @@ public class Log
    */
   public synchronized void remove(int index)
   {
+    // Do nothing if out of range
+    if(index >=qsoList.size() || index < 0)
+      return; 
+    
     db.remove(qsoList.get(index)); // Remove the qso from the RAM (i.e local list)
     qsoList.remove(index);         // Remove the qso from the database
     db.commit();
@@ -104,8 +111,12 @@ public class Log
   public synchronized int getRowCount()
   {
     return qsoList.size();
+  } 
+  
+  public synchronized int getSize()
+  {
+    return qsoList.size();          
   }
-
  
   /**
    * The number of columns inside the Log are equal to the number of parameters
@@ -149,6 +160,9 @@ public class Log
    */
   public synchronized String getValueAt(int row, int col)
   {
+    if(row >= qsoList.size())
+      return "";
+    
     Qso qso = qsoList.get(row);
     return qso.getParamValue(col);
   }
@@ -165,6 +179,10 @@ public class Log
    */
   public synchronized void setValueAt(String value, int row, int col)
   {
+    if(row >= qsoList.size())
+      return;
+    
+    
     Qso qso = qsoList.get(row); 
     qso.setParamValue(col,value); // Update 
     db.modify(qso); // Update the database
@@ -194,11 +212,14 @@ public class Log
     // Else send serial number + first three digits of received report during previous Qso
     else
     {
-      String part1 = String.format("%03d", getRowCount()+1);
-      
       Qso qso = qsoList.get(qsoList.size()-1);
-      String part2 = qso.getRcv().substring(0, 3);
       
+      String part1 = qso.getSnt().substring(0, 3);
+      int mySerial = Integer.parseInt(part1);
+      mySerial += 1;
+      part1 = String.format("%03d", mySerial);
+      
+      String part2 = qso.getRcv().substring(0, 3);
       return part1+part2;
     }
   }
@@ -222,6 +243,15 @@ public class Log
     }
     
     return null;
+  }
+  
+  public synchronized Qso getLastQso()
+  {
+    if(qsoList.isEmpty())
+    {
+      return null;
+    }
+    return qsoList.get(qsoList.size()-1);
   }
   
   
@@ -285,6 +315,7 @@ public class Log
     return secondsLeft > 0;
   }
  
+  
   /**
    * Returns a list of all unique callsigns in the log
    * @return  - array of callsign strings
@@ -324,11 +355,6 @@ public class Log
       {
         qsos.add(qso);
       }
-      
-//      if(!list.contains(qso.getHisCallsign()))
-//      {
-//        list.add(qso.getHisCallsign());
-//      }
     }
     
     return qsos;

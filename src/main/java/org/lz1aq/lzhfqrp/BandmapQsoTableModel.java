@@ -191,7 +191,17 @@ public class BandmapQsoTableModel extends AbstractTableModel
   
   public void addSpot(String callsign, int freq)
   {
-    // If a manual sport is available update the frequency 
+     
+    for(BandmapSpot spot : manualSpots)
+    {
+      // If a manual sport is available update the frequency
+      if(spot.getCallsign().equals(callsign))
+      {
+        spot.setFreq(freq);
+        return;
+      }   
+    }
+    
     manualSpots.add(new BandmapSpot(callsign, freq));
   }
   
@@ -205,8 +215,37 @@ public class BandmapQsoTableModel extends AbstractTableModel
     
     lastSpQsos = log.getLastSpContacts();
     
+    // Check if an SP contact is also in the manualSpots. 
+    // If yes and frequency is within 1Khz remove the manual spot
+    for(Qso spQso : lastSpQsos)
+    {
+      if(isManuallySpotOnSameFreq(spQso))
+      {
+        manualSpots.remove(new BandmapSpot(spQso.getHisCallsign(),3500000));
+      }
+    }
+    
+    
     //this.fireTableDataChanged();
     this.fireTableStructureChanged();
+  }
+  
+  /**
+   * Checks if there is a manual spot on the same frequency (+-500KHz)
+   * @param qso
+   * @return 
+   */
+  private boolean isManuallySpotOnSameFreq(Qso qso)
+  {  
+    for(int i=0; i<manualSpots.size(); i++)
+    {
+      if(manualSpots.get(i).getCallsign().equals(qso.getHisCallsign()) && // if same callsign
+         Math.abs(manualSpots.get(i).getFreq() - qso.getFrequencyInt()) < 500 ) // if same freq (+-2KHz)
+      {
+        manualSpots.remove(i);
+      }
+    }    
+    return false;
   }
   
   /**
