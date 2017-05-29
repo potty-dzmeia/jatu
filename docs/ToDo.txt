@@ -1,22 +1,21 @@
- 
- 
- 
-- Function keys to be the same as N1MM  <--- current
+- pressing CQ should change frequency automatically
+- Enter sends message
+- send leading zeros as 'T'
+
+
+
 - [LogWindow2] to be able to show only certain qsos (e.g. callsign filter) and edit them fast. For example like n1mm in a sub-table below the main log.
 - Option for continious CQ
 - Option to remove manual spots
-- format frequency so that it is shown as 3.534.2
-- pressing CQ should change frequency automatically
-- Change spotting to be F10
-- when correcting callsign the call is written with small letters
-- add validation, so that we can manually enter wrong data in the Log table(e.g. Snt 00300f)
-- something is not working well when double pressing in the bandmap. Sometimes the the wrong freq is set.
 - Add cabrilo export
 - Add loading of different dbs files
-- If Enter is pressed in callsign filed depending on the mode we should send hisCallsign+Snt or myCallsign
-- send leading zeros as 'T'
+
 
 After contest:
 - band map should be updated depending on the current freq and mode
 - there should be an option for entering worked frequency for people that do not use CAT
 - when freq is written in the callsign window - transciever should change frequency.
+- For some reason F10 is activating the Menu
+- add validation, so that we can't manually enter wrong data in the Log table(e.g. Snt 00300f)
+- when correcting callsign in the log the call is written with small letters
+- something is not working well when double pressing in the bandmap. Sometimes the the wrong freq is set.

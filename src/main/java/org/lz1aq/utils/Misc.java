@@ -69,6 +69,21 @@ public class Misc
     return buf.toString();
   }
   
+   /**
+   * Inserts "," between the thousands and remove the deca hertz. 
+   * Example 3555543 becomes 3,555.5
+   * 
+   * @param freqInHz - the frequency that we would like to format
+   * @return - new frequency with the "," between the thousands
+   */
+  public static String toIncomingQsoFreq(String freqInHz)
+  {
+    String freq = formatFrequency(freqInHz);
+    freq = freq.substring(0, freq.length()-2);
+    
+    return freq;
+  }
+  
   
    /**
    * E.g. makes 3500500 to 550.5 

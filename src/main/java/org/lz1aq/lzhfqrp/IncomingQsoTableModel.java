@@ -24,6 +24,7 @@ import java.util.Collections;
 import javax.swing.table.AbstractTableModel;
 import org.lz1aq.log.Log;
 import org.lz1aq.log.Qso;
+import org.lz1aq.utils.Misc;
 import org.lz1aq.utils.TimeUtils;
 
 /**
@@ -91,7 +92,7 @@ public class IncomingQsoTableModel extends AbstractTableModel
       case 1:
         return incomingQsoArrayList.get(rowIndex).typeOfWork;
       case 2: 
-        return incomingQsoArrayList.get(rowIndex).frequency;
+        return Misc.toIncomingQsoFreq(incomingQsoArrayList.get(rowIndex).frequency);
       case 3: 
         return TimeUtils.getTimeLeftFormatted(incomingQsoArrayList.get(rowIndex).getSecondsLeft());
       default:

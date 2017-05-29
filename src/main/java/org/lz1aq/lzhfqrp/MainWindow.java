@@ -30,6 +30,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -157,6 +159,12 @@ public class MainWindow extends javax.swing.JFrame
       }
     });
     
+    
+    // Hihglighting for active text fields 
+    jtextfieldCallsign.addFocusListener(highlighter);
+    jtextfieldSnt.addFocusListener(highlighter);
+    jtextfieldRcv.addFocusListener(highlighter);
+
     // Start a one second timer
     timer1sec = new Timer(1000, timer1secListener);
     timer1sec.setRepeats(true);
@@ -226,35 +234,50 @@ public class MainWindow extends javax.swing.JFrame
   
   
   /**
-     * this is called every second
-     */
-    private final ActionListener timer1secListener = new ActionListener()
+   * this is called every second
+   */
+  private final ActionListener timer1secListener = new ActionListener()
+  {
+    @Override
+    public void actionPerformed(ActionEvent evt)
     {
-        @Override
-        public void actionPerformed(ActionEvent evt)
-        {
-          incomingQsoTableModel.refresh(applicationSettings.getQsoRepeatPeriod(),       // How often we can repeat qso
-                                        applicationSettings.getIncomingQsoHiderAfter()); // Hide qso after certain overtime
-                                      
-          
-          bandmapQsoTableModel.refresh(applicationSettings);
-        }
-    };
-    
-    
-    private final ActionListener timer500msListener = new ActionListener()
+      incomingQsoTableModel.refresh(applicationSettings.getQsoRepeatPeriod(), // How often we can repeat qso
+              applicationSettings.getIncomingQsoHiderAfter()); // Hide qso after certain overtime
+
+      bandmapQsoTableModel.refresh(applicationSettings);
+    }
+  };
+
+  private final ActionListener timer500msListener = new ActionListener()
+  {
+    @Override
+    public void actionPerformed(ActionEvent evt)
     {
-        @Override
-        public void actionPerformed(ActionEvent evt)
-        {       
-          // On every second update the callsign status
-          String status = getCallsignStatusText(getCallsignFromTextField());
-          jlabelCallsignStatus.setText(status);
-        }
-    };
+      // On every second update the callsign status
+      String status = getCallsignStatusText(getCallsignFromTextField());
+      jlabelCallsignStatus.setText(status);
+    }
+  };
+
     
-    
-    
+  FocusListener highlighter = new FocusListener()
+  {
+
+    @Override
+    public void focusGained(FocusEvent e)
+    {
+      e.getComponent().setBackground(Color.white);
+    }
+
+    @Override
+    public void focusLost(FocusEvent e)
+    {
+      e.getComponent().setBackground(Color.lightGray);
+    }
+
+  
+  };
+
 //    public void setCallsignFont(JTextField textfield)
 //    {
 //      Font font = textfield.getFont();
@@ -328,6 +351,9 @@ public class MainWindow extends javax.swing.JFrame
     jPanel6 = new javax.swing.JPanel();
     checkboxSettingsQuickMode = new javax.swing.JCheckBox();
     textfieldSettingsDefaultPrefix = new javax.swing.JTextField();
+    jCheckBox1 = new javax.swing.JCheckBox();
+    jCheckBox2 = new javax.swing.JCheckBox();
+    jCheckBox3 = new javax.swing.JCheckBox();
     jPanel2 = new javax.swing.JPanel();
     jtextfieldQsoRepeatPeriod = new javax.swing.JTextField();
     jLabel2 = new javax.swing.JLabel();
@@ -493,37 +519,39 @@ public class MainWindow extends javax.swing.JFrame
     jPanel7.add(jtextfieldf3);
 
     jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-    jLabel4.setText("F6 Agn");
+    jLabel4.setText("F6");
     jPanel7.add(jLabel4);
 
     jtextfieldf6.setText("jTextField3");
     jPanel7.add(jtextfieldf6);
 
     jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-    jLabel5.setText("F7 ?");
+    jLabel5.setText("F7");
     jPanel7.add(jLabel5);
 
     jtextfieldf7.setText("jTextField4");
     jPanel7.add(jtextfieldf7);
 
-    jLabel8.setText("F8 Dupe");
+    jLabel8.setText("F8");
     jPanel7.add(jLabel8);
 
     jtextfieldf8.setText("jTextField5");
     jPanel7.add(jtextfieldf8);
 
     jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-    jLabel6.setText("F9 Spare");
+    jLabel6.setText("F9");
     jPanel7.add(jLabel6);
 
     jtextfieldf9.setText("jTextField6");
     jPanel7.add(jtextfieldf9);
 
     jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-    jLabel7.setText("F10 Spare");
+    jLabel7.setText("F10 ");
     jPanel7.add(jLabel7);
 
+    jtextfieldf10.setEditable(false);
     jtextfieldf10.setText("jTextField7");
+    jtextfieldf10.setEnabled(false);
     jPanel7.add(jtextfieldf10);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -536,7 +564,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
     jPanel1.add(jPanel7, gridBagConstraints);
 
-    jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Quick callsign mode"));
+    jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Misc"));
     jPanel6.setLayout(new java.awt.GridBagLayout());
 
     checkboxSettingsQuickMode.setText("Enable quick callsign entry");
@@ -554,7 +582,6 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 10, 5);
     jPanel6.add(checkboxSettingsQuickMode, gridBagConstraints);
 
     textfieldSettingsDefaultPrefix.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
@@ -569,9 +596,39 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 1.0;
     jPanel6.add(textfieldSettingsDefaultPrefix, gridBagConstraints);
 
+    jCheckBox1.setText("Send leading zeros as 'T'");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridwidth = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    jPanel6.add(jCheckBox1, gridBagConstraints);
+
+    jCheckBox2.setText("F1 jumps to last CQ freq");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.gridwidth = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    jPanel6.add(jCheckBox2, gridBagConstraints);
+
+    jCheckBox3.setText("\"Enter\" sends message");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridwidth = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    jPanel6.add(jCheckBox3, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 5;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 0.1;
     gridBagConstraints.weighty = 0.1;
@@ -604,7 +661,7 @@ public class MainWindow extends javax.swing.JFrame
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 4;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 0.1;
@@ -634,7 +691,7 @@ public class MainWindow extends javax.swing.JFrame
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 5;
+    gridBagConstraints.gridy = 4;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
@@ -1124,6 +1181,7 @@ public class MainWindow extends javax.swing.JFrame
     jpanelCallsign.setFocusCycleRoot(true);
     jpanelCallsign.setLayout(new java.awt.GridLayout(1, 0));
 
+    jtextfieldCallsign.setBackground(java.awt.Color.lightGray);
     jtextfieldCallsign.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
     jtextfieldCallsign.setHorizontalAlignment(javax.swing.JTextField.CENTER);
     jtextfieldCallsign.setBorder(javax.swing.BorderFactory.createTitledBorder("Callsign"));
@@ -1159,12 +1217,14 @@ public class MainWindow extends javax.swing.JFrame
     });
     jpanelCallsign.add(jtextfieldCallsign);
 
+    jtextfieldSnt.setBackground(java.awt.Color.lightGray);
     jtextfieldSnt.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
     jtextfieldSnt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
     jtextfieldSnt.setBorder(javax.swing.BorderFactory.createTitledBorder("Snt"));
     jtextfieldSnt.setMinimumSize(new java.awt.Dimension(0, 80));
     jpanelCallsign.add(jtextfieldSnt);
 
+    jtextfieldRcv.setBackground(java.awt.Color.lightGray);
     jtextfieldRcv.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
     jtextfieldRcv.setHorizontalAlignment(javax.swing.JTextField.CENTER);
     jtextfieldRcv.setBorder(javax.swing.BorderFactory.createTitledBorder("Rcv"));
@@ -1174,6 +1234,13 @@ public class MainWindow extends javax.swing.JFrame
       public void actionPerformed(java.awt.event.ActionEvent evt)
       {
         jtextfieldRcvActionPerformed(evt);
+      }
+    });
+    jtextfieldRcv.addKeyListener(new java.awt.event.KeyAdapter()
+    {
+      public void keyTyped(java.awt.event.KeyEvent evt)
+      {
+        jtextfieldRcvKeyTyped(evt);
       }
     });
     jpanelCallsign.add(jtextfieldRcv);
@@ -1369,7 +1436,7 @@ public class MainWindow extends javax.swing.JFrame
     });
     jpanelFunctionKeys.add(jButton9);
 
-    jButton10.setText("F10 Spare");
+    jButton10.setText("F10 Not used");
     jButton10.setToolTipText("");
     jButton10.setEnabled(false);
     jButton10.setFocusable(false);
@@ -1496,8 +1563,7 @@ public class MainWindow extends javax.swing.JFrame
     jDialogSettings.setVisible(false); // Hide the SettingsDialog
     storeSettingsDialogParams();       // Read the state of the controls and save them
     
-    // Update the F4 button text
-    jButton4.setText("F4 "+applicationSettings.getMyCallsign());
+    initMainWindow(false);
   }//GEN-LAST:event_jButtonSaveActionPerformed
 
   private void jDialogSettingsComponentShown(java.awt.event.ComponentEvent evt)//GEN-FIRST:event_jDialogSettingsComponentShown
@@ -1861,6 +1927,17 @@ public class MainWindow extends javax.swing.JFrame
     if(fontchooser.showDialog(jtableBandmap)==FontChooser.OK_OPTION)
       jtableBandmap.setFont(fontchooser.getSelectedFont());
   }//GEN-LAST:event_jButton18ActionPerformed
+
+  private void jtextfieldRcvKeyTyped(java.awt.event.KeyEvent evt)//GEN-FIRST:event_jtextfieldRcvKeyTyped
+  {//GEN-HEADEREND:event_jtextfieldRcvKeyTyped
+    switch(evt.getKeyChar())
+    {
+      case KeyEvent.VK_SPACE: // Move to Rcv field    
+        jtextfieldCallsign.requestFocus();
+        evt.consume();
+        break;
+    }
+  }//GEN-LAST:event_jtextfieldRcvKeyTyped
   
   
   private boolean connectToRadio()
@@ -2129,29 +2206,38 @@ public class MainWindow extends javax.swing.JFrame
    */
   private void initMainWindow(boolean isStartup)
   {
-    // Restore the last used dimensions for the different frames
-    this.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.JFRAME));
-    intframeBandmap.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.BANDMAP));
-    intframeEntry.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.ENTRY));
-    intframeIncomingQso.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.INCOMING_QSO));
-    intframeLog.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.LOG));
-    intframeRadio.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.RADIO));
+    if(isStartup)
+    {
+      // Restore the last used dimensions for the different frames
+      this.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.JFRAME));
+      intframeBandmap.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.BANDMAP));
+      intframeEntry.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.ENTRY));
+      intframeIncomingQso.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.INCOMING_QSO));
+      intframeLog.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.LOG));
+      intframeRadio.setBounds(applicationSettings.getFrameDimensions(ApplicationSettings.FrameIndex.RADIO));
+
+      // Restore the bandmap settings
+      jcomboboxStepInHz.setSelectedItem(Integer.toString(applicationSettings.getBandmapStepInHz()));
+      jcomboboxColumnCount.setSelectedItem(Integer.toString(applicationSettings.getBandmapColumnCount()));
+      jcomboboxRowCount.setSelectedItem(Integer.toString(applicationSettings.getBandmapRowCount()));
+
+      // Restore the fonts
+      jtextfieldCallsign.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.CALLSIGN));
+      jtextfieldSnt.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.SNT));
+      jtextfieldRcv.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.RCV));
+      jtableBandmap.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.BANDMAP));
+      jtableIncomingQso.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.INCOMING_QSO));
+      jtableLog.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.LOG)); 
+    }
     
-    // Restore the bandmap settings
-    jcomboboxStepInHz.setSelectedItem(Integer.toString(applicationSettings.getBandmapStepInHz()));
-    jcomboboxColumnCount.setSelectedItem(Integer.toString(applicationSettings.getBandmapColumnCount()));
-    jcomboboxRowCount.setSelectedItem(Integer.toString(applicationSettings.getBandmapRowCount()));
     
-    // Restore the fonts
-    jtextfieldCallsign.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.CALLSIGN));
-    jtextfieldSnt.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.SNT));
-    jtextfieldRcv.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.RCV));
-    jtableBandmap.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.BANDMAP));
-    jtableIncomingQso.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.INCOMING_QSO));
-    jtableLog.setFont(applicationSettings.getFonts(ApplicationSettings.FontIndex.LOG));
-    
-    // Update the F4 button text
+    // Update the Function keys button text
     jButton4.setText("F4 "+applicationSettings.getMyCallsign());
+    jButton6.setText("F6 "+applicationSettings.getFunctionKeyText(5));
+    jButton7.setText("F7 "+applicationSettings.getFunctionKeyText(6));
+    jButton8.setText("F8 "+applicationSettings.getFunctionKeyText(7));
+    jButton9.setText("F9 "+applicationSettings.getFunctionKeyText(8));
+    //jButton10.setText("F10 "+applicationSettings.getFunctionKeyText(9));
   }
     
     
@@ -2651,6 +2737,9 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JButton jButton9;
   private javax.swing.JButton jButtonCancel;
   private javax.swing.JButton jButtonSave;
+  private javax.swing.JCheckBox jCheckBox1;
+  private javax.swing.JCheckBox jCheckBox2;
+  private javax.swing.JCheckBox jCheckBox3;
   private javax.swing.JComboBox jComboBoxComPort;
   private javax.swing.JDesktopPane jDesktopPane1;
   private javax.swing.JDialog jDialogFontChooser;
