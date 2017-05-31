@@ -1,5 +1,13 @@
 - pressing CQ should change frequency automatically
-
+- alt-w - iztriva vsichko
+- only 6 symbols in snt i rcv textfields
+- remove "do you want to add Dupe qso"
+- adjust row sizes depending on the font
+- bandmap to do proper rounding
+- fix the size of the 
+- mark CQ frequancy on bandmap
+- enter send message to call CQ when callsign textfield is empty
+- 
 
 
 - [LogWindow2] to be able to show only certain qsos (e.g. callsign filter) and edit them fast. For example like n1mm in a sub-table below the main log.

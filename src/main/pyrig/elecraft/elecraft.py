@@ -35,7 +35,7 @@ class Elecraft(Radio):
 
 
     # The AI meta-command can be used to enable automatic responses from the K3 to a computer in response to K3 front panel control changes by the operator.
-    AUTO_INFO_MODE = "AI1;" # Possible values are: "AI0;", "AI1;", "AI2;", "AI3;"
+    AUTO_INFO_MODE = "AI1;"  # Possible values are: "AI0;", "AI1;", "AI2;", "AI3;"
 
 
 
@@ -118,7 +118,9 @@ class Elecraft(Radio):
         :return: Initialization command that is to be send to the Rig
         :rtype: EncodedTransaction
         """
-        return list([EncodedTransaction(cls.AUTO_INFO_MODE)])
+        result = cls.AUTO_INFO_MODE
+        logger.debug("returns: {0}".format(result))
+        return list([EncodedTransaction(result)])
 
 
     @classmethod
@@ -229,7 +231,7 @@ class Elecraft(Radio):
 
         result = "KY {0};".format('{: <24}'.format(text))
 
-        # logger.debug("returns: {0}".format(result))
+        logger.debug("returns: {0}".format(result))
         return list([EncodedTransaction(result)])
 
 
@@ -239,7 +241,8 @@ class Elecraft(Radio):
         Gets the command with which we can tell the radio to stop sending morse code
         :return:
         """
-        result = "KY@;"
+        result = "KY @;"
+        logger.debug("returns: {0}".format(result))
         return list([EncodedTransaction(result)])
 
 
@@ -250,6 +253,7 @@ class Elecraft(Radio):
         :return:
         """
         result = "FT;"
+        logger.debug("returns: {0}".format(result))
         return list([EncodedTransaction(result)])
 
     #+--------------------------------------------------------------------------+
@@ -305,14 +309,14 @@ class Elecraft(Radio):
                 result_dic = getattr(fn, '__func__')(cls, trans) # call the responsible parser
                 break
 
-        logger.debug(result_dic.__str__())
+        # logger.debug(result_dic.__str__())
 
         if result_dic is None:
             result_dic = dict()
             DecodedTransaction.insertNotSupported(result_dic, trans)
 
         result_json = DecodedTransaction.toJson(result_dic)
-        logger.debug(result_json.__str__())
+        # logger.debug(result_json.__str__())
         logger.debug("parsed result: {0}".format(result_json))
         return result_json
 
