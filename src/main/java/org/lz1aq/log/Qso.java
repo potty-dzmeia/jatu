@@ -21,7 +21,6 @@ package org.lz1aq.log;
 
 import java.util.ArrayList;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
 import org.lz1aq.utils.TimeUtils;
 
 /**
@@ -443,7 +442,9 @@ public class Qso
     // should be only numbers
     try
     {
-      Integer.parseInt(str);
+      int number = Integer.parseInt(str); 
+      if(number<0)
+        return false;
     }
     catch (Exception exc)
     {

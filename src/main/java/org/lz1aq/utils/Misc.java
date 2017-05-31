@@ -43,6 +43,26 @@ public class Misc
   }
   
   
+  public static String leadingZerosToT(String serial)
+  {
+    String part1 = serial.substring(0, 3);
+    String part2 = serial.substring(3, 6);
+    
+    
+    
+    part1 = part1.replaceFirst("^0{3}", "TTT");
+    part1 = part1.replaceFirst("^0{2}", "TT");
+    part1 = part1.replaceFirst("^0{1}", "T");
+    part2 = part2.replaceFirst("^0{3}", "TTT");
+    part2 = part2.replaceFirst("^0{2}", "TT");
+    part2 = part2.replaceFirst("^0{1}", "T");
+    
+    
+    
+    return part1+part2;
+  }
+  
+  
   /**
    * Inserts "," between the thousands 
    * 

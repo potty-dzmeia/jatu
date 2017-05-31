@@ -1,6 +1,4 @@
 - pressing CQ should change frequency automatically
-- Enter sends message
-- send leading zeros as 'T'
 
 
 

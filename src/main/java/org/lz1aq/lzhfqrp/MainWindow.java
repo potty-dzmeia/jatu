@@ -74,6 +74,10 @@ public class MainWindow extends javax.swing.JFrame
   static final String PROGRAM_VERSION = "1.0.0";
   static final String PROGRAM_NAME    = "LZ Log";
           
+  static final String TYPE_OF_WORK_SP = "SP";
+  static final String TYPE_OF_WORK_CQ = "CQ";
+  
+  
   private Log                           log;
   private LogTableModel                 qsoTableModel;
   private IncomingQsoTableModel         incomingQsoTableModel;
@@ -351,9 +355,9 @@ public class MainWindow extends javax.swing.JFrame
     jPanel6 = new javax.swing.JPanel();
     checkboxSettingsQuickMode = new javax.swing.JCheckBox();
     textfieldSettingsDefaultPrefix = new javax.swing.JTextField();
-    jCheckBox1 = new javax.swing.JCheckBox();
-    jCheckBox2 = new javax.swing.JCheckBox();
-    jCheckBox3 = new javax.swing.JCheckBox();
+    checkboxSendLeadingZeroAsT = new javax.swing.JCheckBox();
+    checkboxF1JumpsToCq = new javax.swing.JCheckBox();
+    checkboxESM = new javax.swing.JCheckBox();
     jPanel2 = new javax.swing.JPanel();
     jtextfieldQsoRepeatPeriod = new javax.swing.JTextField();
     jLabel2 = new javax.swing.JLabel();
@@ -372,6 +376,12 @@ public class MainWindow extends javax.swing.JFrame
     jButton17 = new javax.swing.JButton();
     jButton18 = new javax.swing.JButton();
     jButton19 = new javax.swing.JButton();
+    jDialogCq = new javax.swing.JDialog();
+    jPanel11 = new javax.swing.JPanel();
+    jButton20 = new javax.swing.JButton();
+    jCheckBox1 = new javax.swing.JCheckBox();
+    jLabel11 = new javax.swing.JLabel();
+    jButton21 = new javax.swing.JButton();
     jDesktopPane1 = new javax.swing.JDesktopPane();
     intframeIncomingQso = new javax.swing.JInternalFrame();
     jScrollPane2 = new javax.swing.JScrollPane();
@@ -424,9 +434,9 @@ public class MainWindow extends javax.swing.JFrame
     jButton10 = new javax.swing.JButton();
     jButton11 = new javax.swing.JButton();
     jButton12 = new javax.swing.JButton();
-    jpanelAdditionalKeys = new javax.swing.JPanel();
     jPanelStatusBar = new javax.swing.JPanel();
     jlabelCallsignStatus = new javax.swing.JLabel();
+    jpanelAdditionalKeys = new javax.swing.JPanel();
     jMenuBar1 = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     jMenu2 = new javax.swing.JMenu();
@@ -596,7 +606,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 1.0;
     jPanel6.add(textfieldSettingsDefaultPrefix, gridBagConstraints);
 
-    jCheckBox1.setText("Send leading zeros as 'T'");
+    checkboxSendLeadingZeroAsT.setText("Send leading zeros as 'T'");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -604,9 +614,9 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    jPanel6.add(jCheckBox1, gridBagConstraints);
+    jPanel6.add(checkboxSendLeadingZeroAsT, gridBagConstraints);
 
-    jCheckBox2.setText("F1 jumps to last CQ freq");
+    checkboxF1JumpsToCq.setText("F1 jumps to last CQ freq");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
@@ -614,9 +624,9 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    jPanel6.add(jCheckBox2, gridBagConstraints);
+    jPanel6.add(checkboxF1JumpsToCq, gridBagConstraints);
 
-    jCheckBox3.setText("\"Enter\" sends message");
+    checkboxESM.setText("\"Enter\" sends message");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 3;
@@ -624,7 +634,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
-    jPanel6.add(jCheckBox3, gridBagConstraints);
+    jPanel6.add(checkboxESM, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -835,6 +845,24 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
     jDialogFontChooser.getContentPane().add(jPanel10, gridBagConstraints);
+
+    jDialogCq.getContentPane().setLayout(new java.awt.GridLayout());
+
+    jPanel11.setLayout(new java.awt.GridLayout());
+
+    jButton20.setText("jButton20");
+    jPanel11.add(jButton20);
+
+    jCheckBox1.setText("jCheckBox1");
+    jPanel11.add(jCheckBox1);
+
+    jLabel11.setText("jLabel11");
+    jPanel11.add(jLabel11);
+
+    jButton21.setText("jButton21");
+    jPanel11.add(jButton21);
+
+    jDialogCq.getContentPane().add(jPanel11);
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("LZ log by LZ1ABC");
@@ -1187,23 +1215,6 @@ public class MainWindow extends javax.swing.JFrame
     jtextfieldCallsign.setBorder(javax.swing.BorderFactory.createTitledBorder("Callsign"));
     jtextfieldCallsign.setMinimumSize(new java.awt.Dimension(0, 80));
     jtextfieldCallsign.setPreferredSize(new java.awt.Dimension(30, 58));
-    jtextfieldCallsign.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
-        jtextfieldCallsignActionPerformed(evt);
-      }
-    });
-    jtextfieldCallsign.addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener()
-    {
-      public void ancestorMoved(java.awt.event.HierarchyEvent evt)
-      {
-      }
-      public void ancestorResized(java.awt.event.HierarchyEvent evt)
-      {
-        jtextfieldCallsignAncestorResized(evt);
-      }
-    });
     jtextfieldCallsign.addKeyListener(new java.awt.event.KeyAdapter()
     {
       public void keyTyped(java.awt.event.KeyEvent evt)
@@ -1483,16 +1494,6 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 1.0;
     intframeEntry.getContentPane().add(jpanelFunctionKeys, gridBagConstraints);
 
-    jpanelAdditionalKeys.setLayout(new java.awt.GridBagLayout());
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 4;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    intframeEntry.getContentPane().add(jpanelAdditionalKeys, gridBagConstraints);
-
     jPanelStatusBar.setLayout(new java.awt.GridBagLayout());
 
     jlabelCallsignStatus.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
@@ -1515,6 +1516,16 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(5, 0, 10, 0);
     intframeEntry.getContentPane().add(jPanelStatusBar, gridBagConstraints);
+
+    jpanelAdditionalKeys.setLayout(new java.awt.GridBagLayout());
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 4;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    intframeEntry.getContentPane().add(jpanelAdditionalKeys, gridBagConstraints);
 
     jDesktopPane1.add(intframeEntry);
     intframeEntry.setBounds(280, 20, 453, 227);
@@ -1652,6 +1663,21 @@ public class MainWindow extends javax.swing.JFrame
       case KeyEvent.VK_ENTER: // Move to Rcv field
         jtextfieldRcv.requestFocus();
         evt.consume();
+        
+        // Send message if the options is enabled
+        if(applicationSettings.isEms())
+        {
+          if(getTypeOfWork().equalsIgnoreCase(TYPE_OF_WORK_CQ))
+          {
+            pressedF5(); // Send his callsign
+            pressedF2(); // S end Snt serial number
+          }
+          else
+          {
+            pressedF4(); // Send my callsign
+          }        
+        }
+        
         break;
     }
   }//GEN-LAST:event_jtextfieldCallsignKeyTyped
@@ -1866,16 +1892,6 @@ public class MainWindow extends javax.swing.JFrame
      }
   }//GEN-LAST:event_jcomboboxStepInHzItemStateChanged
 
-  private void jtextfieldCallsignActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jtextfieldCallsignActionPerformed
-  {//GEN-HEADEREND:event_jtextfieldCallsignActionPerformed
-    // TODO add your handling code here:
-  }//GEN-LAST:event_jtextfieldCallsignActionPerformed
-
-  private void jtextfieldCallsignAncestorResized(java.awt.event.HierarchyEvent evt)//GEN-FIRST:event_jtextfieldCallsignAncestorResized
-  {//GEN-HEADEREND:event_jtextfieldCallsignAncestorResized
-
-  }//GEN-LAST:event_jtextfieldCallsignAncestorResized
-
   private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem2ActionPerformed
   {//GEN-HEADEREND:event_jMenuItem2ActionPerformed
     jDialogFontChooser.setVisible(true);
@@ -2056,9 +2072,9 @@ public class MainWindow extends javax.swing.JFrame
   private String getTypeOfWork()
   {
     if(jradiobuttonSP.isSelected())
-      return "SP";
+      return TYPE_OF_WORK_SP;
     else
-      return "CQ";
+      return TYPE_OF_WORK_CQ;
   }
   
   
@@ -2185,7 +2201,7 @@ public class MainWindow extends javax.swing.JFrame
     // Cean the Rcv field
     jtextfieldRcv.setText("");
     // Clean the callsign status
-    jlabelCallsignStatus.setText("New");
+    jlabelCallsignStatus.setText("NEW");
     // Set focus to callsign field
     jtextfieldCallsign.requestFocus();
   }
@@ -2252,8 +2268,11 @@ public class MainWindow extends javax.swing.JFrame
     // my callsing texts
     textfieldSettingsMyCallsign.setText(applicationSettings.getMyCallsign());
 
-    // Quick callsign mode 
+    // Misc 
     checkboxSettingsQuickMode.setSelected(applicationSettings.isQuickCallsignModeEnabled());
+    checkboxESM.setSelected(applicationSettings.isEms());
+    checkboxF1JumpsToCq.setSelected(applicationSettings.isAutoCqJump());
+    checkboxSendLeadingZeroAsT.setSelected(applicationSettings.isSendZeroAsT());
     
     // Set the text for the function keys
     jtextfieldf1.setText(applicationSettings.getFunctionKeyText(0));
@@ -2312,8 +2331,12 @@ public class MainWindow extends javax.swing.JFrame
     applicationSettings.setFunctionKeyText(9, jtextfieldf10.getText());
     
    
-    // Quick callsign mode
+    // Misc settings
     applicationSettings.setQuickCallsignMode(checkboxSettingsQuickMode.isSelected());
+    applicationSettings.setAutoCqJump(checkboxF1JumpsToCq.isSelected());
+    applicationSettings.setEms(checkboxESM.isSelected());
+    applicationSettings.setSendZeroAsT(checkboxSendLeadingZeroAsT.isSelected());
+    
     
     // Default prefix
     applicationSettings.setDefaultPrefix(textfieldSettingsDefaultPrefix.getText());
@@ -2363,15 +2386,7 @@ public class MainWindow extends javax.swing.JFrame
   
   private void pressedF2()
   {
-    // If F2 is pressed and jtextfieldCallsign is empty we should Snt from the last qso 
-    if(jtextfieldCallsign.getText().isEmpty() && log.getSize()>0)
-    {
-      radioController.sendMorse(log.getLastQso().getSnt());
-    }
-    else
-    {
-      radioController.sendMorse(jtextfieldSnt.getText());
-    }
+    sendSerial();
   }
   
   private void pressedF3()
@@ -2436,6 +2451,33 @@ public class MainWindow extends javax.swing.JFrame
   {
     return Math.abs(cqFrequency-getFreq());
   }
+  
+  
+  private void sendSerial()
+  {
+    String serial;
+    // If F2 is pressed and jtextfieldCallsign is empty we should Snt from the last qso 
+    if(jtextfieldCallsign.getText().isEmpty() && log.getSize()>0)
+    {
+      serial = log.getLastQso().getSnt();
+    }
+    else
+    {
+      serial = jtextfieldSnt.getText().replaceAll("\\s", ""); // Get the serial removing white spaces
+    }
+    
+
+    // If needed substitute leading zeros with 'T'
+    if(applicationSettings.isSendZeroAsT())
+    {
+      serial = Misc.leadingZerosToT(serial);
+    }
+   
+    radioController.sendMorse(serial.substring(0, 3)+ " " +serial.substring(3, 6));
+    
+    
+  }
+  
   
   class LocalRadioControllerListener implements RadioController.RadioControllerListener
   {
@@ -2610,6 +2652,14 @@ public class MainWindow extends javax.swing.JFrame
           pressedF11();
           evt.consume();
           break;
+        case KeyEvent.VK_W:
+          if(evt.isControlDown())
+          {
+            pressedF12();
+            evt.consume();
+            break;
+          }
+          break;
         case KeyEvent.VK_F12:
           pressedF12();
           evt.consume();
@@ -2710,6 +2760,9 @@ public class MainWindow extends javax.swing.JFrame
   
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.ButtonGroup buttonGroupTypeOfWork;
+  private javax.swing.JCheckBox checkboxESM;
+  private javax.swing.JCheckBox checkboxF1JumpsToCq;
+  private javax.swing.JCheckBox checkboxSendLeadingZeroAsT;
   private javax.swing.JCheckBox checkboxSettingsQuickMode;
   private javax.swing.JInternalFrame intframeBandmap;
   private javax.swing.JInternalFrame intframeEntry;
@@ -2728,6 +2781,8 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JButton jButton18;
   private javax.swing.JButton jButton19;
   private javax.swing.JButton jButton2;
+  private javax.swing.JButton jButton20;
+  private javax.swing.JButton jButton21;
   private javax.swing.JButton jButton3;
   private javax.swing.JButton jButton4;
   private javax.swing.JButton jButton5;
@@ -2738,14 +2793,14 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JButton jButtonCancel;
   private javax.swing.JButton jButtonSave;
   private javax.swing.JCheckBox jCheckBox1;
-  private javax.swing.JCheckBox jCheckBox2;
-  private javax.swing.JCheckBox jCheckBox3;
   private javax.swing.JComboBox jComboBoxComPort;
   private javax.swing.JDesktopPane jDesktopPane1;
+  private javax.swing.JDialog jDialogCq;
   private javax.swing.JDialog jDialogFontChooser;
   private javax.swing.JDialog jDialogSettings;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel10;
+  private javax.swing.JLabel jLabel11;
   private javax.swing.JLabel jLabel12;
   private javax.swing.JLabel jLabel13;
   private javax.swing.JLabel jLabel14;
@@ -2765,6 +2820,7 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JMenuItem jMenuItem2;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel10;
+  private javax.swing.JPanel jPanel11;
   private javax.swing.JPanel jPanel2;
   private javax.swing.JPanel jPanel3;
   private javax.swing.JPanel jPanel4;

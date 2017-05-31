@@ -50,7 +50,9 @@ public final class ApplicationSettings
   static final String PROPERTY_BANDMAP_COLUMN_COUNT = "bandmap_column_count";
   static final String PROPERTY_BANDMAP_ROW_COUNT = "bandmap_row_count";
   static final String PROPERTY_FONTS = "fonts";
-  
+  static final String PROPERTY_ESM = "ems"; // enter sends message
+  static final String PROPERTY_SEND_ZERO_AS_T = "zero_as_t";
+  static final String PROPERTY_AUTO_CQ_FREQ_JUMP = "auto_cq_freq_jump";
   
   public static final int FUNCTION_KEYS_COUNT = 12; // The number of function keys
  
@@ -87,6 +89,9 @@ public final class ApplicationSettings
   private String comPort;
   private String myCallsign;
   private boolean isQuickCallsignModeEnabled;
+  private boolean isEms;
+  private boolean isAutoCqJump;
+  private boolean isSendZeroAsT;
   private String defaultPrefix;
   private int qsoRepeatPeriodInSeconds;
   private Rectangle[] framesDimensions; // Postition and size of all frames used by the program
@@ -184,6 +189,37 @@ public final class ApplicationSettings
     this.myCallsign = callsign;
   }
 
+  
+  public void setEms(boolean isEnabled)
+  {
+    this.isEms = isEnabled;
+  }
+  
+  public boolean isEms()
+  {
+    return this.isEms;
+  }
+  
+  public void setAutoCqJump(boolean isEnabled)
+  {
+    this.isAutoCqJump = isEnabled;
+  }
+  
+  public boolean isAutoCqJump()
+  {
+    return this.isAutoCqJump;
+  }
+  
+  public void setSendZeroAsT(boolean isEnabled)
+  {
+    this.isSendZeroAsT = isEnabled;
+  }
+  
+  public boolean isSendZeroAsT()
+  {
+    return this.isSendZeroAsT;
+  }
+          
   /**
    * This setting is not saved to a file (also it is initialized to 0 on object creation)
    *
@@ -381,6 +417,9 @@ public final class ApplicationSettings
     prop.setProperty(PROPERTY_COMPORT, comPort);
     prop.setProperty(PROPERTY_MY_CALL_SIGN, myCallsign);
     prop.setProperty(PROPERTY_QUICK_CALLSIGN_MODE, Boolean.toString(isQuickCallsignModeEnabled));
+    prop.setProperty(PROPERTY_AUTO_CQ_FREQ_JUMP, Boolean.toString(isAutoCqJump));
+    prop.setProperty(PROPERTY_ESM, Boolean.toString(isEms));
+    prop.setProperty(PROPERTY_SEND_ZERO_AS_T, Boolean.toString(isSendZeroAsT));
     prop.setProperty(PROPERTY_DEFAULT_PREFIX, defaultPrefix);
     prop.setProperty(PROPERTY_QSO_REPEAT_PERIOD_SEC, Integer.toString(qsoRepeatPeriodInSeconds));
 
@@ -440,12 +479,29 @@ public final class ApplicationSettings
           throwMissingPropertyException(PROPERTY_FUNCTION_KEYS);
       }
 
-      // Quick callsign mode
+      
+      // Misc settings
       String temp = prop.getProperty(PROPERTY_QUICK_CALLSIGN_MODE);
       if (temp == null)
         throwMissingPropertyException(PROPERTY_QUICK_CALLSIGN_MODE);
       isQuickCallsignModeEnabled = Boolean.parseBoolean(temp);
+      
+      temp = prop.getProperty(PROPERTY_AUTO_CQ_FREQ_JUMP);
+      if (temp == null)
+        throwMissingPropertyException(PROPERTY_AUTO_CQ_FREQ_JUMP);
+      isAutoCqJump = Boolean.parseBoolean(temp);
+      
+      temp = prop.getProperty(PROPERTY_ESM);
+      if (temp == null)
+        throwMissingPropertyException(PROPERTY_ESM);
+      isEms = Boolean.parseBoolean(temp);
+      
+      temp = prop.getProperty(PROPERTY_SEND_ZERO_AS_T);
+      if (temp == null)
+        throwMissingPropertyException(PROPERTY_SEND_ZERO_AS_T);
+      isSendZeroAsT = Boolean.parseBoolean(temp);
 
+      
       // Default prefix
       defaultPrefix = prop.getProperty(PROPERTY_DEFAULT_PREFIX);
       if (defaultPrefix == null)
@@ -524,6 +580,9 @@ public final class ApplicationSettings
     myCallsign = "LZ1ABC";
     isQuickCallsignModeEnabled = false;
     defaultPrefix = "LZ0";
+    isAutoCqJump = false;
+    isEms = false;
+    isSendZeroAsT = false; 
     qsoRepeatPeriodInSeconds = 1800;
 
     // Set texts for the direction buttons
@@ -532,10 +591,10 @@ public final class ApplicationSettings
     functionKeyTexts[2] = "tu";                  // F3
     functionKeyTexts[3] = "not defined by user";
     functionKeyTexts[4] = "not defined by user";
-    functionKeyTexts[5] = "agn";
+    functionKeyTexts[5] = "nr?";
     functionKeyTexts[6] = "?";
-    functionKeyTexts[7] = "dupe";
-    functionKeyTexts[8] = "";
+    functionKeyTexts[7] = "qsob4";
+    functionKeyTexts[8] = "hello";
     functionKeyTexts[9] = "";
     functionKeyTexts[10] = "not defined by user";
     functionKeyTexts[11] = "not defined by user";
