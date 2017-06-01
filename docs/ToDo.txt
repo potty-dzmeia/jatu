@@ -1,12 +1,16 @@
-- bandmap to do proper rounding
+- K3 morse is not interruptable. 
+  KY @                     ; worked but was having some nasty side effects.
+  
+  Now I will try KY @; togather with shorter KY text; command (without fixed 24 byte length)
 
 
 - pressing CQ should change frequency automatically
 - adjust row sizes depending on the font
 - fix the size of the 
 - mark CQ frequency on bandmap
-- enter send message to call CQ when callsign textfield is empty
-- 
+- when callsign is empty and en
+- pgup and pgdown to increase/decrease speed of the cw speed
+
 
 
 - [LogWindow2] to be able to show only certain qsos (e.g. callsign filter) and edit them fast. For example like n1mm in a sub-table below the main log.
@@ -14,6 +18,7 @@
 - Option to remove manual spots
 - Add cabrilo export
 - Add loading of different dbs files
+- enter send message to call CQ when callsign textfield is empty
 
 
 After contest:

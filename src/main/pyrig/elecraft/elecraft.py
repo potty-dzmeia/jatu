@@ -227,9 +227,11 @@ class Elecraft(Radio):
         :rtype: EncodedTransaction
         """
         if len(text) > 24:
-            logger.warning("Text for CW is too long.")
+            logger.warning("Text for CW is too long. Max 24 chars.")
+            text = text[:24]
 
-        result = "KY {0};".format('{: <24}'.format(text))
+        # result = "KY {0};".format('{: <24}'.format(text))
+        result = "KY {0};".format(text)
 
         logger.debug("returns: {0}".format(result))
         return list([EncodedTransaction(result)])
@@ -241,7 +243,9 @@ class Elecraft(Radio):
         Gets the command with which we can tell the radio to stop sending morse code
         :return:
         """
-        result = "KY @;"
+
+        #result = "KY {0};".format('{: <24}'.format('@'))
+        result = "KY @;" # you can try "KY@;", "KY {};".format(chr(4)), "KY{};".format(chr(4))
         logger.debug("returns: {0}".format(result))
         return list([EncodedTransaction(result)])
 
@@ -331,9 +335,9 @@ class Elecraft(Radio):
         :return: The dict with the parsed data
         :rtype: dict
         """
-        res = dict()
+        result = dict()
         DecodedTransaction.insertFreq(res, command[2:-1].lstrip('0'), vfo=Radio.VFO_A)
-        return res;
+        return result
 
 
 
@@ -439,10 +443,10 @@ class Elecraft(Radio):
         :rtype: dict
         """
         result = dict()
-        ###   command IF00000000000+yyyyrx*00tmvspbd1*;
-        ###   index   0123456789012345678901234567890
-        mode = cls.__mode_from_byte_to_string(int(command[24]))
-        vfo  = command[25]
+        ###   command  IF00000000000*****+yyyyrx*00tmvspbd1*;
+        ###   index    0123456789012345678901234567890123456
+        mode = cls.__mode_from_byte_to_string(int(command[29]))
+        vfo  = command[30]
         freq = command[2:13]
         DecodedTransaction.insertFreq(result, freq.lstrip('0'), vfo)
         DecodedTransaction.insertMode(result, mode, vfo)

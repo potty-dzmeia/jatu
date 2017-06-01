@@ -1660,20 +1660,8 @@ public class MainWindow extends javax.swing.JFrame
         jtextfieldRcv.requestFocus();
         evt.consume();
         
-        // Send message if the options is enabled
-        if(applicationSettings.isEms())
-        {
-          if(getTypeOfWork().equalsIgnoreCase(TYPE_OF_WORK_CQ))
-          {
-            pressedF5(); // Send his callsign
-            pressedF2(); // S end Snt serial number
-          }
-          else
-          {
-            pressedF4(); // Send my callsign
-          }        
-        }
-        
+        sendEnterSendsMessage();
+             
         break;
     }
   }//GEN-LAST:event_jtextfieldCallsignKeyTyped
@@ -1950,6 +1938,37 @@ public class MainWindow extends javax.swing.JFrame
         break;
     }
   }//GEN-LAST:event_jtextfieldRcvKeyTyped
+  
+  
+  /**
+   * Sends CW message when we press the enter button inside the callsign textfield
+   */ 
+  private void sendEnterSendsMessage()
+  {
+    if(!applicationSettings.isEms())
+      return; // not enabled - do nothing
+    
+    
+    // Send message if the options is enabled
+    if(getTypeOfWork().equalsIgnoreCase(TYPE_OF_WORK_CQ))
+    {
+      if(jtextfieldCallsign.getText().isEmpty())
+      {
+        pressedF1(); // If callsign field is empty - send CQ
+      }
+      else
+      {
+        pressedF5(); // Send his callsign
+        pressedF2(); // and Snt serial number
+      }
+      
+    }
+    else
+    {
+      pressedF4(); // Send my callsign
+    }
+    
+  }
   
   
   private boolean connectToRadio()
@@ -2769,10 +2788,9 @@ public class MainWindow extends javax.swing.JFrame
       {
         text = text.substring(0, text.length() - overLimit);
       }
-      if (text.length() > 0)
-      {
-        super.replace(fb, offset, length, text, attrs);
-      }
+      
+      super.replace(fb, offset, length, text, attrs);
+     
     }
   }
   
