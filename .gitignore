@@ -6,3 +6,4 @@
 *.pyc
 *.class
 *.db4o
+nbactions.xml

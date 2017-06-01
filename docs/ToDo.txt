@@ -1,11 +1,10 @@
-- pressing CQ should change frequency automatically
-- alt-w - iztriva vsichko
-- only 6 symbols in snt i rcv textfields
-- remove "do you want to add Dupe qso"
-- adjust row sizes depending on the font
 - bandmap to do proper rounding
+
+
+- pressing CQ should change frequency automatically
+- adjust row sizes depending on the font
 - fix the size of the 
-- mark CQ frequancy on bandmap
+- mark CQ frequency on bandmap
 - enter send message to call CQ when callsign textfield is empty
 - 
 

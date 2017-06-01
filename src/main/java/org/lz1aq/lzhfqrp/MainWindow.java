@@ -21,9 +21,6 @@ package org.lz1aq.lzhfqrp;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -38,18 +35,13 @@ import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -76,7 +68,7 @@ public class MainWindow extends javax.swing.JFrame
           
   static final String TYPE_OF_WORK_SP = "SP";
   static final String TYPE_OF_WORK_CQ = "CQ";
-  
+  static final int    SERIAL_NUMBER_LENGTH = 6;
   
   private Log                           log;
   private LogTableModel                 qsoTableModel;
@@ -89,7 +81,8 @@ public class MainWindow extends javax.swing.JFrame
   private Timer                         timer500ms;
   private FontChooser                   fontchooser = new FontChooser();
   
-  private DocumentFilter                filter = new UppercaseDocumentFilter();
+  private DocumentFilter                callsignFilter = new UppercaseDocumentFilter();
+  private DocumentFilter                serialNumberFilter = new SerialNumberDocumentFilter();
   private final JFileChooser            chooser;
   
   
@@ -145,7 +138,10 @@ public class MainWindow extends javax.swing.JFrame
     initEntryFields();
 
     // Callsign text field should show capital letters only
-    ((AbstractDocument) jtextfieldCallsign.getDocument()).setDocumentFilter(filter);
+    ((AbstractDocument) jtextfieldCallsign.getDocument()).setDocumentFilter(callsignFilter);
+    ((AbstractDocument) jtextfieldSnt.getDocument()).setDocumentFilter(serialNumberFilter);
+    ((AbstractDocument) jtextfieldRcv.getDocument()).setDocumentFilter(serialNumberFilter);
+    
     
     
     // Configure the FileChooser
@@ -2029,17 +2025,6 @@ public class MainWindow extends javax.swing.JFrame
       return false;
     }
       
-    // If it is DUPE
-    if(log.isDupe(getCallsignFromTextField(), applicationSettings.getQsoRepeatPeriod()))
-    {
-      int response = JOptionPane.showConfirmDialog(null, "Do you want to log DUPE Qso?", "Confirm",
-                                                   JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-      if (response == JOptionPane.NO_OPTION || response == JOptionPane.CLOSED_OPTION)
-      {
-        return false; // do nothing
-      }
-    }
-    
     
     // Add qso to log
     // ------------------------------
@@ -2653,7 +2638,7 @@ public class MainWindow extends javax.swing.JFrame
           evt.consume();
           break;
         case KeyEvent.VK_W:
-          if(evt.isControlDown())
+          if(evt.isControlDown() || evt.isAltDown())
           {
             pressedF12();
             evt.consume();
@@ -2755,6 +2740,39 @@ public class MainWindow extends javax.swing.JFrame
     {
 
       fb.replace(offset, length, text.toUpperCase(), attrs);
+    }
+  }
+  
+  
+  class SerialNumberDocumentFilter extends DocumentFilter
+  {
+   
+    @Override
+    public void insertString(DocumentFilter.FilterBypass fb, int offset,
+            String text, AttributeSet attr) throws BadLocationException
+    {
+      int overlimit = fb.getDocument().getLength()+text.length() - SERIAL_NUMBER_LENGTH;
+      if(overlimit > 0)
+      {
+        fb.insertString(offset, text.substring(0, text.length()-overlimit), attr);
+      }
+      fb.insertString(offset, text, attr);
+    }
+
+    @Override
+    public void replace(DocumentFilter.FilterBypass fb, int offset, int length,
+            String text, AttributeSet attrs) throws BadLocationException
+    {
+      int currentLength = fb.getDocument().getLength();
+      int overLimit = (currentLength + text.length()) - SERIAL_NUMBER_LENGTH - length;
+      if (overLimit > 0)
+      {
+        text = text.substring(0, text.length() - overLimit);
+      }
+      if (text.length() > 0)
+      {
+        super.replace(fb, offset, length, text, attrs);
+      }
     }
   }
   

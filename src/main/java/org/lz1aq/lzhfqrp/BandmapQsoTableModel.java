@@ -83,7 +83,7 @@ public class BandmapQsoTableModel extends AbstractTableModel
     // Last worked SP
     for (Qso qso : lastSpQsos)
     {
-      if (isQsoInThisCell(rowIndex, columnIndex, qso))
+      if (isCurrentFreqInThisCell(rowIndex, columnIndex, qso.getFrequencyInt()))
       {
         cellBuilder.addWorkedOnSp(qso);
       }
@@ -281,8 +281,10 @@ public class BandmapQsoTableModel extends AbstractTableModel
   public boolean isCurrentFreqInThisCell(int row, int col, int freq)
   {
     int cellFreq = cellToFreq(row, col);
+    int lowRange = cellFreq - (appSettings.getBandmapStepInHz()/2);
+    int highTange = cellFreq + (appSettings.getBandmapStepInHz()/2);
     
-    return freq >= cellFreq && freq < cellFreq+appSettings.getBandmapStepInHz();
+    return freq >= lowRange && freq < highTange;
   }
   
   
@@ -296,9 +298,7 @@ public class BandmapQsoTableModel extends AbstractTableModel
    */
   private boolean isQsoInThisCell(int row, int col, Qso qso)
   {
-    int cellFreq = cellToFreq(row, col);
-    
-    return (qso.getFrequencyInt() >= cellFreq) && (qso.getFrequencyInt() < cellFreq+appSettings.getBandmapStepInHz());
+    return isCurrentFreqInThisCell(row, col, qso.getFrequencyInt());
   }
   
   
