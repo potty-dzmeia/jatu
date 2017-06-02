@@ -3,18 +3,12 @@
   
   Now I will try KY @; togather with shorter KY text; command (without fixed 24 byte length)
 
-
-- pressing CQ should change frequency automatically
-- adjust row sizes depending on the font
-- fix the size of the 
-- mark CQ frequency on bandmap
-- when callsign is empty and en
-- pgup and pgdown to increase/decrease speed of the cw speed
-
-
-
-- [LogWindow2] to be able to show only certain qsos (e.g. callsign filter) and edit them fast. For example like n1mm in a sub-table below the main log.
 - Option for continious CQ
+
+
+- mark CQ frequency on bandmap
+- pgup and pgdown to increase/decrease speed of the cw speed
+- [LogWindow2] to be able to show only certain qsos (e.g. callsign filter) and edit them fast. For example like n1mm in a sub-table below the main log.
 - Option to remove manual spots
 - Add cabrilo export
 - Add loading of different dbs files
@@ -29,3 +23,4 @@ After contest:
 - add validation, so that we can't manually enter wrong data in the Log table(e.g. Snt 00300f)
 - when correcting callsign in the log the call is written with small letters
 - something is not working well when double pressing in the bandmap. Sometimes the the wrong freq is set.
+- adjust row sizes depending on the font

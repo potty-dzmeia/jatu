@@ -64,7 +64,8 @@ public final class ApplicationSettings
     LOG(2),       
     INCOMING_QSO(3),    
     BANDMAP(4), 
-    RADIO(5);
+    RADIO(5),
+    SETTINGS(6);
     
     private final int code;
     FrameIndex(int code)  { this.code = code; }
@@ -276,7 +277,7 @@ public final class ApplicationSettings
    * @param keyIndex - Index 0 is for the F1 key, 1 for F2 and so on...
    * @return
    */
-  public String getFunctionKeyText(int keyIndex)
+  public String getFunctionKeyMessage(int keyIndex)
   {
     return functionKeyTexts[keyIndex];
   }
@@ -287,7 +288,7 @@ public final class ApplicationSettings
    * @param keyIndex - Index 0 is for the F1 key, 1 for F2 and so on...
    * @param text - the text that will be set for the desired function key
    */
-  public void setFunctionKeyText(int keyIndex, String text)
+  public void setFunctionKeyMessage(int keyIndex, String text)
   {
     functionKeyTexts[keyIndex] = text;
   }
@@ -609,6 +610,7 @@ public final class ApplicationSettings
     framesDimensions[FrameIndex.INCOMING_QSO.toInt()] = new Rectangle(60, 60, 200, 200);
     framesDimensions[FrameIndex.LOG.toInt()] = new Rectangle(80, 80, 200, 200);
     framesDimensions[FrameIndex.RADIO.toInt()] = new Rectangle(100, 100, 300, 50);
+    framesDimensions[FrameIndex.SETTINGS.toInt()] = new Rectangle(100, 100, 300, 50);
     
     // Fonts
     fonts[FontIndex.BANDMAP.toInt()] = new Font("Dialog", Font.PLAIN, 12);
