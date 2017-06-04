@@ -73,7 +73,7 @@ public class MainWindow extends javax.swing.JFrame
   private Log                           log;
   private LogTableModel                 qsoTableModel;
   private IncomingQsoTableModel         incomingQsoTableModel;
-  private BandmapQsoTableModel          bandmapQsoTableModel;
+  private BandmapTableModel          bandmapQsoTableModel;
   private final ApplicationSettings     applicationSettings;
   private final RadioController         radioController;
   private int                           cqFrequency =3500000;
@@ -113,7 +113,7 @@ public class MainWindow extends javax.swing.JFrame
     // Init TableModel for the incoming qso panel
     incomingQsoTableModel = new IncomingQsoTableModel(log);
     // Init table model for the bandmap
-    bandmapQsoTableModel = new BandmapQsoTableModel(log, 3500000, applicationSettings);
+    bandmapQsoTableModel = new BandmapTableModel(log, 3500000, applicationSettings);
     
     // Init GUI
     initComponents();
@@ -1930,14 +1930,19 @@ public class MainWindow extends javax.swing.JFrame
       JTable target = (JTable) evt.getSource();
       int row = target.getSelectedRow();
       int col = target.getSelectedColumn();
-      try
-      {
-        radioController.setFrequency(bandmapQsoTableModel.cellToFreq(row, col));
-        initEntryFields();
-      }
-      catch (Exception ex)
-      {
-        Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+      
+      if(row>-1 && col>-1)
+      { 
+        try
+        {
+          int freq = bandmapQsoTableModel.cellToFreq(row, col);
+          radioController.setFrequency(freq);
+          initEntryFields();
+        }
+        catch (Exception ex)
+        {
+          Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
       }
     }
 

@@ -22,5 +22,4 @@ After contest:
 - For some reason F10 is activating the Menu
 - add validation, so that we can't manually enter wrong data in the Log table(e.g. Snt 00300f)
 - when correcting callsign in the log the call is written with small letters
-- something is not working well when double pressing in the bandmap. Sometimes the the wrong freq is set.
 - adjust row sizes depending on the font

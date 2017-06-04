@@ -30,7 +30,7 @@ import org.lz1aq.utils.Misc;
  *
  * @author potty
  */
-public class BandmapQsoTableModel extends AbstractTableModel
+public class BandmapTableModel extends AbstractTableModel
 {
   private int startFreqInHz;
   private ApplicationSettings appSettings;
@@ -43,7 +43,7 @@ public class BandmapQsoTableModel extends AbstractTableModel
   List<BandmapSpot> manualSpots= new ArrayList();
   
   
-  public BandmapQsoTableModel(Log log, int startFreq, ApplicationSettings appSettings)
+  public BandmapTableModel(Log log, int startFreq, ApplicationSettings appSettings)
   {
     this.log = log;
     this.startFreqInHz = startFreq;
