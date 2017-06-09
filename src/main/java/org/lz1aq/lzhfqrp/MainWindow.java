@@ -79,6 +79,7 @@ public class MainWindow extends javax.swing.JFrame
   private int                           cqFrequency =3500000;
   private Timer                         timer1sec;
   private Timer                         timer500ms;
+  private Timer                         timerContinuousCq;
   private FontChooser                   fontchooser = new FontChooser();
   
   private DocumentFilter                callsignFilter = new UppercaseDocumentFilter();
@@ -258,6 +259,15 @@ public class MainWindow extends javax.swing.JFrame
       jlabelCallsignStatus.setText(status);
     }
   };
+  
+  private final ActionListener timerContinuousCqListener = new ActionListener()
+  {
+    @Override
+    public void actionPerformed(ActionEvent evt)
+    {
+      pressedF1();
+    }
+  };
 
     
   FocusListener highlighter = new FocusListener()
@@ -433,9 +443,9 @@ public class MainWindow extends javax.swing.JFrame
     jcheckboxF1jumpsToCq = new javax.swing.JCheckBox();
     jlabelCqFreq = new javax.swing.JLabel();
     jbuttonSetCqFreq = new javax.swing.JButton();
-    jCheckBox2 = new javax.swing.JCheckBox();
+    jcheckboxContinuousCq = new javax.swing.JCheckBox();
     jLabel16 = new javax.swing.JLabel();
-    jTextField2 = new javax.swing.JTextField();
+    jtextfieldContinuousCqPeriod = new javax.swing.JTextField();
     jMenuBar1 = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     jMenu2 = new javax.swing.JMenu();
@@ -445,7 +455,6 @@ public class MainWindow extends javax.swing.JFrame
     jDialogSettings.setTitle("Settings");
     jDialogSettings.setAlwaysOnTop(true);
     jDialogSettings.setModal(true);
-    jDialogSettings.setPreferredSize(new java.awt.Dimension(400, 550));
     jDialogSettings.setType(java.awt.Window.Type.UTILITY);
     jDialogSettings.addComponentListener(new java.awt.event.ComponentAdapter()
     {
@@ -1587,7 +1596,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(1, 0, 1, 0);
     jpanelCqSettings.add(jbuttonSetCqFreq, gridBagConstraints);
 
-    jCheckBox2.setText("Continuous CQ");
+    jcheckboxContinuousCq.setText("Continuous CQ");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
@@ -1596,7 +1605,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(1, 0, 1, 0);
-    jpanelCqSettings.add(jCheckBox2, gridBagConstraints);
+    jpanelCqSettings.add(jcheckboxContinuousCq, gridBagConstraints);
 
     jLabel16.setText("CQ interval [msec]:   ");
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1608,7 +1617,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(1, 5, 1, 0);
     jpanelCqSettings.add(jLabel16, gridBagConstraints);
 
-    jTextField2.setText("2000");
+    jtextfieldContinuousCqPeriod.setText("2000");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 1;
@@ -1616,7 +1625,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(1, 0, 1, 0);
-    jpanelCqSettings.add(jTextField2, gridBagConstraints);
+    jpanelCqSettings.add(jtextfieldContinuousCqPeriod, gridBagConstraints);
 
     intframeSettings.getContentPane().add(jpanelCqSettings, java.awt.BorderLayout.CENTER);
 
@@ -1762,7 +1771,7 @@ public class MainWindow extends javax.swing.JFrame
              jtextfieldRcv.requestFocus();
           }
         }
-         evt.consume();     
+        evt.consume();     
         break;
     }
   }//GEN-LAST:event_jtextfieldCallsignKeyTyped
@@ -2068,7 +2077,7 @@ public class MainWindow extends javax.swing.JFrame
    */
   private boolean sendEnterSendsMessage()
   {
-    // Send message if the options is enabled
+    // CQ mode
     if(getTypeOfWork().equalsIgnoreCase(TYPE_OF_WORK_CQ))
     {
       if(jtextfieldCallsign.getText().isEmpty())
@@ -2084,10 +2093,11 @@ public class MainWindow extends javax.swing.JFrame
       }
       
     }
+    // S&P mode
     else
     {
       pressedF4(); // Send my callsign
-      return false; // do not move focis to Snt field
+      return true; // do not move focis to Snt field
     }
     
   }
@@ -2535,6 +2545,16 @@ public class MainWindow extends javax.swing.JFrame
    
     // Select the CQ radio button
     jradiobuttonCQ.setSelected(true);
+    
+    
+    // Continious CQ is enabled ...
+    if(jcheckboxContinuousCq.isSelected())
+    {
+      int period = Integer.parseInt(jtextfieldContinuousCqPeriod.getText());
+      timerContinuousCq = new Timer(period, timerContinuousCqListener);
+      timerContinuousCq.setRepeats(true);
+      timerContinuousCq.start();
+    }
   }
   
   private void pressedF2()
@@ -2976,7 +2996,6 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JButton jButton9;
   private javax.swing.JButton jButtonCancel;
   private javax.swing.JButton jButtonSave;
-  private javax.swing.JCheckBox jCheckBox2;
   private javax.swing.JComboBox jComboBoxComPort;
   private javax.swing.JDesktopPane jDesktopPane1;
   private javax.swing.JDialog jDialogFontChooser;
@@ -3016,10 +3035,10 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JScrollPane jScrollPane4;
   private javax.swing.JScrollPane jScrollPane5;
   private javax.swing.JTextField jTextField1;
-  private javax.swing.JTextField jTextField2;
   private javax.swing.JButton jbuttonDeleteEntry;
   private javax.swing.JButton jbuttonJumpToCqFreq;
   private javax.swing.JButton jbuttonSetCqFreq;
+  private javax.swing.JCheckBox jcheckboxContinuousCq;
   private javax.swing.JCheckBox jcheckboxF1jumpsToCq;
   private javax.swing.JComboBox jcomboboxBand;
   private javax.swing.JComboBox<String> jcomboboxColumnCount;
@@ -3046,6 +3065,7 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JTable jtableLog;
   private javax.swing.JTable jtableSearch;
   private javax.swing.JTextField jtextfieldCallsign;
+  private javax.swing.JTextField jtextfieldContinuousCqPeriod;
   private javax.swing.JTextField jtextfieldFrequency;
   private javax.swing.JTextField jtextfieldMode;
   private javax.swing.JTextField jtextfieldQsoRepeatPeriod;

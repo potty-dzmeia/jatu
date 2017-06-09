@@ -4,6 +4,7 @@
   Now I will try KY @; togather with shorter KY text; command (without fixed 24 byte length)
 
 - Option for continious CQ
+- new settings options should not break window organization
 
 
 - mark CQ frequency on bandmap
