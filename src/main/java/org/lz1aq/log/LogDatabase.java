@@ -67,4 +67,9 @@ public class LogDatabase
   {
     db.commit();
   }
+  
+  void close()
+  {
+    db.close();
+  }
 }

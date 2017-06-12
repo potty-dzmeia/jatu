@@ -71,22 +71,7 @@ public class Log
   }
 
   
-  /**
-   * Method for accessing QSOs inside the log.
-   * 
-   * @param index - Qso index inside the log (0 is being the first QSO in the log)
-   * @return  Reference to the QSO object
-   */
-  public synchronized Qso get(int index)
-  {
-    if(index >= qsoList.size())
-      return null;
-    
-    return qsoList.get(index);
-  }
- 
-  
-  /**
+   /**
    * Removes a QSO object from the log.
    * 
    * @param index Index of the Qso object to be removed
@@ -100,6 +85,27 @@ public class Log
     db.remove(qsoList.get(index)); // Remove the qso from the RAM (i.e local list)
     qsoList.remove(index);         // Remove the qso from the database
     db.commit();
+  }
+  
+  
+  public synchronized void close()
+  {
+    db.close();
+  }
+  
+  
+  /**
+   * Method for accessing QSOs inside the log.
+   * 
+   * @param index - Qso index inside the log (0 is being the first QSO in the log)
+   * @return  Reference to the QSO object
+   */
+  public synchronized Qso get(int index)
+  {
+    if(index >= qsoList.size())
+      return null;
+    
+    return qsoList.get(index);
   }
   
   

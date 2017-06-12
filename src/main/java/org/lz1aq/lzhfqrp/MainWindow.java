@@ -71,17 +71,18 @@ public class MainWindow extends javax.swing.JFrame
   static final int    SERIAL_NUMBER_LENGTH = 6;
   
   private Log                           log;
-  private LogTableModel                 qsoTableModel;
+  private LogTableModel                 logTableModel;
   private IncomingQsoTableModel         incomingQsoTableModel;
-  private BandmapTableModel          bandmapQsoTableModel;
+  private BandmapTableModel             bandmapQsoTableModel;
   private final ApplicationSettings     applicationSettings;
   private final RadioController         radioController;
   private int                           cqFrequency =3500000;
-  private Timer                         timer1sec;
-  private Timer                         timer500ms;
+  private final Timer                   timer1sec;
+  private final Timer                   timer500ms;
   private Timer                         timerContinuousCq;
   private FontChooser                   fontchooser = new FontChooser();
-  
+  private String                        logDbFile;
+          
   private DocumentFilter                callsignFilter = new UppercaseDocumentFilter();
   private DocumentFilter                serialNumberFilter = new SerialNumberDocumentFilter();
   private final JFileChooser            chooser;
@@ -93,31 +94,37 @@ public class MainWindow extends javax.swing.JFrame
    * Creates new form MainWindow
    */
   public MainWindow()
-  {
-     
-    // Init the Log/database 
+  { 
+    // Load user settings from the properties file
+    this.applicationSettings = new ApplicationSettings();
+    
+    // Init GUI
+    initComponents();
+    
+    // Show dialog for opening New/Existing log - result will be kept in logDbFile
+    jdialogLogSelection.setVisible(true);
+    
+    // Open log database
     try
     {
       Qso example = new Qso(14190000, "cw", "lz1abc", "lz0fs", "200 091", "200 091", "cq"); // We need to supply an example QSO whwn creating/opening new
-      log = new Log(new LogDatabase("log_test.db4o"), example);
-      qsoTableModel = new LogTableModel(log);
-      qsoTableModel.setInvisible(4); // Hide myCall
+      log = new Log(new LogDatabase(logDbFile), example);
     }
     catch (Exception ex)
     {
       logger.log(Level.SEVERE, "Couldn't open the log database!", ex);
     }
     
-    // Load user settings from the properties file
-    this.applicationSettings = new ApplicationSettings();
+    // Init TableModels
+    logTableModel = new LogTableModel(log);
+    logTableModel.setInvisible(4); // Hide myCall
+    jtableLog.setModel(logTableModel);
     
-    // Init TableModel for the incoming qso panel
     incomingQsoTableModel = new IncomingQsoTableModel(log);
-    // Init table model for the bandmap
-    bandmapQsoTableModel = new BandmapTableModel(log, 3500000, applicationSettings);
+    jtableIncomingQso.setModel(incomingQsoTableModel);
     
-    // Init GUI
-    initComponents();
+    bandmapQsoTableModel = new BandmapTableModel(log, 3500000, applicationSettings);
+    jtableBandmap.setModel(bandmapQsoTableModel);
     
     
     // renderer for the bandmap
@@ -127,25 +134,21 @@ public class MainWindow extends javax.swing.JFrame
     // For communicating with the radio
     radioController = new RadioController();
     
-    
-    //resizeColumnWidth(jtableBandmap);
-    
     //This is used for catching global key presses (i.e. needed for F1-F12 presses)
     KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
     manager.addKeyEventDispatcher(new MyDispatcher());
     
-
     // Prepare the entry fields to have the necessary data
     initEntryFields();
 
     // Callsign text field should show capital letters only
     ((AbstractDocument) jtextfieldCallsign.getDocument()).setDocumentFilter(callsignFilter);
+    // Serial number should be 6 digits long
     ((AbstractDocument) jtextfieldSnt.getDocument()).setDocumentFilter(serialNumberFilter);
     ((AbstractDocument) jtextfieldRcv.getDocument()).setDocumentFilter(serialNumberFilter);
     
     
-    
-    // Configure the FileChooser
+    // Configure the FileChooser for python files
     chooser = new JFileChooser();
     chooser.setFileFilter(new FileNameExtensionFilter("Python files", "py"));
     chooser.setCurrentDirectory(new File(System.getProperty("user.dir")+"/src/main/pyrig"));
@@ -382,6 +385,9 @@ public class MainWindow extends javax.swing.JFrame
     jButton17 = new javax.swing.JButton();
     jButton18 = new javax.swing.JButton();
     jButton19 = new javax.swing.JButton();
+    jdialogLogSelection = new javax.swing.JDialog();
+    jbuttonCreateNewLog = new javax.swing.JButton();
+    jbuttonOpenExistingLog = new javax.swing.JButton();
     jDesktopPane1 = new javax.swing.JDesktopPane();
     intframeIncomingQso = new javax.swing.JInternalFrame();
     jScrollPane2 = new javax.swing.JScrollPane();
@@ -402,9 +408,6 @@ public class MainWindow extends javax.swing.JFrame
     jScrollPane1 = new javax.swing.JScrollPane();
     jtableLog = new javax.swing.JTable();
     jbuttonDeleteEntry = new javax.swing.JButton();
-    jpanelSearchLog = new javax.swing.JPanel();
-    jScrollPane3 = new javax.swing.JScrollPane();
-    jtableSearch = new javax.swing.JTable();
     intframeRadio = new javax.swing.JInternalFrame();
     jpanelVfoA = new javax.swing.JPanel();
     jtogglebuttonConnectToRadio = new javax.swing.JToggleButton();
@@ -436,7 +439,6 @@ public class MainWindow extends javax.swing.JFrame
     jButton12 = new javax.swing.JButton();
     jPanelStatusBar = new javax.swing.JPanel();
     jlabelCallsignStatus = new javax.swing.JLabel();
-    jpanelAdditionalKeys = new javax.swing.JPanel();
     intframeSettings = new javax.swing.JInternalFrame();
     jpanelCqSettings = new javax.swing.JPanel();
     jbuttonJumpToCqFreq = new javax.swing.JButton();
@@ -855,6 +857,26 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 1.0;
     jDialogFontChooser.getContentPane().add(jPanel10, gridBagConstraints);
 
+    jdialogLogSelection.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+    jdialogLogSelection.setTitle("Choose action");
+    jdialogLogSelection.setMinimumSize(new java.awt.Dimension(300, 200));
+    jdialogLogSelection.setModal(true);
+    jdialogLogSelection.setResizable(false);
+    jdialogLogSelection.getContentPane().setLayout(new java.awt.GridLayout(2, 0));
+
+    jbuttonCreateNewLog.setText("New log");
+    jbuttonCreateNewLog.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jbuttonCreateNewLogActionPerformed(evt);
+      }
+    });
+    jdialogLogSelection.getContentPane().add(jbuttonCreateNewLog);
+
+    jbuttonOpenExistingLog.setText("Existing log");
+    jdialogLogSelection.getContentPane().add(jbuttonOpenExistingLog);
+
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("LZ log by LZ1ABC");
     addWindowListener(new java.awt.event.WindowAdapter()
@@ -878,7 +900,6 @@ public class MainWindow extends javax.swing.JFrame
     intframeIncomingQso.setVisible(true);
 
     jtableIncomingQso.setFont(new java.awt.Font("Liberation Mono", 0, 18)); // NOI18N
-    jtableIncomingQso.setModel(incomingQsoTableModel);
     jtableIncomingQso.setRowHeight(30);
     jtableIncomingQso.addMouseListener(new java.awt.event.MouseAdapter()
     {
@@ -901,7 +922,6 @@ public class MainWindow extends javax.swing.JFrame
     intframeBandmap.setVisible(true);
     intframeBandmap.getContentPane().setLayout(new java.awt.GridBagLayout());
 
-    jtableBandmap.setModel(bandmapQsoTableModel);
     jtableBandmap.setCellSelectionEnabled(true);
     jtableBandmap.addMouseListener(new java.awt.event.MouseAdapter()
     {
@@ -1047,7 +1067,6 @@ public class MainWindow extends javax.swing.JFrame
     jScrollPane1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
     jtableLog.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-    jtableLog.setModel(qsoTableModel);
     jtableLog.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
     jScrollPane1.setViewportView(jtableLog);
 
@@ -1085,44 +1104,6 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
     intframeLog.getContentPane().add(jpanelCompleteLog, gridBagConstraints);
-
-    jpanelSearchLog.setLayout(new java.awt.GridBagLayout());
-
-    jScrollPane3.setBorder(javax.swing.BorderFactory.createTitledBorder("Search results"));
-    jScrollPane3.setToolTipText("");
-
-    jtableSearch.setModel(new javax.swing.table.DefaultTableModel(
-      new Object [][]
-      {
-        {null, null, null, null},
-        {null, null, null, null},
-        {null, null, null, null},
-        {null, null, null, null}
-      },
-      new String []
-      {
-        "Title 1", "Title 2", "Title 3", "Title 4"
-      }
-    ));
-    jScrollPane3.setViewportView(jtableSearch);
-
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 0.3;
-    gridBagConstraints.weighty = 0.3;
-    jpanelSearchLog.add(jScrollPane3, gridBagConstraints);
-
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 0.4;
-    intframeLog.getContentPane().add(jpanelSearchLog, gridBagConstraints);
 
     jDesktopPane1.add(intframeLog);
     intframeLog.setBounds(30, 130, 410, 590);
@@ -1256,6 +1237,7 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 1.0;
     intframeEntry.getContentPane().add(jpanelCallsign, gridBagConstraints);
 
+    jpanelTypeOfWork.setMinimumSize(new java.awt.Dimension(0, 25));
     jpanelTypeOfWork.setLayout(new java.awt.GridBagLayout());
 
     buttonGroupTypeOfWork.add(jradiobuttonCQ);
@@ -1328,6 +1310,9 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 1.0;
     intframeEntry.getContentPane().add(jpanelTypeOfWork, gridBagConstraints);
 
+    jpanelFunctionKeys.setMinimumSize(new java.awt.Dimension(0, 80));
+    jpanelFunctionKeys.setName(""); // NOI18N
+    jpanelFunctionKeys.setPreferredSize(new java.awt.Dimension(100, 75));
     jpanelFunctionKeys.setLayout(new java.awt.GridLayout(3, 0));
 
     jButton1.setText("F1 CQ");
@@ -1482,9 +1467,10 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.weighty = 0.4;
     intframeEntry.getContentPane().add(jpanelFunctionKeys, gridBagConstraints);
 
+    jPanelStatusBar.setMinimumSize(new java.awt.Dimension(0, 22));
     jPanelStatusBar.setLayout(new java.awt.GridBagLayout());
 
     jlabelCallsignStatus.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
@@ -1507,16 +1493,6 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.weighty = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(5, 0, 10, 0);
     intframeEntry.getContentPane().add(jPanelStatusBar, gridBagConstraints);
-
-    jpanelAdditionalKeys.setLayout(new java.awt.GridBagLayout());
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 4;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    intframeEntry.getContentPane().add(jpanelAdditionalKeys, gridBagConstraints);
 
     jDesktopPane1.add(intframeEntry);
     intframeEntry.setBounds(280, 20, 453, 227);
@@ -1791,7 +1767,7 @@ public class MainWindow extends javax.swing.JFrame
     if(selection >= 0)
     {
       selection = jtableLog.convertRowIndexToModel(selection);
-      qsoTableModel.removeRow(selection);
+      logTableModel.removeRow(selection);
       initEntryFields(); // We need to update the Snt field in case we deleted the last contact
     }
     else
@@ -1896,8 +1872,8 @@ public class MainWindow extends javax.swing.JFrame
 
   private void jtableIncomingQsoMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jtableIncomingQsoMouseClicked
   {//GEN-HEADEREND:event_jtableIncomingQsoMouseClicked
-    if (evt.getClickCount() == 2)
-    {
+    //if (evt.getClickCount() == 2)
+    //{
       JTable target = (JTable) evt.getSource();
       int row = target.getSelectedRow();
       String callsign;
@@ -1926,7 +1902,7 @@ public class MainWindow extends javax.swing.JFrame
       {
         Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
       }
-    }
+    //}
     
     // Return focus to callsign field
     jtextfieldCallsign.requestFocus();
@@ -1934,8 +1910,8 @@ public class MainWindow extends javax.swing.JFrame
 
   private void jtableBandmapMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jtableBandmapMouseClicked
   {//GEN-HEADEREND:event_jtableBandmapMouseClicked
-    if (evt.getClickCount() == 2)
-    {
+    //if (evt.getClickCount() == 2)
+    //{
       JTable target = (JTable) evt.getSource();
       int row = target.getSelectedRow();
       int col = target.getSelectedColumn();
@@ -1953,7 +1929,7 @@ public class MainWindow extends javax.swing.JFrame
           Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
       }
-    }
+    //}
 
     // Return focus to callsign field
     jtextfieldCallsign.requestFocus();
@@ -2068,6 +2044,12 @@ public class MainWindow extends javax.swing.JFrame
       jbuttonSetCqFreq.setEnabled(false);
     }
   }//GEN-LAST:event_jcheckboxF1jumpsToCqStateChanged
+
+  private void jbuttonCreateNewLogActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbuttonCreateNewLogActionPerformed
+  {//GEN-HEADEREND:event_jbuttonCreateNewLogActionPerformed
+    if(openExistingLog())
+      jdialogLogSelection.dispose();
+  }//GEN-LAST:event_jbuttonCreateNewLogActionPerformed
   
   
   /**
@@ -2196,7 +2178,7 @@ public class MainWindow extends javax.swing.JFrame
       return false;
     }
 
-    qsoTableModel.addRow(qso);
+    logTableModel.addRow(qso);
     return true;
   }
 
@@ -2769,6 +2751,34 @@ public class MainWindow extends javax.swing.JFrame
     });
   }
 
+  
+  
+  private boolean openExistingLog()
+  {
+    JFileChooser fc = new JFileChooser();
+    fc.setFileFilter(new FileNameExtensionFilter("Log database files", "db4o"));
+    fc.setCurrentDirectory(new File(System.getProperty("user.dir") + "/src/main/pyrig"));
+    try
+    {
+      int returnVal = fc.showOpenDialog(this.getParent());
+      if (returnVal != JFileChooser.APPROVE_OPTION)
+      {
+        return false;
+      }
+    }
+    catch (Exception exc)
+    {
+      logger.log(Level.SEVERE, "Coudln't start file chooser", exc);
+      return false;
+    }
+    
+    logDbFile = fc.getSelectedFile().getName();
+    
+    return true;
+  }
+
+  
+  
   private class MyDispatcher implements KeyEventDispatcher
   {
 
@@ -3031,12 +3041,13 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JPanel jPanelStatusBar;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JScrollPane jScrollPane2;
-  private javax.swing.JScrollPane jScrollPane3;
   private javax.swing.JScrollPane jScrollPane4;
   private javax.swing.JScrollPane jScrollPane5;
   private javax.swing.JTextField jTextField1;
+  private javax.swing.JButton jbuttonCreateNewLog;
   private javax.swing.JButton jbuttonDeleteEntry;
   private javax.swing.JButton jbuttonJumpToCqFreq;
+  private javax.swing.JButton jbuttonOpenExistingLog;
   private javax.swing.JButton jbuttonSetCqFreq;
   private javax.swing.JCheckBox jcheckboxContinuousCq;
   private javax.swing.JCheckBox jcheckboxF1jumpsToCq;
@@ -3045,17 +3056,16 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JComboBox jcomboboxMode;
   private javax.swing.JComboBox<String> jcomboboxRowCount;
   private javax.swing.JComboBox<String> jcomboboxStepInHz;
+  private javax.swing.JDialog jdialogLogSelection;
   private javax.swing.JLabel jlabelBandmapFreeSpace;
   private javax.swing.JLabel jlabelCallsignStatus;
   private javax.swing.JLabel jlabelCqFreq;
   private javax.swing.JMenuItem jmenuFonts;
   private javax.swing.JMenuItem jmenuSettings;
-  private javax.swing.JPanel jpanelAdditionalKeys;
   private javax.swing.JPanel jpanelCallsign;
   private javax.swing.JPanel jpanelCompleteLog;
   private javax.swing.JPanel jpanelCqSettings;
   private javax.swing.JPanel jpanelFunctionKeys;
-  private javax.swing.JPanel jpanelSearchLog;
   private javax.swing.JPanel jpanelTypeOfWork;
   private javax.swing.JPanel jpanelVfoA;
   private javax.swing.JRadioButton jradiobuttonCQ;
@@ -3063,7 +3073,6 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JTable jtableBandmap;
   private javax.swing.JTable jtableIncomingQso;
   private javax.swing.JTable jtableLog;
-  private javax.swing.JTable jtableSearch;
   private javax.swing.JTextField jtextfieldCallsign;
   private javax.swing.JTextField jtextfieldContinuousCqPeriod;
   private javax.swing.JTextField jtextfieldFrequency;
