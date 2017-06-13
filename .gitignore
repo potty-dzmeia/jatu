@@ -6,5 +6,5 @@
 *.pyc
 *.class
 *.db4o
-nbactions.xml
-settings.properties
+/nbactions.xml
+/settings.properties
