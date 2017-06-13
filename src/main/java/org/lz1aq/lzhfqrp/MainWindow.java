@@ -89,7 +89,7 @@ public class MainWindow extends javax.swing.JFrame
           
   private DocumentFilter                callsignFilter = new UppercaseDocumentFilter();
   private DocumentFilter                serialNumberFilter = new SerialNumberDocumentFilter();
-  private final JFileChooser            chooser;
+  private JFileChooser            chooser;
   
   
   
@@ -166,11 +166,6 @@ public class MainWindow extends javax.swing.JFrame
     ((AbstractDocument) jtextfieldRcv.getDocument()).setDocumentFilter(serialNumberFilter);
     
     
-    // Configure the FileChooser for python files
-    chooser = new JFileChooser();
-    chooser.setFileFilter(new FileNameExtensionFilter("Python files", "py"));
-    chooser.setCurrentDirectory(new File(System.getProperty("user.dir")+"/src/main/pyrig"));
-
     // Needed so that jTable to scroll automatically upon entering a new Qso
     jtableLog.addComponentListener(new ComponentAdapter()
     {
@@ -187,7 +182,7 @@ public class MainWindow extends javax.swing.JFrame
     jtextfieldSnt.addFocusListener(highlighter);
     jtextfieldRcv.addFocusListener(highlighter);
 
-    // Start a one second timer
+    // Start a 1sec timer
     timer1sec = new Timer(1000, timer1secListener);
     timer1sec.setRepeats(true);
     timer1sec.start();
@@ -2187,6 +2182,11 @@ public class MainWindow extends javax.swing.JFrame
   {
     try
     {
+        // Configure the FileChooser for python files
+      chooser = new JFileChooser();
+      chooser.setFileFilter(new FileNameExtensionFilter("Python files (*.py)", "py"));
+      chooser.setCurrentDirectory(Paths.get(pathToWorkingDir,"/pyrig").toFile());
+
       int returnVal = chooser.showOpenDialog(this.getParent());
       if (returnVal != JFileChooser.APPROVE_OPTION)
         return false;
@@ -2835,8 +2835,8 @@ public class MainWindow extends javax.swing.JFrame
 
   
   /**
-   * Will return true if new db4o log file can be created. The log file absolute path will be 
-   * written in logDbFile.
+   * Will return true if new db4o log file can be created. Theabsolute path 
+   * for the log file will be written in logDbFile.
    * 
    * @return true in case the db4o file can be created
    */
@@ -2859,14 +2859,12 @@ public class MainWindow extends javax.swing.JFrame
       return false;
     }
     
-    logDbFile = fc.getSelectedFile().getName();
+    logDbFile = fc.getSelectedFile().getAbsolutePath();
     if(!logDbFile.endsWith(".db4o"))
     {
       logDbFile = logDbFile+".db4o";
     }
         
-    logDbFile = Paths.get(pathToWorkingDir, "/logs/",logDbFile).toString();
-    
     File file = new File(logDbFile);
     
     if(file.exists())
