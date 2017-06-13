@@ -32,9 +32,12 @@ import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -82,6 +85,7 @@ public class MainWindow extends javax.swing.JFrame
   private Timer                         timerContinuousCq;
   private FontChooser                   fontchooser = new FontChooser();
   private String                        logDbFile;
+  private String                        pathToWorkingDir; // where the jar file is located
           
   private DocumentFilter                callsignFilter = new UppercaseDocumentFilter();
   private DocumentFilter                serialNumberFilter = new SerialNumberDocumentFilter();
@@ -93,8 +97,26 @@ public class MainWindow extends javax.swing.JFrame
   /**
    * Creates new form MainWindow
    */
+  
+  private void determineWorkingDir()
+  {
+    File file = new File(".");
+		String currentDirectory = file.getAbsolutePath();
+    currentDirectory = currentDirectory.substring(0, currentDirectory.length()-1);
+    pathToWorkingDir = Paths.get(currentDirectory).toString();
+    System.out.println("Current working directory is: " + pathToWorkingDir); 
+  }
   public MainWindow()
   { 
+    determineWorkingDir();
+    
+    // Create directory for logs if not existing
+    File directory = new File(Paths.get(pathToWorkingDir, "/logs").toString());
+    if (! directory.exists())
+    {
+        directory.mkdir();
+    }
+    
     // Load user settings from the properties file
     this.applicationSettings = new ApplicationSettings();
     
@@ -102,7 +124,10 @@ public class MainWindow extends javax.swing.JFrame
     initComponents();
     
     // Show dialog for opening New/Existing log - result will be kept in logDbFile
-    jdialogLogSelection.setVisible(true);
+    if(((LogSelectionDialog)jdialogLogSelection).showDialog())
+    {
+      System.exit(0); // Close program if Showdialog tells us to do so
+    }
     
     // Open log database
     try
@@ -234,6 +259,19 @@ public class MainWindow extends javax.swing.JFrame
   private DefaultComboBoxModel getBandmapRowCountComboboxModel()
   {
     return new DefaultComboBoxModel(new String[] { "4", "8", "12", "16", "20", "24", "28", "32","36","40", "44", "48","52", "56","60", "64", "68"});
+  }
+  
+  
+  
+  private class LogSelectionDialog extends JDialog
+  {
+    public boolean isProgramTerminated = false;
+
+    public boolean showDialog()
+    {
+      this.setVisible(true);
+      return isProgramTerminated;
+    }
   }
   
   
@@ -385,7 +423,7 @@ public class MainWindow extends javax.swing.JFrame
     jButton17 = new javax.swing.JButton();
     jButton18 = new javax.swing.JButton();
     jButton19 = new javax.swing.JButton();
-    jdialogLogSelection = new javax.swing.JDialog();
+    jdialogLogSelection = new LogSelectionDialog();
     jbuttonCreateNewLog = new javax.swing.JButton();
     jbuttonOpenExistingLog = new javax.swing.JButton();
     jDesktopPane1 = new javax.swing.JDesktopPane();
@@ -396,9 +434,9 @@ public class MainWindow extends javax.swing.JFrame
     jScrollPane5 = new javax.swing.JScrollPane();
     jtableBandmap = new javax.swing.JTable();
     jPanel8 = new javax.swing.JPanel();
-    jcomboboxStepInHz = new javax.swing.JComboBox<String>();
-    jcomboboxColumnCount = new javax.swing.JComboBox<String>();
-    jcomboboxRowCount = new javax.swing.JComboBox<String>();
+    jcomboboxStepInHz = new javax.swing.JComboBox<>();
+    jcomboboxColumnCount = new javax.swing.JComboBox<>();
+    jcomboboxRowCount = new javax.swing.JComboBox<>();
     jlabelBandmapFreeSpace = new javax.swing.JLabel();
     jLabel13 = new javax.swing.JLabel();
     jLabel14 = new javax.swing.JLabel();
@@ -862,6 +900,13 @@ public class MainWindow extends javax.swing.JFrame
     jdialogLogSelection.setMinimumSize(new java.awt.Dimension(300, 200));
     jdialogLogSelection.setModal(true);
     jdialogLogSelection.setResizable(false);
+    jdialogLogSelection.addWindowListener(new java.awt.event.WindowAdapter()
+    {
+      public void windowClosing(java.awt.event.WindowEvent evt)
+      {
+        jdialogLogSelectionWindowClosing(evt);
+      }
+    });
     jdialogLogSelection.getContentPane().setLayout(new java.awt.GridLayout(2, 0));
 
     jbuttonCreateNewLog.setText("New log");
@@ -875,6 +920,13 @@ public class MainWindow extends javax.swing.JFrame
     jdialogLogSelection.getContentPane().add(jbuttonCreateNewLog);
 
     jbuttonOpenExistingLog.setText("Existing log");
+    jbuttonOpenExistingLog.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jbuttonOpenExistingLogActionPerformed(evt);
+      }
+    });
     jdialogLogSelection.getContentPane().add(jbuttonOpenExistingLog);
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -913,7 +965,7 @@ public class MainWindow extends javax.swing.JFrame
     intframeIncomingQso.getContentPane().add(jScrollPane2, java.awt.BorderLayout.CENTER);
 
     jDesktopPane1.add(intframeIncomingQso);
-    intframeIncomingQso.setBounds(490, 10, 463, 435);
+    intframeIncomingQso.setBounds(490, 10, 460, 435);
 
     intframeBandmap.setIconifiable(true);
     intframeBandmap.setMaximizable(true);
@@ -1052,7 +1104,7 @@ public class MainWindow extends javax.swing.JFrame
     intframeBandmap.getContentPane().add(jPanel8, gridBagConstraints);
 
     jDesktopPane1.add(intframeBandmap);
-    intframeBandmap.setBounds(500, 520, 463, 459);
+    intframeBandmap.setBounds(500, 520, 460, 459);
 
     intframeLog.setIconifiable(true);
     intframeLog.setMaximizable(true);
@@ -1169,7 +1221,7 @@ public class MainWindow extends javax.swing.JFrame
     intframeRadio.getContentPane().add(jpanelVfoA, java.awt.BorderLayout.CENTER);
 
     jDesktopPane1.add(intframeRadio);
-    intframeRadio.setBounds(30, 20, 277, 69);
+    intframeRadio.setBounds(30, 20, 249, 68);
 
     intframeEntry.setIconifiable(true);
     intframeEntry.setMaximizable(true);
@@ -1495,7 +1547,7 @@ public class MainWindow extends javax.swing.JFrame
     intframeEntry.getContentPane().add(jPanelStatusBar, gridBagConstraints);
 
     jDesktopPane1.add(intframeEntry);
-    intframeEntry.setBounds(280, 20, 453, 227);
+    intframeEntry.setBounds(280, 20, 453, 230);
 
     intframeSettings.setIconifiable(true);
     intframeSettings.setMaximizable(true);
@@ -2047,9 +2099,19 @@ public class MainWindow extends javax.swing.JFrame
 
   private void jbuttonCreateNewLogActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbuttonCreateNewLogActionPerformed
   {//GEN-HEADEREND:event_jbuttonCreateNewLogActionPerformed
+    
+  }//GEN-LAST:event_jbuttonCreateNewLogActionPerformed
+
+  private void jdialogLogSelectionWindowClosing(java.awt.event.WindowEvent evt)//GEN-FIRST:event_jdialogLogSelectionWindowClosing
+  {//GEN-HEADEREND:event_jdialogLogSelectionWindowClosing
+    ((LogSelectionDialog)jdialogLogSelection).isProgramTerminated = true;
+  }//GEN-LAST:event_jdialogLogSelectionWindowClosing
+
+  private void jbuttonOpenExistingLogActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbuttonOpenExistingLogActionPerformed
+  {//GEN-HEADEREND:event_jbuttonOpenExistingLogActionPerformed
     if(openExistingLog())
       jdialogLogSelection.dispose();
-  }//GEN-LAST:event_jbuttonCreateNewLogActionPerformed
+  }//GEN-LAST:event_jbuttonOpenExistingLogActionPerformed
   
   
   /**
@@ -2757,24 +2819,25 @@ public class MainWindow extends javax.swing.JFrame
   {
     JFileChooser fc = new JFileChooser();
     fc.setFileFilter(new FileNameExtensionFilter("Log database files", "db4o"));
-    fc.setCurrentDirectory(new File(System.getProperty("user.dir") + "/src/main/pyrig"));
+    fc.setCurrentDirectory(Paths.get(pathToWorkingDir, "/logs/").toFile());
     try
     {
       int returnVal = fc.showOpenDialog(this.getParent());
       if (returnVal != JFileChooser.APPROVE_OPTION)
       {
         return false;
-      }
+      } 
     }
     catch (Exception exc)
     {
-      logger.log(Level.SEVERE, "Coudln't start file chooser", exc);
+      JOptionPane.showMessageDialog(null, "Error when trying to acquire log database file.", "Error", JOptionPane.ERROR_MESSAGE);
       return false;
     }
     
     logDbFile = fc.getSelectedFile().getName();
+    File file = new File(logDbFile);
     
-    return true;
+    return file.exists();
   }
 
   
