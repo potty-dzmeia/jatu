@@ -231,6 +231,23 @@ public class RadioController
     }
   }
   
+  public void setKeyerSpeed(int speed)
+  {
+    if (!isConnected())
+      return;
+    
+    try
+    {
+      radio.setKeyerSpeed(speed);
+    }
+    catch (Exception ex)
+    {
+      Logger.getLogger(RadioController.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    
+  }
+  
+  
   public void interruptMorseSending()
   {
     if (!isConnected())

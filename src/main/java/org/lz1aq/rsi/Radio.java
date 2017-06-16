@@ -231,6 +231,11 @@ public class Radio
   }
   
   
+  public void setKeyerSpeed(int speed) throws Exception
+  {
+    this.queueTransactions(radioProtocolParser.encodeSetKeyerSpeed(speed));
+  }
+  
   /**
    * Interrupts the sending of morse code which was initiated by the SendCW() command
    * @throws Exception 

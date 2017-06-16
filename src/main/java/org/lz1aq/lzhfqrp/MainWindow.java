@@ -2250,7 +2250,7 @@ public class MainWindow extends javax.swing.JFrame
       return;
     
     keyerSpeed++;
-    //radioController.setKeyerSpeed(keyerSpeed);
+    radioController.setKeyerSpeed(keyerSpeed);
     jlabelKeyerSpeed.setText(Integer.toString(keyerSpeed)+" WPM");
   }
   
@@ -2260,7 +2260,7 @@ public class MainWindow extends javax.swing.JFrame
       return;
     
     keyerSpeed--;
-    //radioController.setKeyerSpeed(keyerSpeed);
+    radioController.setKeyerSpeed(keyerSpeed);
     jlabelKeyerSpeed.setText(Integer.toString(keyerSpeed)+" WPM");
   }
    
