@@ -32,7 +32,8 @@ import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.nio.file.Path;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,7 +68,7 @@ import org.lz1aq.utils.TimeUtils;
 public class MainWindow extends javax.swing.JFrame
 {
   static final String PROGRAM_VERSION = "1.0.0";
-  static final String PROGRAM_NAME    = "LZ Log";
+  static final String PROGRAM_NAME    = "LZ-Log";
           
   static final String TYPE_OF_WORK_SP = "SP";
   static final String TYPE_OF_WORK_CQ = "CQ";
@@ -80,6 +81,7 @@ public class MainWindow extends javax.swing.JFrame
   private final ApplicationSettings     applicationSettings;
   private final RadioController         radioController;
   private int                           cqFrequency =3500000;
+  private int                           keyerSpeed = 28;
   private final Timer                   timer1sec;
   private final Timer                   timer500ms;
   private Timer                         timerContinuousCq;
@@ -89,7 +91,6 @@ public class MainWindow extends javax.swing.JFrame
           
   private DocumentFilter                callsignFilter = new UppercaseDocumentFilter();
   private DocumentFilter                serialNumberFilter = new SerialNumberDocumentFilter();
-  private JFileChooser            chooser;
   
   
   
@@ -422,9 +423,9 @@ public class MainWindow extends javax.swing.JFrame
     jScrollPane5 = new javax.swing.JScrollPane();
     jtableBandmap = new javax.swing.JTable();
     jPanel8 = new javax.swing.JPanel();
-    jcomboboxStepInHz = new javax.swing.JComboBox<String>();
-    jcomboboxColumnCount = new javax.swing.JComboBox<String>();
-    jcomboboxRowCount = new javax.swing.JComboBox<String>();
+    jcomboboxStepInHz = new javax.swing.JComboBox<>();
+    jcomboboxColumnCount = new javax.swing.JComboBox<>();
+    jcomboboxRowCount = new javax.swing.JComboBox<>();
     jlabelBandmapFreeSpace = new javax.swing.JLabel();
     jLabel13 = new javax.swing.JLabel();
     jLabel14 = new javax.swing.JLabel();
@@ -474,8 +475,13 @@ public class MainWindow extends javax.swing.JFrame
     jcheckboxContinuousCq = new javax.swing.JCheckBox();
     jLabel16 = new javax.swing.JLabel();
     jtextfieldContinuousCqPeriod = new javax.swing.JTextField();
+    jpanelKeyerSettings = new javax.swing.JPanel();
+    jbuttonKeyerUP = new javax.swing.JButton();
+    jbuttonKeyerDown = new javax.swing.JButton();
+    jlabelKeyerSpeed = new javax.swing.JLabel();
     jMenuBar1 = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
+    jmenuGenerateCabrillo = new javax.swing.JMenuItem();
     jMenu2 = new javax.swing.JMenu();
     jmenuSettings = new javax.swing.JMenuItem();
     jmenuFonts = new javax.swing.JMenuItem();
@@ -887,7 +893,6 @@ public class MainWindow extends javax.swing.JFrame
     jdialogLogSelection.setTitle("Choose action");
     jdialogLogSelection.setMinimumSize(new java.awt.Dimension(200, 150));
     jdialogLogSelection.setModal(true);
-    jdialogLogSelection.setPreferredSize(new java.awt.Dimension(200, 150));
     jdialogLogSelection.setResizable(false);
     jdialogLogSelection.addWindowListener(new java.awt.event.WindowAdapter()
     {
@@ -931,16 +936,16 @@ public class MainWindow extends javax.swing.JFrame
     jdialogLogSelection.getContentPane().add(jbuttonOpenExistingLog, gridBagConstraints);
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-    setTitle("LZ log by LZ1ABC");
+    setTitle(PROGRAM_NAME+" by LZ1ABC");
     addWindowListener(new java.awt.event.WindowAdapter()
     {
-      public void windowOpened(java.awt.event.WindowEvent evt)
-      {
-        formWindowOpened(evt);
-      }
       public void windowClosing(java.awt.event.WindowEvent evt)
       {
         formWindowClosing(evt);
+      }
+      public void windowOpened(java.awt.event.WindowEvent evt)
+      {
+        formWindowOpened(evt);
       }
     });
 
@@ -966,7 +971,7 @@ public class MainWindow extends javax.swing.JFrame
     intframeIncomingQso.getContentPane().add(jScrollPane2, java.awt.BorderLayout.CENTER);
 
     jDesktopPane1.add(intframeIncomingQso);
-    intframeIncomingQso.setBounds(490, 10, 463, 435);
+    intframeIncomingQso.setBounds(490, 10, 460, 435);
 
     intframeBandmap.setIconifiable(true);
     intframeBandmap.setMaximizable(true);
@@ -1105,7 +1110,7 @@ public class MainWindow extends javax.swing.JFrame
     intframeBandmap.getContentPane().add(jPanel8, gridBagConstraints);
 
     jDesktopPane1.add(intframeBandmap);
-    intframeBandmap.setBounds(500, 520, 463, 459);
+    intframeBandmap.setBounds(500, 520, 460, 459);
 
     intframeLog.setIconifiable(true);
     intframeLog.setMaximizable(true);
@@ -1222,7 +1227,7 @@ public class MainWindow extends javax.swing.JFrame
     intframeRadio.getContentPane().add(jpanelVfoA, java.awt.BorderLayout.CENTER);
 
     jDesktopPane1.add(intframeRadio);
-    intframeRadio.setBounds(30, 20, 277, 69);
+    intframeRadio.setBounds(30, 20, 249, 68);
 
     intframeEntry.setIconifiable(true);
     intframeEntry.setMaximizable(true);
@@ -1548,13 +1553,14 @@ public class MainWindow extends javax.swing.JFrame
     intframeEntry.getContentPane().add(jPanelStatusBar, gridBagConstraints);
 
     jDesktopPane1.add(intframeEntry);
-    intframeEntry.setBounds(280, 20, 453, 227);
+    intframeEntry.setBounds(280, 20, 453, 230);
 
     intframeSettings.setIconifiable(true);
     intframeSettings.setMaximizable(true);
     intframeSettings.setResizable(true);
     intframeSettings.setTitle("Settings");
     intframeSettings.setVisible(true);
+    intframeSettings.getContentPane().setLayout(new java.awt.GridBagLayout());
 
     jpanelCqSettings.setBorder(javax.swing.BorderFactory.createTitledBorder("CQ settings"));
     jpanelCqSettings.setLayout(new java.awt.GridBagLayout());
@@ -1656,7 +1662,48 @@ public class MainWindow extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(1, 0, 1, 0);
     jpanelCqSettings.add(jtextfieldContinuousCqPeriod, gridBagConstraints);
 
-    intframeSettings.getContentPane().add(jpanelCqSettings, java.awt.BorderLayout.CENTER);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    intframeSettings.getContentPane().add(jpanelCqSettings, gridBagConstraints);
+
+    jpanelKeyerSettings.setBorder(javax.swing.BorderFactory.createTitledBorder("Keyer settings"));
+    jpanelKeyerSettings.setLayout(new java.awt.GridLayout());
+
+    jbuttonKeyerUP.setText("UP");
+    jbuttonKeyerUP.setToolTipText("Also the PAGE_UP key");
+    jbuttonKeyerUP.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jbuttonKeyerUPActionPerformed(evt);
+      }
+    });
+    jpanelKeyerSettings.add(jbuttonKeyerUP);
+
+    jbuttonKeyerDown.setText("DOWN");
+    jbuttonKeyerDown.setToolTipText("Also the PAGE_DOWN key");
+    jbuttonKeyerDown.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jbuttonKeyerDownActionPerformed(evt);
+      }
+    });
+    jpanelKeyerSettings.add(jbuttonKeyerDown);
+
+    jlabelKeyerSpeed.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    jlabelKeyerSpeed.setText(Integer.toString(keyerSpeed)+" WPM");
+    jpanelKeyerSettings.add(jlabelKeyerSpeed);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    intframeSettings.getContentPane().add(jpanelKeyerSettings, gridBagConstraints);
 
     jDesktopPane1.add(intframeSettings);
     intframeSettings.setBounds(400, 340, 230, 170);
@@ -1664,6 +1711,17 @@ public class MainWindow extends javax.swing.JFrame
     getContentPane().add(jDesktopPane1, java.awt.BorderLayout.CENTER);
 
     jMenu1.setText("File");
+
+    jmenuGenerateCabrillo.setText("Generate Cabrillo File");
+    jmenuGenerateCabrillo.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jmenuGenerateCabrilloActionPerformed(evt);
+      }
+    });
+    jMenu1.add(jmenuGenerateCabrillo);
+
     jMenuBar1.add(jMenu1);
 
     jMenu2.setText("Tools");
@@ -2114,8 +2172,98 @@ public class MainWindow extends javax.swing.JFrame
     if(findExistingLog())
       jdialogLogSelection.dispose();
   }//GEN-LAST:event_jbuttonOpenExistingLogActionPerformed
+
+  private void jmenuGenerateCabrilloActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jmenuGenerateCabrilloActionPerformed
+  {//GEN-HEADEREND:event_jmenuGenerateCabrilloActionPerformed
+    JFileChooser fc = new JFileChooser();
+    fc.setFileFilter(new FileNameExtensionFilter("Cabrillo files (*.log)", "log"));
+    fc.setCurrentDirectory(Paths.get(pathToWorkingDir, "/logs/").toFile());
+    try
+    {
+      int returnVal = fc.showSaveDialog(this.getParent());
+      if (returnVal != JFileChooser.APPROVE_OPTION)
+      {
+        return;
+      } 
+    }
+    catch (Exception exc)
+    {
+      JOptionPane.showMessageDialog(null, "Error when trying to acquire cabrillo file.", "Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    
+    String absPath = fc.getSelectedFile().getAbsolutePath();
+    if(!absPath.endsWith(".log"))
+    {
+      absPath = absPath+".log";
+    }
+        
+    File file = new File(absPath);
+    
+    if(file.exists())
+    {
+      JOptionPane.showMessageDialog(null, "File already exists: "+file.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    
+    // Write the cabrillo file
+    try (PrintWriter printWriter = new PrintWriter(absPath))
+    {
+      printWriter.println("START-OF-LOG: 2.0");
+      printWriter.println("CALLSIGN: " + applicationSettings.getMyCallsign());
+      printWriter.println("CONTEST: ");
+      printWriter.println("CATEGORY: ");
+      printWriter.println("CLAIMED-SCORE: ");
+      printWriter.println("OPERATORS: ");
+      printWriter.println("NAME: ");
+      printWriter.println("ADDRESS: ");
+      printWriter.println("ADDRESS: ");
+      printWriter.println("CREATED-BY: " + PROGRAM_NAME + " " + PROGRAM_VERSION);
+      for (int i = 0; i < log.getQsoCount(); i++)
+      {
+        printWriter.println(log.get(i).toStringCabrillo());
+      }
+      printWriter.println("END-OF-LOG:");
+    }
+    catch (FileNotFoundException ex)
+    {
+      JOptionPane.showMessageDialog(null, "Couldn't generate the Cabrillo file", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    
+    JOptionPane.showMessageDialog(null, "Cabrilo file created successfully.", "Success...", JOptionPane.INFORMATION_MESSAGE);
+  }//GEN-LAST:event_jmenuGenerateCabrilloActionPerformed
+
+  private void jbuttonKeyerUPActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbuttonKeyerUPActionPerformed
+  {//GEN-HEADEREND:event_jbuttonKeyerUPActionPerformed
+    increaseKeyerSpeed();
+  }//GEN-LAST:event_jbuttonKeyerUPActionPerformed
+
+  private void jbuttonKeyerDownActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbuttonKeyerDownActionPerformed
+  {//GEN-HEADEREND:event_jbuttonKeyerDownActionPerformed
+    decreaseKeyerSpeed();
+  }//GEN-LAST:event_jbuttonKeyerDownActionPerformed
   
   
+  private void increaseKeyerSpeed()
+  {        
+   if(keyerSpeed>45)
+      return;
+    
+    keyerSpeed++;
+    //radioController.setKeyerSpeed(keyerSpeed);
+    jlabelKeyerSpeed.setText(Integer.toString(keyerSpeed)+" WPM");
+  }
+  
+  private void decreaseKeyerSpeed()
+  {        
+    if(keyerSpeed<10)
+      return;
+    
+    keyerSpeed--;
+    //radioController.setKeyerSpeed(keyerSpeed);
+    jlabelKeyerSpeed.setText(Integer.toString(keyerSpeed)+" WPM");
+  }
+   
   /**
    * Sends CW message when we press the enter button inside the callsign textfield
    * 
@@ -2180,6 +2328,8 @@ public class MainWindow extends javax.swing.JFrame
    */
   private boolean loadRadioProtocolParser()
   {
+    JFileChooser chooser;
+      
     try
     {
         // Configure the FileChooser for python files
@@ -2929,46 +3079,57 @@ public class MainWindow extends javax.swing.JFrame
           pressedF1();
           evt.consume();
           break;
+          
         case KeyEvent.VK_F2:
           pressedF2();
           evt.consume();
           break;
+          
         case KeyEvent.VK_F3:
           pressedF3();
           evt.consume();
           break;
+          
         case KeyEvent.VK_F4:
           pressedF4();
           evt.consume();
           break;
+          
         case KeyEvent.VK_F5:
           pressedF5();
           evt.consume();
           break;
+          
         case KeyEvent.VK_F6:
           pressedF6();
           evt.consume();
           break;
+          
         case KeyEvent.VK_F7:
           pressedF7();
           evt.consume();
           break;
+          
         case KeyEvent.VK_F8:
           pressedF8();
           evt.consume();
           break;
+          
         case KeyEvent.VK_F9:
           pressedF9();
           evt.consume();
           break;
+          
 //        case KeyEvent.VK_F10:
 //          pressedF10();
 //          evt.consume();
 //          break;
+          
         case KeyEvent.VK_F11:
           pressedF11();
           evt.consume();
           break;
+          
         case KeyEvent.VK_W:
           if(evt.isControlDown() || evt.isAltDown())
           {
@@ -2977,10 +3138,22 @@ public class MainWindow extends javax.swing.JFrame
             break;
           }
           break;
+          
         case KeyEvent.VK_F12:
           pressedF12();
           evt.consume();
           break;
+          
+        case KeyEvent.VK_PAGE_UP:
+          increaseKeyerSpeed();
+          evt.consume();
+          break;
+         
+        case KeyEvent.VK_PAGE_DOWN:
+          decreaseKeyerSpeed();
+          evt.consume();
+          break;
+          
         case KeyEvent.VK_ESCAPE:
           pressedEsc();
           break;
@@ -3181,6 +3354,8 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JButton jbuttonCreateNewLog;
   private javax.swing.JButton jbuttonDeleteEntry;
   private javax.swing.JButton jbuttonJumpToCqFreq;
+  private javax.swing.JButton jbuttonKeyerDown;
+  private javax.swing.JButton jbuttonKeyerUP;
   private javax.swing.JButton jbuttonOpenExistingLog;
   private javax.swing.JButton jbuttonSetCqFreq;
   private javax.swing.JCheckBox jcheckboxContinuousCq;
@@ -3194,12 +3369,15 @@ public class MainWindow extends javax.swing.JFrame
   private javax.swing.JLabel jlabelBandmapFreeSpace;
   private javax.swing.JLabel jlabelCallsignStatus;
   private javax.swing.JLabel jlabelCqFreq;
+  private javax.swing.JLabel jlabelKeyerSpeed;
   private javax.swing.JMenuItem jmenuFonts;
+  private javax.swing.JMenuItem jmenuGenerateCabrillo;
   private javax.swing.JMenuItem jmenuSettings;
   private javax.swing.JPanel jpanelCallsign;
   private javax.swing.JPanel jpanelCompleteLog;
   private javax.swing.JPanel jpanelCqSettings;
   private javax.swing.JPanel jpanelFunctionKeys;
+  private javax.swing.JPanel jpanelKeyerSettings;
   private javax.swing.JPanel jpanelTypeOfWork;
   private javax.swing.JPanel jpanelVfoA;
   private javax.swing.JRadioButton jradiobuttonCQ;

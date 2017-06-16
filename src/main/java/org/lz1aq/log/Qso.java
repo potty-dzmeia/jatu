@@ -20,6 +20,7 @@
 package org.lz1aq.log;
 
 import java.util.ArrayList;
+import java.util.Formatter;
 import org.joda.time.DateTime;
 import org.lz1aq.utils.TimeUtils;
 
@@ -189,6 +190,28 @@ public class Qso
     return str.toString();
   }
   
+  
+   /**
+   * Returns the Qso in Cabrillo format. Example:
+   * QSO:  3545 CW 2016-08-20 0802 LZ0AA         004 003       LZ0AZ         004 004 
+   * @return Cabrillo formatted Qso string
+   */
+  public synchronized String toStringCabrillo()
+  {
+    StringBuilder sbuf = new StringBuilder();
+    Formatter fmt = new Formatter(sbuf);
+    
+    fmt.format("QSO: %5s", getFrequency().substring(0, getFrequency().length()-3));
+    fmt.format(" %s", getModeCabrilloStyle());
+    fmt.format(" %s", getDate());
+    fmt.format(" %s", getTime());
+    fmt.format(" %-13s", getMyCallsign());
+    fmt.format(" %-13s", getSntWithExtraSpace());
+    fmt.format(" %-13s", getHisCallsign());
+    fmt.format(" %-13s", getRcvWithExtraSpace());
+    
+    return sbuf.toString();
+  }
 
   /**
    * @return The count of the total Qso parameters
@@ -225,13 +248,16 @@ public class Qso
 
   
   /**
-   * @return Frequency on Hz
+   * @return Frequency in Hz
    */
   public synchronized String getFrequency()
   {
     return qsoParams.get(FREQ_INDEX).value;
   }
   
+  /**
+   * @return Frequency in Hz
+   */
   public synchronized int getFrequencyInt()
   {
     return Integer.parseInt(qsoParams.get(FREQ_INDEX).value);
@@ -246,6 +272,19 @@ public class Qso
     return qsoParams.get(MODE_INDEX).value;
   }
 
+  /**
+   * @return Returns "PH" or "CW"
+   */
+  public synchronized String getModeCabrilloStyle()
+  {
+    if(qsoParams.get(MODE_INDEX).value.equals("LSB")||
+       qsoParams.get(MODE_INDEX).value.equals("USB")||
+       qsoParams.get(MODE_INDEX).value.equals("SSB")||
+       qsoParams.get(MODE_INDEX).value.equals("PH")   )
+      return "PH";
+    else 
+      return "CW";
+  }
   
   public synchronized String getMyCallsign()
   {
@@ -268,6 +307,15 @@ public class Qso
     return qsoParams.get(SNT_INDEX).value;
   }
   
+  public synchronized String getSntWithExtraSpace()
+  {
+    StringBuilder buf = new StringBuilder();
+    buf.append(qsoParams.get(SNT_INDEX).value.substring(0, 3));
+    buf.append(" ");
+    buf.append(qsoParams.get(SNT_INDEX).value.substring(3, 6));
+    return buf.toString();
+  }
+  
   
   /**
    * Gets the "Rcv" parameter of the Qso
@@ -278,6 +326,15 @@ public class Qso
     return qsoParams.get(RCV_INDEX).value;
   }
   
+  
+  public synchronized String getRcvWithExtraSpace()
+  {
+    StringBuilder buf = new StringBuilder();
+    buf.append(qsoParams.get(RCV_INDEX).value.substring(0, 3));
+    buf.append(" ");
+    buf.append(qsoParams.get(RCV_INDEX).value.substring(3, 6));
+    return buf.toString();
+  }
   
   /**
    *  The Type of work during which the QSO was made (CQ or SP)
@@ -304,6 +361,7 @@ public class Qso
     return qsoParams.get(parameterIndex).value = value;
   }
 
+  
   /**
    * For accessing qso parameters.
    *

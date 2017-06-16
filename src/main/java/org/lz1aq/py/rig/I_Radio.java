@@ -88,7 +88,7 @@ public interface I_Radio extends I_Rig
    * @return array of Transactions which are to be sent to the radio.
    */
   public I_EncodedTransaction[] encodeGetMode(int vfo);
-  
+ 
   
   /**
    * Gets the command with which we can the the radio to send us the currently active VFO
@@ -110,4 +110,14 @@ public interface I_Radio extends I_Rig
    * @return - array of Transactions which are to be sent to the radio.
    */
   public I_EncodedTransaction[] encodeInterruptSendCW();
+  
+  
+  /**
+   * Gets the command(s) with which we can tell the radio to set the speed of the CW
+   * transmission.
+   *
+   * @param keyerSpeed - the desired speed 
+   * @return array of Transactions which are to be sent to the radio.
+   */
+  public I_EncodedTransaction[] encodeSetKeyerSpeed(int keyerSpeed);
 }

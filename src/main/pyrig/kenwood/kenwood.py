@@ -227,6 +227,22 @@ class Kenwood(Radio):
 
 
     @classmethod
+    def encodeSetKeyerSpeed(cls, keyerSpeed):
+        """
+        Gets the command(s) with which we can tell the radio to set the speed of the CW transmission.
+
+        :param keyerSpeed: The desired speed that we would like to set
+        :type keyerSpeed: int
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
+        """
+        result = "KS{0:03d};".format(keyerSpeed)
+
+        logger.debug("returns: {0}".format(result))
+        return list([EncodedTransaction(result)])
+
+
+    @classmethod
     def encodeInterruptSendCW(cls):
         """
         Gets the command with which we can tell the radio to stop sending morse code
@@ -234,6 +250,7 @@ class Kenwood(Radio):
         """
         result = "KY0;"
         return list([EncodedTransaction(result)])
+
 
     @classmethod
     def encodeGetActiveVfo(cls):

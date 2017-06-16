@@ -106,6 +106,7 @@ class Radio(I_Radio):
         """
         raise NotImplementedError("encode_SetFreq")
 
+
     @classmethod
     def encodeSendCW(cls, text):
         """
@@ -118,6 +119,20 @@ class Radio(I_Radio):
         """
 
         raise NotImplementedError("encodeSendCW")
+
+
+    @classmethod
+    def encodeSetKeyerSpeed(cls, keyerSpeed):
+        """
+        Gets the command(s) with which we can tell the radio to set the speed of the CW transmission.
+
+        :param keyerSpeed: The desired speed that we would like to set
+        :type keyerSpeed: int
+        :return: Object containing transaction with some additional control settings
+        :rtype: EncodedTransaction
+        """
+        raise NotImplementedError("encode_SetFreq")
+
 
     @classmethod
     def encodeInterruptSendCW(cls):
